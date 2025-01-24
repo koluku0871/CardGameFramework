@@ -1,0 +1,16 @@
+.vsconfig
+*.csproj
+.vs/
+*.meta
+Library/
+*.asset
+.vscode/settings.json
+*.sln
+*.zip
+Windows/BSCardGame_Data/deck/
+Assets/Resources/DB/Img/
+Windows/BSCardGame_Data/card/
+Logs/
+Windows_main/
+Windows/
+obj/

@@ -11,24 +11,8 @@ public class HomeSceneManager : MonoBehaviour
     [SerializeField]
     private TMPro.TMP_InputField m_nameInputField = null;
 
-    [SerializeField]
-    private FadeManager m_fadeManager = null;
-
-    [SerializeField]
-    private GameObject m_audioManager = null;
-
     private void Start()
     {
-        if (FadeManager.Instance() == null)
-        {
-            Instantiate(m_fadeManager);
-        }
-
-        if (AudioSourceManager.Instance() == null)
-        {
-            Instantiate(m_audioManager);
-        }
-
         AudioSourceManager.Instance().PlayOneShot((int)AudioSourceManager.BGM_NUM.HOME_1, true);
 
         var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;

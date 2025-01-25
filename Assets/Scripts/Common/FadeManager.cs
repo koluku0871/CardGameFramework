@@ -20,7 +20,7 @@ public class FadeManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    public void OnStart(string sceneName, bool isAsync = true)
+    public void OnStart(string sceneName, bool isAsync = false)
     {
         if (isAsync)
         {

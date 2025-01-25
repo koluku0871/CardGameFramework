@@ -20,9 +20,15 @@ public class FadeManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    public void OnStart(string sceneName)
+    public void OnStart(string sceneName, bool isAsync = true)
     {
-        StartCoroutine(LoadSceneAsync(sceneName));
+        if (isAsync)
+        {
+            StartCoroutine(LoadSceneAsync(sceneName));
+            return;
+        }
+
+        SceneManager.LoadScene(sceneName);
     }
 
     IEnumerator LoadSceneAsync(string sceneName)

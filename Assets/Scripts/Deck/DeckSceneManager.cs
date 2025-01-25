@@ -61,7 +61,6 @@ public class DeckSceneManager : MonoBehaviour
 
     private CardDownLoadManager m_cardDownLoadManager = null;
     private DeckManager m_deckManager = null;
-    private DeckDownLoadManager m_deckDownLoadManager = null;
 
     private List<CardData> cardDatas = new List<CardData>();
     public CardData GetCardDatas(int index)
@@ -91,20 +90,12 @@ public class DeckSceneManager : MonoBehaviour
 
         m_cardDownLoadManager = CardDownLoadManager.Instance();
         m_deckManager = DeckManager.Instance();
-        m_deckDownLoadManager = DeckDownLoadManager.Instance();
 
-        m_closeButton.interactable = false;
-        m_downloadButton.interactable = false;
-        m_createSharpnessButton.interactable = false;
-        m_downloadDeckButton.interactable = false;
-        StartCoroutine(m_cardDownLoadManager.LocalLoadTexture(() =>
-        {
-            DownLoadCallback();
-            m_closeButton.interactable = true;
-            m_downloadButton.interactable = true;
-            m_createSharpnessButton.interactable = true;
-            m_downloadDeckButton.interactable = true;
-        }));
+        DownLoadCallback();
+        m_closeButton.interactable = true;
+        m_downloadButton.interactable = true;
+        m_createSharpnessButton.interactable = true;
+        m_downloadDeckButton.interactable = true;
     }
 
     public Dropdown GetDeckSelectDropdown()
@@ -140,55 +131,6 @@ public class DeckSceneManager : MonoBehaviour
     public void OnClickToCloseButton()
     {
         FadeManager.Instance().OnStart("HomeScene");
-    }
-
-    public void OnClickToDownLoadButton()
-    {
-        m_closeButton.interactable = false;
-        m_downloadButton.interactable = false;
-        m_createSharpnessButton.interactable = false;
-        m_downloadDeckButton.interactable = false;
-        StartCoroutine(m_cardDownLoadManager.DownLoadTexture(() =>
-        {
-            DownLoadCallback();
-            m_closeButton.interactable = true;
-            m_downloadButton.interactable = true;
-            m_createSharpnessButton.interactable = true;
-            m_downloadDeckButton.interactable = true;
-        }));
-    }
-
-    public void OnClickToCreateSharpnessButton()
-    {
-        m_closeButton.interactable = false;
-        m_downloadButton.interactable = false;
-        m_createSharpnessButton.interactable = false;
-        m_downloadDeckButton.interactable = false;
-        StartCoroutine(m_cardDownLoadManager.CreateSharpnessTexture(() =>
-        {
-            DownLoadCallback();
-            m_closeButton.interactable = true;
-            m_downloadButton.interactable = true;
-            m_createSharpnessButton.interactable = true;
-            m_downloadDeckButton.interactable = true;
-        }));
-    }
-
-    public void OnClickToDeckDownLoadButton()
-    {
-        m_closeButton.interactable = false;
-        m_downloadButton.interactable = false;
-        m_createSharpnessButton.interactable = false;
-        m_downloadDeckButton.interactable = false;
-        string url = m_downloadDeckInputField.text;
-        StartCoroutine(m_deckDownLoadManager.DownLoadDeck(url, () =>
-        {
-            DownLoadCallback();
-            m_closeButton.interactable = true;
-            m_downloadButton.interactable = true;
-            m_createSharpnessButton.interactable = true;
-            m_downloadDeckButton.interactable = true;
-        }));
     }
 
     public void DownLoadCallback()

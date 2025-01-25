@@ -1,11 +1,9 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class RoomSceneManager : MonoBehaviourPunCallbacks
 {
@@ -254,7 +252,7 @@ public class RoomSceneManager : MonoBehaviourPunCallbacks
     {        
         PhotonNetwork.IsMessageQueueRunning = false;
 
-        FadeManager.Instance().OnStart("BattleScene");
+        FadeManager.Instance().OnStart("BattleScene", false);
     }
 
     public void OnClickToCloseButton() {

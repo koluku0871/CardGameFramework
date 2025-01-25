@@ -10,9 +10,6 @@ public class UiCreateManager : MonoBehaviour
     [SerializeField]
     private GameObject m_background = null;
 
-    [SerializeField]
-    private GameObject m_audio = null;
-
     private bool isEnd = false;
 
     private void Update()

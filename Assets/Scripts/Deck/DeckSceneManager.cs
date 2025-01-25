@@ -15,9 +15,6 @@ public class DeckSceneManager : MonoBehaviour
     private Button m_createSharpnessButton = null;
 
     [SerializeField]
-    private InputField m_downloadDeckInputField = null;
-
-    [SerializeField]
     private Button m_downloadDeckButton = null;
 
     [SerializeField]

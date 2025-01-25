@@ -262,7 +262,7 @@ public class FieldCardManager : MonoBehaviour
 
         foreach (DeckManager.CardDetail cardDetail in m_deckDetail.cardDetailList)
         {
-            var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD_NORMAL + cardDetail.tag + "/" + cardDetail.cardId;
+            var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD + cardDetail.tag + "/" + cardDetail.cardId;
             CardData data = CardDetailManager.Instance().GetCardData(directoryPath);
             if (!data.cardCategory.Contains("契約"))
             {

@@ -173,7 +173,7 @@ public class CardDetailManager : MonoBehaviour
             });
         }
 
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD_NORMAL + tag + "/" + cardId;
+        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD + tag + "/" + cardId;
         CardData data = GetCardData(directoryPath);
 
         if (!string.IsNullOrEmpty(data.cost))

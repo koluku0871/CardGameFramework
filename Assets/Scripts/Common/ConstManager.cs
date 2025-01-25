@@ -4,30 +4,15 @@ using System.IO;
 public class ConstManager
 {
     public const string DIRECTORY_PATH_TO_CARD = "/card/";
-    public const string DIRECTORY_PATH_TO_CARD_QUALITY = "/card/quality/";
     public const string DIRECTORY_PATH_TO_DECK = "/deck/";
     public const string DIRECTORY_PATH_TO_OPTION = "/option/";
 
-    public static string DIRECTORY_FULL_PATH_TO_CARD
-    {
-        get
-        {
-            if (Directory.Exists(DIRECTORY_FULL_PATH_TO_CARD_QUALITY))
-            {
-                return DIRECTORY_FULL_PATH_TO_CARD_QUALITY;
-            }
-            return DIRECTORY_FULL_PATH_TO_CARD_NORMAL;
-        }
-    }
-
 #if UNITY_EDITOR
-    public static readonly string DIRECTORY_FULL_PATH_TO_CARD_NORMAL = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_CARD;
-    public static readonly string DIRECTORY_FULL_PATH_TO_CARD_QUALITY = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_CARD_QUALITY;
+    public static readonly string DIRECTORY_FULL_PATH_TO_CARD = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_CARD;
     public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_DECK;
     public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_OPTION;
 #else
-    public static readonly string DIRECTORY_FULL_PATH_TO_CARD_NORMAL = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_CARD;
-    public static readonly string DIRECTORY_FULL_PATH_TO_CARD_QUALITY = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_CARD_QUALITY;
+    public static readonly string DIRECTORY_FULL_PATH_TO_CARD = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_CARD;
     public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_DECK;
     public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_OPTION;
 #endif

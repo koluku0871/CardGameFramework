@@ -61,7 +61,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
             if (m_isOpen)
             {
-                string[] list = transform.name.Split('_');
+                string[] list = transform.name.Split('^');
                 if (list.Length < 2) return;
                 m_image.sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
                 
@@ -105,13 +105,9 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
             if (m_isOpen)
             {
-                string[] list = transform.name.Split('_');
+                string[] list = transform.name.Split('^');
                 if (list.Length < 2) return;
                 string cardId = list[1];
-                if (list.Length == 3)
-                {
-                    cardId = list[1] + "_" + list[2];
-                }
                 if (m_isAwake)
                 {
                     cardId = cardId + "_b";
@@ -263,7 +259,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     {
         if (!m_photonView.IsMine) return;
 
-        string[] list = m_image.name.Split('_');
+        string[] list = m_image.name.Split('^');
 
         switch (m_endTagStr)
         {

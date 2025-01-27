@@ -3,18 +3,15 @@ using System.IO;
 
 public class ConstManager
 {
-    public const string DIRECTORY_PATH_TO_CARD = "/card/";
     public const string DIRECTORY_PATH_TO_DECK = "/deck/";
     public const string DIRECTORY_PATH_TO_OPTION = "/option/";
     public const string DIRECTORY_PATH_TO_BUNDLES = "/bundles/";
 
 #if UNITY_EDITOR
-    public static readonly string DIRECTORY_FULL_PATH_TO_CARD = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_CARD;
     public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_DECK;
     public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_OPTION;
     public static readonly string DIRECTORY_FULL_PATH_TO_BUNDLES = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_BUNDLES;
 #else
-    public static readonly string DIRECTORY_FULL_PATH_TO_CARD = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_CARD;
     public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_DECK;
     public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_OPTION;
     public static readonly string DIRECTORY_FULL_PATH_TO_BUNDLES = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_BUNDLES;

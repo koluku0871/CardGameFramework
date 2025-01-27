@@ -13,7 +13,7 @@ public class DeckCardImageList : MonoBehaviour
             CardData cardData = DeckSceneManager.Instance().GetCardDatas(count * 4 + i);
             if(cardData != null)
             {
-                deckCardImages[i].SetData(cardData.packNo, cardData.fileName, cardData.sprite);
+                deckCardImages[i].SetData(cardData.PackNo, cardData.fileName, cardData.Sprite);
                 continue;
             }
             deckCardImages[i].gameObject.SetActive(false);

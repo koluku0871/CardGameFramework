@@ -9,15 +9,6 @@ public class DeckSceneManager : MonoBehaviour
     private Button m_closeButton = null;
 
     [SerializeField]
-    private Button m_downloadButton = null;
-
-    [SerializeField]
-    private Button m_createSharpnessButton = null;
-
-    [SerializeField]
-    private Button m_downloadDeckButton = null;
-
-    [SerializeField]
     private Dropdown m_deckSelectDropdown = null;
 
     [SerializeField]
@@ -55,8 +46,7 @@ public class DeckSceneManager : MonoBehaviour
 
     [SerializeField]
     private DeckCardScrollSetup m_deckCardScrollSetup = null;
-
-    private CardDownLoadManager m_cardDownLoadManager = null;
+    
     private DeckManager m_deckManager = null;
 
     private List<CardData> cardDatas = new List<CardData>();
@@ -85,14 +75,10 @@ public class DeckSceneManager : MonoBehaviour
     {
         AudioSourceManager.Instance().PlayOneShot((int)AudioSourceManager.BGM_NUM.DECK_1, true);
 
-        m_cardDownLoadManager = CardDownLoadManager.Instance();
         m_deckManager = DeckManager.Instance();
 
         DownLoadCallback();
         m_closeButton.interactable = true;
-        m_downloadButton.interactable = true;
-        m_createSharpnessButton.interactable = true;
-        m_downloadDeckButton.interactable = true;
     }
 
     public Dropdown GetDeckSelectDropdown()
@@ -137,11 +123,11 @@ public class DeckSceneManager : MonoBehaviour
         {
             text = "no select"
         });
-        foreach (var packData in m_cardDownLoadManager.m_packDataList)
+        foreach (var packData in AssetBundleManager.Instance().m_bs_baseData.packNameList)
         {
             m_packTypeDropdown.options.Add(new Dropdown.OptionData()
             {
-                text = packData.tag
+                text = packData.Key
             });
         }
         //m_packTypeDropdown.value = m_packTypeDropdown.options.Count - 1;
@@ -179,15 +165,21 @@ public class DeckSceneManager : MonoBehaviour
         cardDatas.Clear();
 
         var selectId = m_packTypeDropdown.value - 1;
-        if (0 > selectId || selectId >= m_cardDownLoadManager.m_packDataList.Count)
+        if (0 > selectId)
         {
             return;
         }
 
+        var key = m_packTypeDropdown.options[m_packTypeDropdown.value].text;
+        AssetBundleManager assetBundleManager = AssetBundleManager.Instance();
+        if (!assetBundleManager.m_bs_baseData.packNameList.ContainsKey(key))
+        {
+            return;
+        }
+        var packNameList = assetBundleManager.m_bs_baseData.packNameList[key];
+
         CardDetailManager cardDetailManager = CardDetailManager.Instance();
 
-        var tag = m_cardDownLoadManager.m_packDataList[selectId].tag;
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD + tag + "/";
         int searchCardCount = 0;
         HashSet<string> cardTypeList = new HashSet<string>();
         HashSet<string> categoryList = new HashSet<string>();
@@ -199,66 +191,39 @@ public class DeckSceneManager : MonoBehaviour
             m_categoryDropdown.value = 0;
             m_cardNameInputField.text = "";
         }
-        bool isAll = tag == "All";
-#if !UNITY_EDITOR
-        if (isAll)
+        bool isAll = key == "All";
+        for (int i = 0; i < packNameList.Count; i++)
         {
-            foreach (var cardDataKey in new List<string>() { "BS", "BSC", "CB", "SD", "P", })
+            string fileName = packNameList[i];
+            string name = fileName;
+            string targetTag = key;
+            Debug.Log("key :" + key + ", fileName : " + fileName);
+            if (isAll)
             {
-                foreach (var cardDataList in cardDetailManager.GetCardDataList(cardDataKey))
-                {
-                    foreach (var cardData in cardDataList.cardDatas.FindAll(CheckCardData))
-                    {
-                        if (oldSelectId != selectId)
-                        {
-                            foreach (var item in cardData.cardType.Split("・"))
-                            {
-                                cardTypeList.Add(item);
-                            }
-                            categoryList.Add(cardData.cardCategory);
-                        }
-                        cardDatas.Add(cardData);
-                    }
-                }
+                targetTag = fileName.Split("*")[0];
+                name = fileName.Split("*")[1];
             }
-        }
-        else
-#endif
-        {
-            var fileNameList = m_cardDownLoadManager.m_packDataList[selectId].fileNameList;
-            for (int i = 0; i < fileNameList.Count; i++)
+
+            CardData cardData = assetBundleManager.GetBaseData(targetTag, name);
+            if (cardData == null)
             {
-                string fileName = fileNameList[i];
-                string name = fileName;
-                string targetTag = tag;
-                if (isAll)
-                {
-                    targetTag = fileName.Split("*")[0];
-                    name = fileName.Split("*")[1];
-                    directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD + targetTag + "/";
-                }
-
-                CardData cardData = cardDetailManager.GetCardData(directoryPath + name);
-                if (cardData == null)
-                {
-                    continue;
-                }
-
-                if (oldSelectId != selectId)
-                {
-                    foreach (var item in cardData.cardType.Split("・"))
-                    {
-                        cardTypeList.Add(item);
-                    }
-                    categoryList.Add(cardData.cardCategory);
-                }
-
-                if (!CheckCardData(cardData))
-                {
-                    continue;
-                }
-                cardDatas.Add(cardData);
+                continue;
             }
+
+            if (oldSelectId != selectId)
+            {
+                foreach (var item in cardData.CardType.Split("・"))
+                {
+                    cardTypeList.Add(item);
+                }
+                categoryList.Add(cardData.CardCategory);
+            }
+
+            if (!CheckCardData(cardData))
+            {
+                continue;
+            }
+            cardDatas.Add(cardData);
         }
         searchCardCount = cardDatas.Count;
 
@@ -315,7 +280,7 @@ public class DeckSceneManager : MonoBehaviour
 
         if (m_elementDropdown.value > 0)
         {
-            if (!cardData.element.Contains(ConstManager.CardElementType[m_elementDropdown.value]))
+            if (!cardData.Element.Contains(ConstManager.CardElementType[m_elementDropdown.value]))
             {
                 return false;
             }
@@ -323,7 +288,7 @@ public class DeckSceneManager : MonoBehaviour
 
         if (m_cardTypeDropdown.value > 0)
         {
-            if (!cardData.cardType.Contains(m_cardTypeDropdown.options[m_cardTypeDropdown.value].text))
+            if (!cardData.CardType.Contains(m_cardTypeDropdown.options[m_cardTypeDropdown.value].text))
             {
                 return false;
             }
@@ -331,7 +296,7 @@ public class DeckSceneManager : MonoBehaviour
 
         if (m_categoryDropdown.value > 0)
         {
-            if (!cardData.cardCategory.Contains(m_categoryDropdown.options[m_categoryDropdown.value].text))
+            if (!cardData.CardCategory.Contains(m_categoryDropdown.options[m_categoryDropdown.value].text))
             {
                 return false;
             }
@@ -339,17 +304,17 @@ public class DeckSceneManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(m_cardNameInputField.text))
         {
-            if (string.IsNullOrEmpty(cardData.cardName))
+            if (string.IsNullOrEmpty(cardData.CardName))
             {
                 return false;
             }
-            if (string.IsNullOrEmpty(cardData.text))
+            if (string.IsNullOrEmpty(cardData.Text))
             {
                 return false;
             }
 
-            if (!cardData.cardName.Contains(m_cardNameInputField.text)
-                && !cardData.text.Contains(m_cardNameInputField.text))
+            if (!cardData.CardName.Contains(m_cardNameInputField.text)
+                && !cardData.Text.Contains(m_cardNameInputField.text))
             {
                 return false;
             }

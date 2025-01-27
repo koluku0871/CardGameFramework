@@ -262,9 +262,8 @@ public class FieldCardManager : MonoBehaviour
 
         foreach (DeckManager.CardDetail cardDetail in m_deckDetail.cardDetailList)
         {
-            var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD + cardDetail.tag + "/" + cardDetail.cardId;
-            CardData data = CardDetailManager.Instance().GetCardData(directoryPath);
-            if (!data.cardCategory.Contains("契約"))
+            CardData data = AssetBundleManager.Instance().GetBaseData(cardDetail.tag, cardDetail.cardId);
+            if (!data.CardCategory.Contains("契約"))
             {
                 continue;
             }
@@ -638,7 +637,7 @@ public class FieldCardManager : MonoBehaviour
         string fileName = cardDetail.cardId;
 
         Image copied = targetImage;
-        copied.name = tag + "_" + fileName;
+        copied.name = tag + "^" + fileName;
         if (isInstantiate)
         {
             copied = UnityEngine.Object.Instantiate(targetImage);
@@ -804,7 +803,7 @@ public class FieldCardManager : MonoBehaviour
             else if (list[1] == "True" && copied.sprite == sleeveSprite)
             {
                 handCard.SetIsOpen(true);
-                string[] namelist = copied.name.Split('_');
+                string[] namelist = copied.name.Split('^');
                 copied.sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = namelist[0], cardId = namelist[1] });
                 cardEventTrigger.triggers = new List<EventTrigger.Entry>();
                 // マウスオーバー

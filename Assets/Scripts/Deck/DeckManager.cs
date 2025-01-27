@@ -27,9 +27,8 @@ public class DeckManager : MonoBehaviour
         {
             foreach (CardDetail cardDetail in cardDetailList)
             {
-                var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD + cardDetail.tag + "/" + cardDetail.cardId;
-                CardData data = CardDetailManager.Instance().GetCardData(directoryPath);
-                if (!data.cardCategory.Contains("契約"))
+                CardData data = AssetBundleManager.Instance().GetBaseData(cardDetail.tag, cardDetail.cardId);
+                if (!data.CardCategory.Contains("契約"))
                 {
                     continue;
                 }
@@ -123,15 +122,11 @@ public class DeckManager : MonoBehaviour
 
         DeckDetail deckCardList = new DeckDetail();
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
-            string[] cardData = c.name.Split('_');
+            string[] cardData = c.name.Split('^');
             if (cardData.Length < 2) {
                 continue;
             }
             var cardId = cardData[1];
-            if (cardData.Length == 3)
-            {
-                cardId = cardData[1] + "_" + cardData[2];
-            }
             deckCardList.Add(new CardDetail(){
                 tag = cardData[0], cardId = cardId
             });
@@ -155,15 +150,11 @@ public class DeckManager : MonoBehaviour
 
         DeckDetail deckCardList = new DeckDetail();
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
-            string[] cardData = c.name.Split('_');
+            string[] cardData = c.name.Split('^');
             if (cardData.Length < 2) {
                 continue;
             }
             var cardId = cardData[1];
-            if (cardData.Length == 3)
-            {
-                cardId = cardData[1] + "_" + cardData[2];
-            }
             deckCardList.Add(new CardDetail()
             {
                 tag = cardData[0],
@@ -193,13 +184,12 @@ public class DeckManager : MonoBehaviour
         }
 
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_CARD + tag + "/" + cardId;
 
-        GameObject cardObj = new GameObject(tag + "_" + cardId);
+        GameObject cardObj = new GameObject(tag + "^" + cardId);
         cardObj.transform.SetParent(deckSceneManager.GetDeckContent());
         cardObj.transform.localScale = Vector3.one;
         Image cardImage = cardObj.AddComponent<Image>();
-        cardImage.sprite = CardDetailManager.Instance().GetCardData(directoryPath).sprite;
+        cardImage.sprite = AssetBundleManager.Instance().GetBaseData(tag, cardId).Sprite;
         EventTrigger cardEventTrigger = cardObj.AddComponent<EventTrigger>();
         cardEventTrigger.triggers = new List<EventTrigger.Entry>();
         // マウスオーバー
@@ -270,7 +260,7 @@ public class DeckManager : MonoBehaviour
         var duplicateCount = 0;
         var deckSceneManager = DeckSceneManager.Instance();
         foreach (Transform child in deckSceneManager.GetDeckContent()) {
-            if (child.name == tag + "_" + cardId) {
+            if (child.name == tag + "^" + cardId) {
                 duplicateCount++;
             }
         }

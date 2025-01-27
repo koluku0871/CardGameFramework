@@ -7899,7 +7899,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3777808780973323739}
   - component: {fileID: 5119253254564437984}
-  - component: {fileID: 1614850705400602578}
   - component: {fileID: 4236040617051182233}
   m_Layer: 0
   m_Name: Manager
@@ -7936,10 +7935,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_closeButton: {fileID: 3806854709685736312}
-  m_downloadButton: {fileID: 0}
-  m_createSharpnessButton: {fileID: 0}
-  m_downloadDeckInputField: {fileID: 0}
-  m_downloadDeckButton: {fileID: 0}
   m_deckSelectDropdown: {fileID: 3490004912146858292}
   m_deckCreateInputField: {fileID: 3173514440466100643}
   m_packTypeDropdown: {fileID: 7822086609986173003}
@@ -7953,18 +7948,6 @@ MonoBehaviour:
   m_searchCardCountText: {fileID: 6957002492922618963}
   m_infiniteScroll: {fileID: 4788037310233726036}
   m_deckCardScrollSetup: {fileID: 5562613436123713439}
---- !u!114 &1614850705400602578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7860806186519540955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76171965362452743bd210f92ff97414, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4236040617051182233
 MonoBehaviour:
   m_ObjectHideFlags: 0

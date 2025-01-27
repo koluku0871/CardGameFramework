@@ -1,66 +1,125 @@
-using AsyncReader;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "DB/CardData")]
-public class CardData : ScriptableObject
-//public class CardData
+public class BaseData
 {
-    public string directoryPath;
-    public string fileName;
-
-    public byte[] bytes;
-    public Sprite sprite = null;
-
-    /*public async Task<Sprite> GetSprite()
-    {
-        if (sprite != null)
-        {
-            return sprite;
-        }
-
-        using AsyncFileReader reader = new AsyncFileReader();
-        (IntPtr ptr, long size) = await reader.LoadAsync(directoryPath);
-        ImageInfo info = AsyncReader.ImageConverter.Decode(ptr, (int)size);
-
-        Texture2D texture = new Texture2D(info.header.width, info.header.height, info.header.Format, false);
-        texture.LoadRawTextureData(info.buffer, info.fileSize);
-        texture.Apply();
-
-        sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-        return sprite;
-    }*/
-
-    public string cardNo;
-    public string packNo;
-    public string cardRarity;
-    public string cost;
-    public string cardCategory;
-    public string cardType;
-    public string cardName;
-    public string element;
-    public string reducedCost;
-    public List<string> levelTextList = new List<string>();
-    public string text;
+    public Dictionary<string, List<CardData>> packDatas = new Dictionary<string, List<CardData>> ();
+    public Dictionary<string, List<string>> packNameList = new Dictionary<string, List<string>>();
 }
 
-public static class ResourceRequestExtenion
+public class CardData
 {
-    // Resources.LoadAsyncの戻り値であるResourceRequestにGetAwaiter()を追加する
-    public static TaskAwaiter<UnityEngine.Object> GetAwaiter(this ResourceRequest resourceRequest)
-    {
-        var tcs = new TaskCompletionSource<UnityEngine.Object>();
-        resourceRequest.completed += operation =>
-        {
-            // ロードが終わった時点でTaskCompletionSource.TrySetResult
-            tcs.TrySetResult(resourceRequest.asset);
-        };
+    public string assetBundleSpriteName;
+    public string fileName;
 
-        // TaskCompletionSource.Task.GetAwaiter()を返す
-        return tcs.Task.GetAwaiter();
+    private Sprite sprite = null;
+
+    public Sprite Sprite
+    {
+        get
+        {
+            if (sprite != null)
+            {
+                return sprite;
+            }
+
+            sprite = AssetBundleManager.Instance().GetCardSprite(assetBundleSpriteName, CardNo);
+            return sprite;
+        }
     }
+
+    public string CardNo;
+    public string PackNo;
+    public string CardName;
+    public string CardRarity;
+    public string CardCategory;
+    public string Element;
+    public string Cost;
+    public string ReducedCost;
+    public string CardType;
+    public List<string> Lv = new List<string>();
+
+    public string text;
+
+    public string Text {
+        get { return text; }
+        set {
+            var textStr = value;
+            textStr = textStr.Replace("<pclass=txtcardtext>", "");
+            textStr = textStr.Replace("<br/>", "");
+            textStr = textStr.Replace("</p>", "");
+
+            /*if (textStr.LastIndexOf("［バースト：") != -1)
+            {
+                var line = textStr.Substring(0, textStr.LastIndexOf("］"));
+                var start = line.LastIndexOf("［バースト：");
+                var end = line.LastIndexOf("］");
+                var count = end - start + 1;
+                var str = line.Substring(start, count);
+                if (string.IsNullOrEmpty(str))
+                {
+                    Debug.Log(textStr);
+                }
+                else
+                {
+                    textStr = textStr.Replace(str, "<mark=#ff000055>" + str + "</mark>");
+                }
+            }*/
+
+            textStr = textStr.Replace("《神託》", "<sprite=\"CoreCharge\" index=0>");
+            textStr = textStr.Replace("煌臨：", "<sprite=\"Advent\" index=0>");
+            textStr = textStr.Replace("ミラージュ：", "<sprite=\"Mirage\" index=0>");
+            textStr = textStr.Replace("ミラージュ", "<sprite=\"Mirage\" index=0>");
+            textStr = textStr.Replace("【Uトリガー】", "<sprite=\"UltimateTrigger\" index=0>");
+            textStr = textStr.Replace("Uトリガー", "<sprite=\"UltimateTrigger\" index=0>");
+            textStr = textStr.Replace("【Ｕトリガー】", "<sprite=\"UltimateTrigger\" index=0>");
+            textStr = textStr.Replace("Ｕトリガー", "<sprite=\"UltimateTrigger\" index=0>");
+            textStr = textStr.Replace("転醒", "<sprite=\"Awakening\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_red.gif/>", "<sprite=\"SymbolRed\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_pup.gif/>", "<sprite=\"SymbolPurple\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_green.gif/>", "<sprite=\"SymbolGreen\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_white.gif/>", "<sprite=\"SymbolWhite\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_yellow.gif/>", "<sprite=\"SymbolYellow\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_blue.gif/>", "<sprite=\"SymbolBlue\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_god.gif/>", "<sprite=\"SymbolGod\" index=0>");
+            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_soulcore.gif/>", "<sprite=\"SoulCore\" index=0>");
+
+            if (textStr.IndexOf("\n") == 0)
+            {
+                textStr = textStr.Substring(1, textStr.Length - 2);
+            }
+
+            text = textStr;
+        }
+    }
+
+    public CardData(CardDataFromJson cardData)
+    {
+        CardNo = cardData.CardNo;
+        PackNo = cardData.PackNo;
+        CardName = cardData.CardName;
+        CardRarity = cardData.CardRarity;
+        CardCategory = cardData.CardCategory;
+        Element = cardData.Element;
+        Cost = cardData.Cost;
+        ReducedCost = cardData.ReducedCost;
+        CardType = cardData.CardType;
+        Lv = cardData.Lv;
+        Text = cardData.Text;
+    }
+}
+
+public class CardDataFromJson
+{
+    public string CardNo;
+    public string PackNo;
+    public string CardName;
+    public string CardRarity;
+    public string CardCategory;
+    public string Element;
+    public string Cost;
+    public string ReducedCost;
+    public string CardType;
+    public List<string> Lv = new List<string>();
+    public string Text;
 }

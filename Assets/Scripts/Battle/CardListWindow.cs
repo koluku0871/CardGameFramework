@@ -83,7 +83,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
                 continue;
             }
 
-            if (cardDetail.tag + "_" + cardDetail.cardId != c.name)
+            if (cardDetail.tag + "^" + cardDetail.cardId != c.name)
             {
                 continue;
             }
@@ -136,7 +136,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
             List<string> cardStrList = new List<string>();
             foreach (var cardDetail in m_cardDetailList)
             {
-                cardStrList.Add(cardDetail.tag + "_" + cardDetail.cardId);
+                cardStrList.Add(cardDetail.tag + "-" + cardDetail.cardId);
             }
             string cardListStr = string.Join(",", cardStrList);
             stream.SendNext(cardListStr);
@@ -179,13 +179,9 @@ public class CardListWindow : MonoBehaviour, IPunObservable
                 m_cardDetailList.Clear();
                 foreach (var cardStr in cardStrList)
                 {
-                    string[] cardList = cardStr.Split('_');
+                    string[] cardList = cardStr.Split('^');
                     if (cardList.Length < 2) return;
                     var cardId = cardList[1];
-                    if (cardList.Length == 3)
-                    {
-                        cardId = cardList[1] + "_" + cardList[2];
-                    }
                     m_cardDetailList.Add(new DeckManager.CardDetail() { tag = cardList[0], cardId = cardId });
                 }
                 CreateCardList(m_cardDetailList);

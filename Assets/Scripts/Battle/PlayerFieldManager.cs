@@ -382,12 +382,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public Image CreateCard(string name)
     {
-        string[] list = name.Split('_');
+        string[] list = name.Split('^');
         var cardId = list[1];
-        if (list.Length == 3)
-        {
-            cardId = list[1] + "_" + list[2];
-        }
         GameObject card = PhotonNetwork.Instantiate("Prefab/Battle/Card", Vector3.zero, Quaternion.identity);
         card.transform.localScale = Vector3.one;
         Image cardImage = FieldCardManager.Instance().CreateCard(

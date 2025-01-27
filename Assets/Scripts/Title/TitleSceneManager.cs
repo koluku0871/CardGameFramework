@@ -2,10 +2,12 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TitleSceneManager : MonoBehaviour
 {
@@ -15,10 +17,23 @@ public class TitleSceneManager : MonoBehaviour
     [SerializeField]
     private AudioSourceManager m_audioManager = null;
 
+    [SerializeField]
+    private AssetBundleManager m_assetBundleManager = null;
+
+    [SerializeField]
+    private ScrollRect m_scrollRect = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_textMeshPro = null;
+
+    [SerializeField]
+    private List<Image> m_images = new List<Image>();
+
+    private int imageIndex = 0;
+
     private DriveService service;
     private List<Google.Apis.Drive.v3.Data.File> files = new List<Google.Apis.Drive.v3.Data.File>();
 
-    private int fileId = 0;
     private bool isDownload = false;
     private long fileSize = 0;
 
@@ -37,11 +52,50 @@ public class TitleSceneManager : MonoBehaviour
             Instantiate(m_audioManager);
         }
 
+        if (AssetBundleManager.Instance() == null)
+        {
+            Instantiate(m_assetBundleManager);
+        }
+
         if (!Directory.Exists(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES))
         {
             Directory.CreateDirectory(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES);
         }
 
+        StartCoroutine(DownloadFileList(() => {
+            StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
+                AssetBundleManager.Instance().SetCardTextList();
+                FadeManager.Instance().OnStart("HomeScene");
+            }, (string str) => {
+                m_textMeshPro.text += str;
+                m_scrollRect.verticalNormalizedPosition = 0f;
+            }));
+        }));
+    }
+
+    private void Update()
+    {
+        timeElapsed += Time.deltaTime;
+        if (timeElapsed < timeOut)
+        {
+            return;
+        }
+        timeElapsed = 0.0f;
+
+        if (imageIndex >= m_images.Count)
+        {
+            imageIndex = 0;
+            foreach (var image in m_images)
+            {
+                image.gameObject.SetActive(false);
+            }
+        }
+        m_images[imageIndex].gameObject.SetActive(true);
+        imageIndex++;
+    }
+
+    public IEnumerator DownloadFileList(Action action)
+    {
         GoogleCredential credential;
         using (var stream = new FileStream(ConstManager.JSON_FILE_PATH_TO_GOOGLE_DRIVE, FileMode.Open, FileAccess.Read))
         {
@@ -58,89 +112,57 @@ public class TitleSceneManager : MonoBehaviour
         request.Q = "'" + ConstManager.GOOGLE_DRIVE_FOLDER_ID + "' in parents";
         request.Fields = "nextPageToken, files(id, name, size, createdTime)";
         files = new List<Google.Apis.Drive.v3.Data.File>();
-        do
-        {
-            var result = request.Execute();
-            files.AddRange(result.Files);
-            request.PageToken = result.NextPageToken;
-        }
-        while (!string.IsNullOrEmpty(request.PageToken));
-        fileId = 0;
-    }
 
-    private void Update()
-    {
-        timeElapsed += Time.deltaTime;
-        if (timeElapsed < timeOut)
+        while (files.Count == 0 || !string.IsNullOrEmpty(request.PageToken))
         {
-            return;
-        }
-        timeElapsed = 0.0f;
-
-        if (fileId >= files.Count)
-        {
-            StartCoroutine("ReadFileList");
-            FadeManager.Instance().OnStart("HomeScene");
-            return;
-        }
-
-        DownloadFileList();
-    }
-
-    public IEnumerable ReadFileList()
-    {
-        string[] fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
-        foreach (string file in fs)
-        {
-            Debug.Log("folderPath : " + file);
-            AssetBundle asset_bundle = AssetBundle.LoadFromFile(file);
-            var request = asset_bundle.LoadAllAssetsAsync();
-            request.completed += (operation) =>
+            var result = request.ExecuteAsync();
+            while (!result.IsCompleted)
             {
-                if (request.asset.GetType() == typeof(UnityEngine.U2D.SpriteAtlas))
-                {
-                    var atlas = (UnityEngine.U2D.SpriteAtlas)request.asset;
-                    Debug.Log("spriteCount : " + atlas.spriteCount);
-                }
-            };
+                yield return null;
+            }
 
-            while (!request.isDone)
+            files.AddRange(result.Result.Files);
+            request.PageToken = result.Result.NextPageToken;
+        }
+
+        m_textMeshPro.text += "DownloadFileList : " + files.Count + "\n";
+        yield return null;
+
+        foreach (var file in files)
+        {
+            isDownload = true;
+
+            if (File.Exists(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES + file.Name))
             {
-                yield return 0;
+                isDownload = false;
+                continue;
+            }
+
+            var str = "Name: " + file.Name + " ID: " + file.Id + " Size: " + file.Size + "byte CreatedTime: " + file.CreatedTimeDateTimeOffset;
+            Debug.Log(str);
+            m_textMeshPro.text += "DownloadFile : " + str + "\n";
+            m_scrollRect.verticalNormalizedPosition = 0f;
+            yield return null;
+
+            fileSize = 0;
+            if (file.Size.HasValue)
+            {
+                fileSize = file.Size.Value;
+            }
+
+            var serviceRequest = service.Files.Get(file.Id);
+            var fileStream = new FileStream(Path.Combine(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, file.Name), FileMode.Create, FileAccess.Write);
+            serviceRequest.MediaDownloader.ProgressChanged += DownloadProgress;
+            serviceRequest.Download(fileStream);
+            fileStream.Close();
+
+            while (isDownload)
+            {
+                yield return null;
             }
         }
-    }
 
-    public void DownloadFileList()
-    {
-        if (isDownload)
-        {
-            return;
-        }
-
-        isDownload = true;
-
-        var file = files[fileId];
-        fileId++;
-
-        if (File.Exists(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES + file.Name))
-        {
-            isDownload = false;
-            return;
-        }
-
-        Debug.Log("Name: " + file.Name + " ID: " + file.Id + " Size: " + file.Size + "byte CreatedTime: " + file.CreatedTimeDateTimeOffset);
-        fileSize = 0;
-        if (file.Size.HasValue)
-        {
-            fileSize = file.Size.Value;
-        }
-
-        var serviceRequest = service.Files.Get(file.Id);
-        var fileStream = new FileStream(Path.Combine(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, file.Name), FileMode.Create, FileAccess.Write);
-        serviceRequest.MediaDownloader.ProgressChanged += DownloadProgress;
-        serviceRequest.Download(fileStream);
-        fileStream.Close();
+        action();
     }
 
     public void DownloadProgress(IDownloadProgress dlP)

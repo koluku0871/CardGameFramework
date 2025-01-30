@@ -136,7 +136,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
             List<string> cardStrList = new List<string>();
             foreach (var cardDetail in m_cardDetailList)
             {
-                cardStrList.Add(cardDetail.tag + "-" + cardDetail.cardId);
+                cardStrList.Add(cardDetail.tag + "^" + cardDetail.cardId);
             }
             string cardListStr = string.Join(",", cardStrList);
             stream.SendNext(cardListStr);

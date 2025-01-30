@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,8 +31,12 @@ public class DeckSceneManager : MonoBehaviour
     [SerializeField]
     private TMP_InputField m_cardNameInputField = null;
 
+    [Header("カード詳細")]
+
     [SerializeField]
     private Image m_targetCardDetail = null;
+
+    [Header("デッキ情報")]
 
     [SerializeField]
     private Text m_deckCardCountText = null;
@@ -38,15 +44,28 @@ public class DeckSceneManager : MonoBehaviour
     [SerializeField]
     private RectTransform m_deckContent = null;
 
+    [Header("検索結果")]
+
     [SerializeField]
     private Text m_searchCardCountText = null;
 
     [SerializeField]
-    private InfiniteScroll m_infiniteScroll = null;
+    private InfiniteScroll m_searchInfiniteScroll = null;
 
     [SerializeField]
-    private DeckCardScrollSetup m_deckCardScrollSetup = null;
-    
+    private DeckCardScrollSetup m_searchCardScrollSetup = null;
+
+    [Header("お気に入り")]
+
+    [SerializeField]
+    private Text m_favoriteCardCountText = null;
+
+    [SerializeField]
+    private InfiniteScroll m_favoriteInfiniteScroll = null;
+
+    [SerializeField]
+    private DeckCardScrollSetup m_favoriteCardScrollSetup = null;
+
     private DeckManager m_deckManager = null;
 
     private List<CardData> cardDatas = new List<CardData>();
@@ -59,6 +78,16 @@ public class DeckSceneManager : MonoBehaviour
         return cardDatas[index];
     }
     private int oldSelectId = -1;
+
+    private List<CardData> favoriteCardDatas = new List<CardData>();
+    public CardData GetFavoriteCardDatas(int index)
+    {
+        if (index < 0 || favoriteCardDatas.Count - 1 < index)
+        {
+            return null;
+        }
+        return favoriteCardDatas[index];
+    }
 
     private static DeckSceneManager instance = null;
     public static DeckSceneManager Instance()
@@ -79,6 +108,18 @@ public class DeckSceneManager : MonoBehaviour
 
         DownLoadCallback();
         m_closeButton.interactable = true;
+
+        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;
+        string[] optFiles = Directory.GetFiles(directoryPath, "favoriteCardData.json", SearchOption.AllDirectories);
+        StreamReader sr = new StreamReader(optFiles[0], Encoding.UTF8);
+        FavoriteData favoriteData = JsonUtility.FromJson<FavoriteData>(sr.ReadToEnd());
+        sr.Close();
+
+        favoriteCardDatas.Clear();
+        foreach (var cardData in favoriteData.cardDetails)
+        {
+            favoriteCardDatas.Add(AssetBundleManager.Instance().GetBaseData(cardData.tag, cardData.cardId));
+        }
     }
 
     public Dropdown GetDeckSelectDropdown()
@@ -113,6 +154,15 @@ public class DeckSceneManager : MonoBehaviour
 
     public void OnClickToCloseButton()
     {
+        FavoriteData favoriteData = new FavoriteData();
+        foreach (var cardData in favoriteCardDatas)
+        {
+            favoriteData.cardDetails.Add(new DeckManager.CardDetail() { tag = cardData.PackNo, cardId = cardData.CardNo });
+        }
+        StreamWriter streamWriter = new StreamWriter(ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "favoriteCardData.json");
+        streamWriter.WriteLine(JsonUtility.ToJson(favoriteData));
+        streamWriter.Close();
+
         FadeManager.Instance().OnStart("HomeScene");
     }
 
@@ -162,6 +212,11 @@ public class DeckSceneManager : MonoBehaviour
 
     public void OnValueChangedToPackTypeDropdown()
     {
+        if (!m_searchInfiniteScroll.gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
         cardDatas.Clear();
 
         var selectId = m_packTypeDropdown.value - 1;
@@ -259,13 +314,13 @@ public class DeckSceneManager : MonoBehaviour
             }
             m_categoryDropdown.value = -1;
         }
-        m_deckCardScrollSetup.max = (cardDatas.Count / 4);
+        m_searchCardScrollSetup.max = (cardDatas.Count / 4);
         if (cardDatas.Count % 4 != 0)
         {
-            m_deckCardScrollSetup.max++;
+            m_searchCardScrollSetup.max++;
         }
-        m_deckCardScrollSetup.SetRectTransform();
-        m_infiniteScroll.Init();
+        m_searchCardScrollSetup.SetRectTransform();
+        m_searchInfiniteScroll.Init();
         oldSelectId = selectId;
 
         m_searchCardCountText.text = "検索結果枚数：" + searchCardCount;
@@ -314,6 +369,8 @@ public class DeckSceneManager : MonoBehaviour
             }
 
             if (!cardData.CardName.Contains(m_cardNameInputField.text)
+                && !cardData.CardType.Contains(m_cardNameInputField.text)
+                && !cardData.CardCategory.Contains(m_cardNameInputField.text)
                 && !cardData.Text.Contains(m_cardNameInputField.text))
             {
                 return false;
@@ -321,5 +378,34 @@ public class DeckSceneManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    public void AddFavoriteCardData(string tag, string cardId)
+    {
+        favoriteCardDatas.Add(AssetBundleManager.Instance().GetBaseData(tag, cardId));
+    }
+
+    public void RemoveFavoriteCardData(string tag, string cardId)
+    {
+        favoriteCardDatas.Remove(AssetBundleManager.Instance().GetBaseData(tag, cardId));
+        UpdateFavoriteCardData(true);
+    }
+
+    public void UpdateFavoriteCardData(bool isActive)
+    {
+        if (!isActive)
+        {
+            return;
+        }
+
+        m_favoriteCardScrollSetup.max = (favoriteCardDatas.Count / 4);
+        if (favoriteCardDatas.Count % 4 != 0)
+        {
+            m_favoriteCardScrollSetup.max++;
+        }
+        m_favoriteCardScrollSetup.SetRectTransform();
+        m_favoriteInfiniteScroll.Init();
+
+        m_favoriteCardCountText.text = "お気に入り枚数：" + favoriteCardDatas.Count;
     }
 }

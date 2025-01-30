@@ -57,9 +57,35 @@ public class TitleSceneManager : MonoBehaviour
             Instantiate(m_assetBundleManager);
         }
 
-        if (!Directory.Exists(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES))
+        string path = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
+        if (!Directory.Exists(path))
         {
-            Directory.CreateDirectory(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES);
+            Directory.CreateDirectory(path);
+        }
+
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "favoriteCardData.json";
+        if (!File.Exists(path))
+        {
+            FavoriteData data = new FavoriteData();
+            StreamWriter streamWriter = new StreamWriter(path);
+            streamWriter.WriteLine(JsonUtility.ToJson(data));
+            streamWriter.Close();
+        }
+
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "opt.json";
+        if (!File.Exists(path))
+        {
+            OptionData optionData = new OptionData();
+            optionData.name = "Player";
+            StreamWriter streamWriter = new StreamWriter(path);
+            streamWriter.WriteLine(JsonUtility.ToJson(optionData));
+            streamWriter.Close();
         }
 
         StartCoroutine(DownloadFileList(() => {

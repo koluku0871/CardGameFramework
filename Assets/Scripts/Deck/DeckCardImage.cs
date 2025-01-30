@@ -5,6 +5,9 @@ using UnityEngine.EventSystems;
 public class DeckCardImage : MonoBehaviour
 {
     [SerializeField]
+    private DeckCardImageList imageList;
+
+    [SerializeField]
     private Image m_image = null;
 
     private string targetTag = "";
@@ -41,6 +44,14 @@ public class DeckCardImage : MonoBehaviour
         {
             case -1:
                 Debug.Log("Left Click");
+                if (imageList.isSearchCard)
+                {
+                    DeckSceneManager.Instance().AddFavoriteCardData(targetTag, targetName);
+                }
+                else
+                {
+                    DeckSceneManager.Instance().RemoveFavoriteCardData(targetTag, targetName);
+                }
                 break;
             case -2:
                 Debug.Log("Right Click");

@@ -2,16 +2,16 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Accessibility;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static CoreManager;
-using static DeckManager;
 
 public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragHandler, IEndDragHandler, IPunObservable
 {
     [SerializeField]
     private Text m_openText = null;
+
+    [SerializeField]
+    private Image m_soulImage = null;
 
     public ConstManager.PhotonObjectType m_photonObjectType = ConstManager.PhotonObjectType.NONE;
 
@@ -92,6 +92,24 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             return m_isOpen;
         }
     }
+
+    private bool m_isSoul = false;
+    public bool IsSoul
+    {
+        private set
+        {
+            if (m_isOpen)
+            {
+                m_isSoul = value;
+                m_soulImage.gameObject.SetActive(m_isSoul);
+            }
+        }
+        get
+        {
+            return m_isSoul;
+        }
+    }
+
 
     private bool m_isAwake = false;
     public bool IsAwake
@@ -211,6 +229,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 return;
             }
 
+            this.transform.SetAsLastSibling();
+
             switch ((pointerEventData as PointerEventData).pointerId)
             {
                 case -1:
@@ -327,6 +347,11 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         IsOpen = isOpen;
     }
 
+    public void SetIsSoul(bool isSoul)
+    {
+        IsSoul = isSoul;
+    }
+
     public void SetIsAwake(bool isAwake)
     {
         IsAwake = isAwake;
@@ -341,17 +366,19 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         {
             //データの送信
             stream.SendNext(transform.name);
+            stream.SendNext(transform.GetSiblingIndex());
             stream.SendNext(IsOpen);
+            stream.SendNext(IsSoul);
             stream.SendNext(IsAwake);
         }
         else
         {
             //データの受信
-            string name = (string)stream.ReceiveNext();
+            transform.name = (string)stream.ReceiveNext();
+            transform.SetSiblingIndex((int)stream.ReceiveNext());
             IsOpen = (bool)stream.ReceiveNext();
+            IsSoul = (bool)stream.ReceiveNext();
             IsAwake = (bool)stream.ReceiveNext();
-
-            transform.name = name;
         }
     }
 }

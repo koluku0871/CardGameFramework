@@ -1,38 +1,52 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 using static CoreManager;
 
 public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 {
-    [SerializeField]
-    private Image m_life = null;
 
     [SerializeField]
     private PhotonView m_photonView = null;
 
     [SerializeField]
-    private Button m_soulPlusButton = null;
+    private Button m_optionButton = null;
+    [SerializeField]
+    private Button m_markButton = null;
 
+
+    [SerializeField]
+    private Button m_countPlusButton = null;
+    [SerializeField]
+    private Button m_countMinusButton = null;
+
+
+    [SerializeField]
+    private Button m_lifePlusButton = null;
+    [SerializeField]
+    private Button m_lifeMinusButton = null;
+
+    [SerializeField]
+    private Button m_soulPlusButton = null;
     [SerializeField]
     private Button m_soulMinusButton = null;
 
     [SerializeField]
-    private Button m_optionButton = null;
-
-    [SerializeField]
     private Button m_plusButton = null;
-
     [SerializeField]
     private Button m_minusButton = null;
 
     [SerializeField]
-    private Button m_markButton = null;
-
+    private Image m_count = null;
+    [SerializeField]
+    private Image m_life = null;
     [SerializeField]
     private Image m_reserve = null;
-
+    [SerializeField]
+    private Image m_field = null;
     [SerializeField]
     private Image m_trash = null;
 
@@ -48,6 +62,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private FieldCardManager m_fieldCardManager = null;
 
+    private List<GameObject> m_countCoreList = new List<GameObject>();
     private List<GameObject> m_soulCoreList = new List<GameObject>();
     private List<GameObject> m_coreList = new List<GameObject>();
 
@@ -84,12 +99,65 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void SetButton(bool IsMine)
     {
-        m_soulPlusButton.gameObject.SetActive(IsMine);
-        m_soulMinusButton.gameObject.SetActive(IsMine);
         m_optionButton.gameObject.SetActive(IsMine);
         m_markButton.gameObject.SetActive(false);
+        m_countPlusButton.gameObject.SetActive(IsMine);
+        m_countMinusButton.gameObject.SetActive(IsMine);
+        m_lifePlusButton.gameObject.SetActive(IsMine);
+        m_lifeMinusButton.gameObject.SetActive(false);
+        m_soulPlusButton.gameObject.SetActive(IsMine);
+        m_soulMinusButton.gameObject.SetActive(IsMine);
         m_plusButton.gameObject.SetActive(IsMine);
         m_minusButton.gameObject.SetActive(IsMine);
+
+        m_countPlusButton.onClick.AddListener(() => {
+            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
+            core.transform.SetParent(m_coreField);
+            float offset = 20;
+            float sizeX = m_count.rectTransform.sizeDelta.x * m_count.rectTransform.localScale.x - offset;
+            float sizeY = m_count.rectTransform.sizeDelta.y * m_count.rectTransform.localScale.y - offset + 5;
+            float posX = m_count.rectTransform.position.x - ((int)(sizeX) / 2 - ((offset / 3 * 2) * (m_countCoreList.Count % 5)));
+            float posY = m_count.rectTransform.position.y + ((int)(sizeY) / 2 - ((offset -5) * (m_countCoreList.Count / 5)));
+            core.transform.position = new Vector3(posX, posY, 0);
+            core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                int coreIndex = m_countCoreList.IndexOf(core);
+                if (coreIndex != -1)
+                {
+                    m_countCoreList.RemoveAt(coreIndex);
+                    core.SetActive(false);
+                }
+            });
+            m_countCoreList.Add(core);
+        });
+        m_countMinusButton.onClick.AddListener(() => {
+            if (m_countCoreList != null && m_countCoreList.Count > 0)
+            {
+                GameObject core = m_countCoreList[m_countCoreList.Count - 1];
+                m_countCoreList.Remove(core);
+                core.SetActive(false);
+            }
+        });
+
+        m_lifePlusButton.onClick.AddListener(() => {
+            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
+            core.transform.SetParent(m_coreField);
+            float offset = 10;
+            float sizeX = m_life.rectTransform.sizeDelta.x * m_life.rectTransform.localScale.x - offset;
+            float sizeY = m_life.rectTransform.sizeDelta.y * m_life.rectTransform.localScale.y - offset;
+            core.transform.position = new Vector3(
+                m_life.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                m_life.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                0);
+            core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                int index = m_coreList.IndexOf(core);
+                if (index != -1)
+                {
+                    m_coreList.RemoveAt(index);
+                    core.SetActive(false);
+                }
+            });
+            m_coreList.Add(core);
+        });
 
         m_soulPlusButton.onClick.AddListener(() => {
             GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/SoulCore", Vector3.zero, Quaternion.identity);
@@ -98,8 +166,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
             float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
             core.transform.position = new Vector3(
-                m_reserve.rectTransform.position.x + (int)Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                m_reserve.rectTransform.position.y + (int)Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
                 0);
             core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
                 int index = m_soulCoreList.IndexOf(core);
@@ -131,8 +199,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
             float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
             core.transform.position = new Vector3(
-                m_reserve.rectTransform.position.x + (int)Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                m_reserve.rectTransform.position.y + (int)Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
                 0);
             core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
                 int index = m_coreList.IndexOf(core);
@@ -196,8 +264,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
             float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
             core.transform.position = new Vector3(
-                m_reserve.rectTransform.position.x + (int)Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                m_reserve.rectTransform.position.y + (int)Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
                 0);
             core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
                 int coreIndex = m_soulCoreList.IndexOf(core);
@@ -218,8 +286,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
             float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
             core.transform.position = new Vector3(
-                m_reserve.rectTransform.position.x + (int)Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                m_reserve.rectTransform.position.y + (int)Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
                 0);
             core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
                 int coreIndex = m_coreList.IndexOf(core);
@@ -258,6 +326,14 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     m_reserve.rectTransform.position.x,
                     m_reserve.rectTransform.position.y);
                 break;
+            case ConstManager.CorePosType.FIELD:
+                dstType = "Field";
+                sizeX = m_field.rectTransform.sizeDelta.x * m_field.rectTransform.localScale.x - offset;
+                sizeY = m_field.rectTransform.sizeDelta.y * m_field.rectTransform.localScale.y - offset;
+                dstPos = new Vector2(
+                    m_field.rectTransform.position.x,
+                    m_field.rectTransform.position.y);
+                break;
             case ConstManager.CorePosType.TRASH:
                 dstType = "Trash";
                 sizeX = m_trash.rectTransform.sizeDelta.x * m_trash.rectTransform.localScale.x - offset;
@@ -281,6 +357,11 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 break;
             case ConstManager.CorePosType.RESERVE:
                 srcType = "Reserve";
+                coreTypeList.Add(m_coreList);
+                coreTypeList.Add(m_soulCoreList);
+                break;
+            case ConstManager.CorePosType.FIELD:
+                srcType = "Field";
                 coreTypeList.Add(m_coreList);
                 coreTypeList.Add(m_soulCoreList);
                 break;
@@ -316,8 +397,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 touchManager.EndTag = dstType;
 
                 core.transform.position = new Vector2(
-                        dstPos.x + (int)Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                        dstPos.y + (int)Random.Range(-((int)sizeY / 2), (int)sizeY / 2));
+                        dstPos.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                        dstPos.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2));
 
                 count--;
             }

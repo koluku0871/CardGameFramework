@@ -419,7 +419,7 @@ GameObject:
   - component: {fileID: 5288619750984923423}
   - component: {fileID: 4612009047197923368}
   m_Layer: 5
-  m_Name: DeckCardColumn
+  m_Name: FavoriteCardColumn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -460,7 +460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b2571687e7a13c4f9f8826a2e313a5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSearchCard: 1
+  isSearchCard: 0
   deckCardImages:
   - {fileID: 3805288830106228855}
   - {fileID: 3627418388612111248}

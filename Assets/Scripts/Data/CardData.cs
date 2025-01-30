@@ -75,14 +75,14 @@ public class CardData
             textStr = textStr.Replace("ÅyÇtÉgÉäÉKÅ[Åz", "<sprite=\"UltimateTrigger\" index=0>");
             textStr = textStr.Replace("ÇtÉgÉäÉKÅ[", "<sprite=\"UltimateTrigger\" index=0>");
             textStr = textStr.Replace("ì]ê¡", "<sprite=\"Awakening\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_red.gif/>", "<sprite=\"SymbolRed\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_pup.gif/>", "<sprite=\"SymbolPurple\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_green.gif/>", "<sprite=\"SymbolGreen\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_white.gif/>", "<sprite=\"SymbolWhite\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_yellow.gif/>", "<sprite=\"SymbolYellow\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_blue.gif/>", "<sprite=\"SymbolBlue\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_god.gif/>", "<sprite=\"SymbolGod\" index=0>");
-            textStr = textStr.Replace("<imgsrc=../image/card_serch/icon_soulcore.gif/>", "<sprite=\"SoulCore\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_red.png\"/>", "<sprite=\"SymbolRed\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_pup.png\"/>", "<sprite=\"SymbolPurple\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_green.png\"/>", "<sprite=\"SymbolGreen\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_white.png\"/>", "<sprite=\"SymbolWhite\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_yellow.png\"/>", "<sprite=\"SymbolYellow\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_blue.png\"/>", "<sprite=\"SymbolBlue\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_god.png\"/>", "<sprite=\"SymbolGod\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_soulcore.png\"/>", "<sprite=\"SoulCore\" index=0>");
 
             if (textStr.IndexOf("\n") == 0)
             {
@@ -122,4 +122,9 @@ public class CardDataFromJson
     public string CardType;
     public List<string> Lv = new List<string>();
     public string Text;
+}
+
+public class CardOptionData
+{
+
 }

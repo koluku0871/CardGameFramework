@@ -165,6 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_openText: {fileID: 0}
+  m_soulImage: {fileID: 0}
   m_photonObjectType: 3
   m_endTagStr: 
 --- !u!114 &7176616543681563469

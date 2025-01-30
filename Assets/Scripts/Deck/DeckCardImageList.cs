@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class DeckCardImageList : MonoBehaviour
 {
+    public bool isSearchCard = true;
+
     [SerializeField]
     List<DeckCardImage> deckCardImages = new List<DeckCardImage>();
 
@@ -10,13 +12,26 @@ public class DeckCardImageList : MonoBehaviour
     {
         for (int i = 0; i < 4; i++)
         {
-            CardData cardData = DeckSceneManager.Instance().GetCardDatas(count * 4 + i);
-            if(cardData != null)
+            if (isSearchCard)
             {
-                deckCardImages[i].SetData(cardData.PackNo, cardData.fileName, cardData.Sprite);
-                continue;
+                CardData cardData = DeckSceneManager.Instance().GetCardDatas(count * 4 + i);
+                if (cardData != null)
+                {
+                    deckCardImages[i].SetData(cardData.PackNo, cardData.fileName, cardData.Sprite);
+                    continue;
+                }
+                deckCardImages[i].gameObject.SetActive(false);
             }
-            deckCardImages[i].gameObject.SetActive(false);
+            else
+            {
+                CardData cardData = DeckSceneManager.Instance().GetFavoriteCardDatas(count * 4 + i);
+                if (cardData != null)
+                {
+                    deckCardImages[i].SetData(cardData.PackNo, cardData.fileName, cardData.Sprite);
+                    continue;
+                }
+                deckCardImages[i].gameObject.SetActive(false);
+            }
         }
     }
 }

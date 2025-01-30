@@ -64,7 +64,7 @@ public class RoomSceneManager : MonoBehaviourPunCallbacks
         base.OnConnected();
 
         var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;
-        string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
+        string[] deckFiles = Directory.GetFiles(directoryPath, "opt.json", SearchOption.AllDirectories);
         try
         {
             StreamReader sr = new StreamReader(deckFiles[0], Encoding.UTF8);

@@ -172,6 +172,11 @@ public class CardDetailManager : MonoBehaviour
             m_cost.text = data.Cost;
             m_cost.gameObject.SetActive(true);
         }
+        if (!string.IsNullOrEmpty(data.CardNo))
+        {
+            m_cardNo.text = data.CardNo;
+            m_cardNo.gameObject.SetActive(true);
+        }
         if (!string.IsNullOrEmpty(data.CardCategory))
         {
             m_cardCategory.text = data.CardCategory;
@@ -199,7 +204,7 @@ public class CardDetailManager : MonoBehaviour
 
             if (i==0 && levelClass.level != "1")
             {
-                if (data.CardCategory.Contains("ネクサス"))
+                if (data.CardCategory.Contains("ネクサス") && !data.CardType.Contains("創界"))
                 {
                     levelClassList.Add(new LevelClass()
                     {

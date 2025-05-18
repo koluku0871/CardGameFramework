@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Text;
 using UnityEngine;
 
@@ -6,6 +7,15 @@ public class HomeSceneManager : MonoBehaviour
 {
     [SerializeField]
     private TMPro.TMP_InputField m_nameInputField = null;
+
+    [SerializeField]
+    private TMPro.TMP_Dropdown m_typeDropdown = null;
+
+    [SerializeField]
+    private TMPro.TMP_Dropdown m_updateDropdown = null;
+
+    [SerializeField]
+    private UnityEngine.UI.Button m_updateButton = null;
 
     private void Start()
     {
@@ -27,6 +37,54 @@ public class HomeSceneManager : MonoBehaviour
         {
             m_nameInputField.text = "Player";
         }
+
+        m_typeDropdown.ClearOptions();
+        foreach (var type in AssetBundleManager.Instance().AssetBundleBaseCardDataKeys)
+        {
+            m_typeDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+            {
+                text = type
+            });
+        }
+        //m_packTypeDropdown.value = m_packTypeDropdown.options.Count - 1;
+        m_typeDropdown.value = -1;
+
+        m_updateDropdown.ClearOptions();
+        int index = 0;
+        int selectIndex = 0;
+        string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_EXE, "CardGameFrameworkSetup_*", SearchOption.TopDirectoryOnly);
+        foreach (string file in fs)
+        {
+            string key = Path.GetFileNameWithoutExtension(file);
+            string update = key.Split('_')[1];
+            m_updateDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+            {
+                text = update
+            });
+
+            if (update == Application.version)
+            {
+                selectIndex = index;
+            }
+
+            index++;
+        }
+        //m_packTypeDropdown.value = m_packTypeDropdown.options.Count - 1;
+        
+        m_updateDropdown.value = selectIndex;
+
+        m_updateButton.onClick.AddListener(() => {
+            string fileName = ConstManager.DIRECTORY_FULL_PATH_TO_EXE + "CardGameFrameworkSetup_" + m_updateDropdown.options[m_updateDropdown.value].text + ".exe";
+#if UNITY_EDITOR
+            UnityEngine.Debug.Log(fileName);
+            return;
+#endif
+            Process process = new Process();
+            process.StartInfo.FileName = fileName;
+            process.Start();
+
+            Application.Quit();
+        });
     }
 
     public void OnClickToRoomButton() {
@@ -62,6 +120,7 @@ public class HomeSceneManager : MonoBehaviour
 
         OptionData optionData = new OptionData();
         optionData.name = m_nameInputField.text;
+        optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
         StreamWriter streamWriter = new StreamWriter(directoryPath + "opt.json");
         streamWriter.WriteLine(JsonUtility.ToJson(optionData));
         streamWriter.Close();

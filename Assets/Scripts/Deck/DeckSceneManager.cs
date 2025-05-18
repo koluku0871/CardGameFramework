@@ -173,7 +173,7 @@ public class DeckSceneManager : MonoBehaviour
         {
             text = "no select"
         });
-        foreach (var packData in AssetBundleManager.Instance().m_bs_baseData.packNameList)
+        foreach (var packData in AssetBundleManager.Instance().AssetBundleBaseCardData.baseData.packNameList)
         {
             m_packTypeDropdown.options.Add(new Dropdown.OptionData()
             {
@@ -210,6 +210,16 @@ public class DeckSceneManager : MonoBehaviour
         OnValueChangedToPackTypeDropdown();
     }
 
+    public (string, List<string>) GetPackNameList()
+    {
+        var key = m_packTypeDropdown.options[m_packTypeDropdown.value].text;
+        AssetBundleManager assetBundleManager = AssetBundleManager.Instance();
+        if (!assetBundleManager.AssetBundleBaseCardData.baseData.packNameList.ContainsKey(key))
+        {
+        }
+        return (key, assetBundleManager.AssetBundleBaseCardData.baseData.packNameList[key]);
+    }
+
     public void OnValueChangedToPackTypeDropdown()
     {
         if (!m_searchInfiniteScroll.gameObject.activeInHierarchy)
@@ -225,13 +235,11 @@ public class DeckSceneManager : MonoBehaviour
             return;
         }
 
-        var key = m_packTypeDropdown.options[m_packTypeDropdown.value].text;
-        AssetBundleManager assetBundleManager = AssetBundleManager.Instance();
-        if (!assetBundleManager.m_bs_baseData.packNameList.ContainsKey(key))
+        (var key, var packNameList) = GetPackNameList();
+        if (packNameList == null)
         {
             return;
         }
-        var packNameList = assetBundleManager.m_bs_baseData.packNameList[key];
 
         CardDetailManager cardDetailManager = CardDetailManager.Instance();
 
@@ -259,7 +267,7 @@ public class DeckSceneManager : MonoBehaviour
                 name = fileName.Split("*")[1];
             }
 
-            CardData cardData = assetBundleManager.GetBaseData(targetTag, name);
+            CardData cardData = AssetBundleManager.Instance().GetBaseData(targetTag, name);
             if (cardData == null)
             {
                 continue;

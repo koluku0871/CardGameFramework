@@ -6,19 +6,23 @@ public class ConstManager
     public const string DIRECTORY_PATH_TO_DECK = "/deck/";
     public const string DIRECTORY_PATH_TO_OPTION = "/option/";
     public const string DIRECTORY_PATH_TO_BUNDLES = "/bundles/";
+    public const string DIRECTORY_PATH_TO_EXE = "/exe/";
 
 #if UNITY_EDITOR
     public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_DECK;
     public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_OPTION;
     public static readonly string DIRECTORY_FULL_PATH_TO_BUNDLES = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_BUNDLES;
+    public static readonly string DIRECTORY_FULL_PATH_TO_EXE = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_EXE;
 #else
     public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_DECK;
     public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_OPTION;
     public static readonly string DIRECTORY_FULL_PATH_TO_BUNDLES = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_BUNDLES;
+    public static readonly string DIRECTORY_FULL_PATH_TO_EXE = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_EXE;
 #endif
 
     public static readonly string JSON_FILE_PATH_TO_GOOGLE_DRIVE = DIRECTORY_FULL_PATH_TO_OPTION + "graphic-charter-448804-u7-70967cff7bfb.json";
-    public static readonly string GOOGLE_DRIVE_FOLDER_ID = "1iK8lamB0BIbImrTOtP9N49uHjCZcgZjC";
+    public static readonly string GOOGLE_DRIVE_FOLDER_ID_TO_EXE = "1KfzsZjlDB9LpPGVhXD3i0iqufpkNkBh5";
+    public static readonly string GOOGLE_DRIVE_FOLDER_ID_TO_CARD = "1iK8lamB0BIbImrTOtP9N49uHjCZcgZjC";
 
     public enum PhotonObjectType
     {

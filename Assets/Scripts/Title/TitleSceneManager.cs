@@ -1,13 +1,15 @@
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
+using static UnityEngine.Networking.UnityWebRequest;
 
 public class TitleSceneManager : MonoBehaviour
 {
@@ -31,7 +33,6 @@ public class TitleSceneManager : MonoBehaviour
 
     private int imageIndex = 0;
 
-    private DriveService service;
     private List<Google.Apis.Drive.v3.Data.File> files = new List<Google.Apis.Drive.v3.Data.File>();
 
     private bool isDownload = false;
@@ -57,7 +58,13 @@ public class TitleSceneManager : MonoBehaviour
             Instantiate(m_assetBundleManager);
         }
 
-        string path = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
+        string path = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
         if (!Directory.Exists(path))
         {
             Directory.CreateDirectory(path);
@@ -78,17 +85,30 @@ public class TitleSceneManager : MonoBehaviour
             streamWriter.Close();
         }
 
+        OptionData optionData = new OptionData();
         path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "opt.json";
         if (!File.Exists(path))
         {
-            OptionData optionData = new OptionData();
             optionData.name = "Player";
+
+            StreamWriter streamWriter = new StreamWriter(path);
+            streamWriter.WriteLine(JsonUtility.ToJson(optionData));
+            streamWriter.Close();
+        }
+        else
+        {
+            StreamReader streamReader = new StreamReader(path, Encoding.UTF8);
+            optionData = JsonUtility.FromJson<OptionData>(streamReader.ReadToEnd());
+            streamReader.Close();
+
             StreamWriter streamWriter = new StreamWriter(path);
             streamWriter.WriteLine(JsonUtility.ToJson(optionData));
             streamWriter.Close();
         }
 
-        StartCoroutine(DownloadFileList(() => {
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "DLlock.json";
+        if (File.Exists(path))
+        {
             StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
                 AssetBundleManager.Instance().SetCardTextList();
                 FadeManager.Instance().OnStart("HomeScene");
@@ -96,7 +116,39 @@ public class TitleSceneManager : MonoBehaviour
                 m_textMeshPro.text += str;
                 m_scrollRect.verticalNormalizedPosition = 0f;
             }));
-        }));
+        }
+        else
+        {
+            StartCoroutine(RequesFileList(
+                optionData.apiPath,
+                () => {
+                    StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
+                        AssetBundleManager.Instance().SetCardTextList();
+                        FadeManager.Instance().OnStart("HomeScene");
+                    }, (string str) => {
+                        m_textMeshPro.text += str;
+                        m_scrollRect.verticalNormalizedPosition = 0f;
+                    }));
+                }));
+
+            /*StartCoroutine(DownloadFileList(
+                ConstManager.GOOGLE_DRIVE_FOLDER_ID_TO_EXE,
+                ConstManager.DIRECTORY_FULL_PATH_TO_EXE,
+                () => {
+                    StartCoroutine(DownloadFileList(
+                    ConstManager.GOOGLE_DRIVE_FOLDER_ID_TO_CARD,
+                    ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES,
+                    () => {
+                        StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
+                            AssetBundleManager.Instance().SetCardTextList();
+                            FadeManager.Instance().OnStart("HomeScene");
+                        }, (string str) => {
+                            m_textMeshPro.text += str;
+                            m_scrollRect.verticalNormalizedPosition = 0f;
+                        }));
+                    }));
+                }));*/
+        }
     }
 
     private void Update()
@@ -120,7 +172,7 @@ public class TitleSceneManager : MonoBehaviour
         imageIndex++;
     }
 
-    public IEnumerator DownloadFileList(Action action)
+    private DriveService CreateDriveService()
     {
         GoogleCredential credential;
         using (var stream = new FileStream(ConstManager.JSON_FILE_PATH_TO_GOOGLE_DRIVE, FileMode.Open, FileAccess.Read))
@@ -128,14 +180,77 @@ public class TitleSceneManager : MonoBehaviour
             credential = GoogleCredential.FromStream(stream).CreateScoped(DriveService.ScopeConstants.Drive);
         }
         // Drive APIのサービスを作成
-        service = new DriveService(new BaseClientService.Initializer()
+        DriveService service = new DriveService(new BaseClientService.Initializer()
         {
             HttpClientInitializer = credential,
             ApplicationName = "Google Drive Sample",
         });
+        return service;
+    }
+
+
+    public IEnumerator RequesFileList(string apiPath, Action action)
+    {
+        while (UnityEngine.Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            m_textMeshPro.text += "Connect Network ..." + "\n";
+            yield return new WaitForSeconds(1f);
+        }
+
+        UnityWebRequest req = UnityWebRequest.Get(apiPath);
+        yield return req.SendWebRequest();
+
+        if (req.result == Result.Success)
+        {
+            Debug.Log(req.downloadHandler.text);
+
+            ApiResponseDataToFileList apiResponseData = JsonUtility.FromJson<ApiResponseDataToFileList>(req.downloadHandler.text);
+
+            foreach (var fileData in apiResponseData.res)
+            {
+                m_textMeshPro.text += "UnityWebRequestPath : " + fileData.url + "\n";
+
+                foreach (var data in fileData.list.Split(","))
+                {
+                    string directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
+                    if (Path.GetExtension(data) == ".exe")
+                    {
+                        directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
+                    }
+
+                    if (File.Exists(directoryPath + data))
+                    {
+                        continue;
+                    }
+
+                    m_textMeshPro.text += "DownloadFilePath : " + data + "\n";
+
+                    UnityWebRequest fileReq = UnityWebRequest.Get(fileData.url + "/" + data);
+                    yield return fileReq.SendWebRequest();
+
+                    if (fileReq.result == Result.Success)
+                    {
+                        File.WriteAllBytes(directoryPath + data, fileReq.downloadHandler.data);
+                    }
+                }
+            }
+
+            action();
+        }
+        else
+        {
+            m_textMeshPro.text += "Is Completed Error " + apiPath + "\n";
+            m_textMeshPro.text += req.error + "\n";
+        }
+    }
+
+    // TODO Googleドライブへのアクセスをやめたので破棄
+    /*public IEnumerator DownloadFileList(string folderId, string dlPath, Action action)
+    {
+        DriveService service = CreateDriveService();
 
         var request = service.Files.List();
-        request.Q = "'" + ConstManager.GOOGLE_DRIVE_FOLDER_ID + "' in parents";
+        request.Q = "'" + folderId + "' in parents";
         request.Fields = "nextPageToken, files(id, name, size, createdTime)";
         files = new List<Google.Apis.Drive.v3.Data.File>();
 
@@ -147,10 +262,18 @@ public class TitleSceneManager : MonoBehaviour
                 yield return null;
             }
 
-            files.AddRange(result.Result.Files);
-            request.PageToken = result.Result.NextPageToken;
+            if (result.IsCompletedSuccessfully)
+            {
+                files.AddRange(result.Result.Files);
+                request.PageToken = result.Result.NextPageToken;
+            }
+            else
+            {
+                m_textMeshPro.text += "Is Completed Error " + folderId;
+            }
         }
 
+        m_textMeshPro.text += "DownloadFilePath : " + dlPath + "\n";
         m_textMeshPro.text += "DownloadFileList : " + files.Count + "\n";
         yield return null;
 
@@ -158,7 +281,7 @@ public class TitleSceneManager : MonoBehaviour
         {
             isDownload = true;
 
-            if (File.Exists(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES + file.Name))
+            if (File.Exists(dlPath + file.Name))
             {
                 isDownload = false;
                 continue;
@@ -177,7 +300,7 @@ public class TitleSceneManager : MonoBehaviour
             }
 
             var serviceRequest = service.Files.Get(file.Id);
-            var fileStream = new FileStream(Path.Combine(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, file.Name), FileMode.Create, FileAccess.Write);
+            var fileStream = new FileStream(Path.Combine(dlPath, file.Name), FileMode.Create, FileAccess.Write);
             serviceRequest.MediaDownloader.ProgressChanged += DownloadProgress;
             serviceRequest.Download(fileStream);
             fileStream.Close();
@@ -195,5 +318,18 @@ public class TitleSceneManager : MonoBehaviour
     {
         isDownload = dlP.Status != DownloadStatus.Completed;
         Debug.Log("Size:" + (dlP.BytesDownloaded / fileSize) * 100);
-    }
+    }*/
+}
+
+[System.Serializable]
+public class ApiResponseDataToFileList
+{
+    public FileData[] res;
+}
+
+[System.Serializable]
+public class FileData
+{
+    public string url;
+    public string list;
 }

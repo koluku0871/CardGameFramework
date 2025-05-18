@@ -218,6 +218,26 @@ public class DeckManager : MonoBehaviour
         CheckDeckDirectory();
     }
 
+    public void OnClickToDeckRCreateButton()
+    {
+        DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
+        (var key, var packNameList) = deckSceneManager.GetPackNameList();
+        if (packNameList == null || packNameList.Count < 12)
+        {
+            return;
+        }
+        int index = 0;
+        System.Random rnd = new System.Random();
+        while (index < 40)
+        {
+            int i = rnd.Next(0, packNameList.Count);
+            string fileName = packNameList[i];
+            string targetTag = key;
+            AddCard(targetTag, fileName);
+            index = deckSceneManager.GetDeckContent().childCount;
+        }
+    }
+
     public void OnClickToDeckClearButton() {
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {

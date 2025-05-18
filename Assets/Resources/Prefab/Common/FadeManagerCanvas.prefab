@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 8726790085119375594}
   - component: {fileID: 221057768830783977}
   - component: {fileID: 4470274010645856772}
-  - component: {fileID: 4394222230816196409}
-  - component: {fileID: 2973487779968446831}
   - component: {fileID: 6028503505361378300}
+  - component: {fileID: 2973487779968446831}
+  - component: {fileID: 4394222230816196409}
   m_Layer: 5
   m_Name: FadeManagerCanvas
   m_TagString: Untagged
@@ -71,6 +71,31 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 54577521522229050}
   m_CullTransparentMesh: 1
+--- !u!114 &6028503505361378300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54577521522229050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b7d1174053a3e944a6fba5b146a74b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fade: {fileID: 2973487779968446831}
+--- !u!114 &2973487779968446831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54577521522229050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d416d1715bbc06d4789612d1211da8d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4394222230816196409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -89,28 +114,3 @@ MonoBehaviour:
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   maskTexture: {fileID: 2800000, guid: af8325b21d31e7b4a925fc3146cf5cdd, type: 3}
   cutoutRange: 0
---- !u!114 &2973487779968446831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 54577521522229050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d416d1715bbc06d4789612d1211da8d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &6028503505361378300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 54577521522229050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b7d1174053a3e944a6fba5b146a74b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fade: {fileID: 2973487779968446831}

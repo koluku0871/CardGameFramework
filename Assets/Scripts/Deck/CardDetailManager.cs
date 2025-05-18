@@ -14,6 +14,9 @@ public class CardDetailManager : MonoBehaviour
     private Text m_cost = null;
 
     [SerializeField]
+    private Text m_cardNo = null;
+
+    [SerializeField]
     private Button m_awake = null;
 
     [SerializeField]
@@ -71,6 +74,8 @@ public class CardDetailManager : MonoBehaviour
     private void Init() {
         m_cost.text = "";
         m_cost.gameObject.SetActive(false);
+        m_cardNo.text = "";
+        m_cardNo.gameObject.SetActive(false);
         m_cardCategory.text = "";
         m_cardCategory.gameObject.SetActive(false);
         m_cardType.text = "";

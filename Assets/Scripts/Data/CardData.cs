@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using UnityEngine;
 
 public class BaseData
@@ -83,6 +84,7 @@ public class CardData
             textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_blue.png\"/>", "<sprite=\"SymbolBlue\" index=0>");
             textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_god.png\"/>", "<sprite=\"SymbolGod\" index=0>");
             textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_soulcore.png\"/>", "<sprite=\"SoulCore\" index=0>");
+            textStr = textStr.Replace("<img src=\"/renewal/images/cardlist/ico_all.png\"/>", "<sprite=\"ico_all\" index=0>");
 
             if (textStr.IndexOf("\n") == 0)
             {

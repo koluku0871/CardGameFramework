@@ -223,6 +223,11 @@ public class CardDetailManager : MonoBehaviour
             textStrSplit = textStrSplit[1].Split('／');
             levelClass.bp = textStrSplit[0];
             levelClass.core = textStrSplit[1];
+            if (levelClass.level.Contains("brave"))
+            {
+                levelClass.core = "B";
+                levelClass.level = "";
+            }
 
             levelClassList.Add(levelClass);
         }

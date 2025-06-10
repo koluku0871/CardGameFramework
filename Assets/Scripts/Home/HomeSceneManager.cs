@@ -6,6 +6,12 @@ using UnityEngine;
 public class HomeSceneManager : MonoBehaviour
 {
     [SerializeField]
+    private TMPro.TextMeshProUGUI m_nameText = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_versionText = null;
+
+    [SerializeField]
     private TMPro.TMP_InputField m_nameInputField = null;
 
     [SerializeField]
@@ -85,6 +91,10 @@ public class HomeSceneManager : MonoBehaviour
 
             Application.Quit();
         });
+
+        m_nameText.text = m_nameInputField.text;
+
+        m_versionText.text = "v " + Application.version;
     }
 
     public void OnClickToRoomButton() {
@@ -120,6 +130,7 @@ public class HomeSceneManager : MonoBehaviour
 
         OptionData optionData = new OptionData();
         optionData.name = m_nameInputField.text;
+        m_nameText.text = m_nameInputField.text;
         optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
         StreamWriter streamWriter = new StreamWriter(directoryPath + "opt.json");
         streamWriter.WriteLine(JsonUtility.ToJson(optionData));

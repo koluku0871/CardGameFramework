@@ -233,27 +233,34 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         });
     }
 
-    public void SetInitCore(int life = 5, int soulCoreNum = 1, int coreNum = 3)
+    public void SetInitCore()
     {
-        for (int index = 0; index < life; index++)
+        int life = int.Parse(m_customRoomProperties["Life"].ToString());
+        int soulCoreNum = int.Parse(m_customRoomProperties["SoulCore"].ToString());
+        int coreNum = int.Parse(m_customRoomProperties["Core"].ToString());
+
+        if (m_life != null)
         {
-            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
-            core.transform.SetParent(m_coreField);
-            float offset = 20;
-            float sizeX = m_life.rectTransform.sizeDelta.x * m_life.rectTransform.localScale.x - offset;
-            float sizeY = m_life.rectTransform.sizeDelta.y * m_life.rectTransform.localScale.y - offset;
-            float posX = m_life.rectTransform.position.x - (int)sizeX / 2 + (offset / 3 * 2) * index;
-            float posY = m_life.rectTransform.position.y + ((offset / 2) + offset * (index / 5));
-            core.transform.position = new Vector3(posX, posY, 0);
-            core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
-                int coreIndex = m_coreList.IndexOf(core);
-                if (coreIndex != -1)
-                {
-                    m_coreList.RemoveAt(coreIndex);
-                    core.SetActive(false);
-                }
-            });
-            m_coreList.Add(core);
+            for (int index = 0; index < life; index++)
+            {
+                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
+                core.transform.SetParent(m_coreField);
+                float offset = 20;
+                float sizeX = m_life.rectTransform.sizeDelta.x * m_life.rectTransform.localScale.x - offset;
+                float sizeY = m_life.rectTransform.sizeDelta.y * m_life.rectTransform.localScale.y - offset;
+                float posX = m_life.rectTransform.position.x - (int)sizeX / 2 + (offset / 3 * 2) * index;
+                float posY = m_life.rectTransform.position.y + ((offset / 2) + offset * (index / 5));
+                core.transform.position = new Vector3(posX, posY, 0);
+                core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                    int coreIndex = m_coreList.IndexOf(core);
+                    if (coreIndex != -1)
+                    {
+                        m_coreList.RemoveAt(coreIndex);
+                        core.SetActive(false);
+                    }
+                });
+                m_coreList.Add(core);
+            }
         }
 
         for (int index = 0; index < soulCoreNum; index++)

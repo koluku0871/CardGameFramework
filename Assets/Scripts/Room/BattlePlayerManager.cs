@@ -1,18 +1,21 @@
 ﻿using ExitGames.Client.Photon;
 using Photon.Pun;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class BattlePlayerManager : MonoBehaviourPunCallbacks
 {
     [SerializeField]
-    private Text m_playerName1 = null;
+    private TMPro.TextMeshProUGUI m_playerName1 = null;
 
     [SerializeField]
-    private Text m_playerName2 = null;
+    private TMPro.TextMeshProUGUI m_playerName2 = null;
 
     // ハッシュテーブルを宣言
-    Hashtable roomHash = new Hashtable();
+    public Hashtable roomHash = new Hashtable();
+
+    public int roomHashCount = 0;
 
     public bool IsStandbyBattlePlayer()
     {
@@ -23,36 +26,35 @@ public class BattlePlayerManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            roomHash["playerName1"] = "";
-            roomHash["playerName2"] = "";
-            roomHash["playerDeck1"] = "";
-            roomHash["playerDeck2"] = "";
-            PhotonNetwork.CurrentRoom.SetCustomProperties(roomHash);
+            ExitGames.Client.Photon.Hashtable customRoomProperties = new ExitGames.Client.Photon.Hashtable();
+            customRoomProperties.Add("Type", "BS");
+            customRoomProperties.Add("Core", 3);
+            customRoomProperties.Add("SoulCore", 1);
+            customRoomProperties.Add("Life", 5);
+            customRoomProperties.Add("Hand", 4);
+
+            customRoomProperties.Add("playerName1", "");
+            customRoomProperties.Add("playerName2", "");
+            customRoomProperties.Add("playerDeck1", "");
+            customRoomProperties.Add("playerDeck2", "");
+
+            SetRoomHash(customRoomProperties);
         }
         else
         {
-            foreach (var prop in PhotonNetwork.CurrentRoom.CustomProperties)
-            {
-                if (prop.Key.ToString() == "playerName1")
-                {
-                    roomHash["playerName1"] = prop.Value.ToString();
-                    m_playerName1.text = roomHash["playerName1"].ToString();
-                }
-                else if (prop.Key.ToString() == "playerName2")
-                {
-                    roomHash["playerName2"] = prop.Value.ToString();
-                    m_playerName2.text = roomHash["playerName2"].ToString();
-                }
-                else if (prop.Key.ToString() == "playerDeck1")
-                {
-                    roomHash["playerDeck1"] = prop.Value.ToString();
-                }
-                else if (prop.Key.ToString() == "playerDeck2")
-                {
-                    roomHash["playerDeck2"] = prop.Value.ToString();
-                }
-            }
+            roomHash = PhotonNetwork.CurrentRoom.CustomProperties;
         }
+
+        if (roomHashCount < roomHash.Count)
+        {
+            roomHashCount = roomHash.Count;
+        }
+    }
+
+    public void SetRoomHash(ExitGames.Client.Photon.Hashtable customRoomProperties)
+    {
+        roomHash = customRoomProperties;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomHash);
     }
 
     public void SetInBattlePlayer(string  playerName, string deckName)
@@ -114,28 +116,9 @@ public class BattlePlayerManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnRoomPropertiesUpdate(Hashtable changedProps)
+    public void OnPropertiesUpdate(Hashtable changedProps)
     {
-        // 更新されたプレイヤーのカスタムプロパティのペアをコンソールに出力する
-        foreach (var prop in changedProps)
-        {
-            if (prop.Key.ToString() == "playerName1")
-            {
-                roomHash["playerName1"] = prop.Value.ToString();
-            }
-            else if (prop.Key.ToString() == "playerName2")
-            {
-                roomHash["playerName2"] = prop.Value.ToString();
-            }
-            else if (prop.Key.ToString() == "playerDeck1")
-            {
-                roomHash["playerDeck1"] = prop.Value.ToString();
-            }
-            else if (prop.Key.ToString() == "playerDeck2")
-            {
-                roomHash["playerDeck2"] = prop.Value.ToString();
-            }
-        }
+        roomHash = PhotonNetwork.CurrentRoom.CustomProperties;
 
         if (roomHash.ContainsKey("playerName1"))
         {

@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using static DeckManager;
 
 public class PhotonSceneManager : MonoBehaviourPunCallbacks
 {
@@ -283,6 +284,9 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
 
     private void CheckDeckDirectory()
     {
+        OptionData optionData = new OptionData();
+        optionData.LoadTxt();
+
         m_deckSelectDropdown.ClearOptions();
         m_deckSelectDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
         {
@@ -301,15 +305,25 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             for (int index = 0; index < deckFiles.Length; index++)
             {
                 StreamReader sr = new StreamReader(deckFiles[index], Encoding.UTF8);
-                m_deckList.Add(sr.ReadToEnd());
-                int start = deckFiles[index].LastIndexOf("/") + 1;
-                int end = deckFiles[index].LastIndexOf(".json");
-                int count = end - start;
-                string deckFileName = deckFiles[index].Substring(start, count);
-                m_deckSelectDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+                var deckStr = sr.ReadToEnd();
+                try
                 {
-                    text = deckFileName
-                });
+                    DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(deckStr);
+                    if (deckCardList.GetDeckType() == optionData.cardType)
+                    {
+                        m_deckList.Add(deckStr);
+                        int start = deckFiles[index].LastIndexOf("/") + 1;
+                        int end = deckFiles[index].LastIndexOf(".json");
+                        int count = end - start;
+                        string deckFileName = deckFiles[index].Substring(start, count);
+                        m_deckSelectDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+                        {
+                            text = deckFileName
+                        });
+                    }
+                }
+                catch { }
+
                 sr.Close();
             }
         }

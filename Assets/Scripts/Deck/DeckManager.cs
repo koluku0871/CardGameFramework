@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -18,12 +19,27 @@ public class DeckManager : MonoBehaviour
 
     [Serializable]
     public class DeckDetail {
+        public string type = "";
         public List<CardDetail> cardDetailList = new List<CardDetail>();
+        public List<CardDetail> subCardDetailList = new List<CardDetail>();
 
         public void Add(CardDetail cardDetail) {
             cardDetailList.Add(cardDetail);
         }
 
+        public string GetDeckType()
+        {
+            if (string.IsNullOrEmpty(type))
+            {
+                type = "bs";
+            }
+            return type;
+        }
+
+        /// <summary>
+        /// BS契約チェック
+        /// </summary>
+        /// <returns></returns>
         public bool IsInContract()
         {
             foreach (CardDetail cardDetail in cardDetailList)
@@ -76,15 +92,26 @@ public class DeckManager : MonoBehaviour
             string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
             for(int index = 0; index < deckFiles.Length; index++)
             {
-                StreamReader sr = new StreamReader(deckFiles[index], Encoding.UTF8);
-                m_deckList.Add(sr.ReadToEnd());
-                int start = deckFiles[index].LastIndexOf("/") + 1;
-                int end = deckFiles[index].LastIndexOf(".json");
-                int count = end - start;
-                string deckFileName = deckFiles[index].Substring(start, count);
-                deckSceneManager.GetDeckSelectDropdown().options.Add(new Dropdown.OptionData(){
-                    text = deckFileName
-                });
+                var sr = new StreamReader(deckFiles[index], Encoding.UTF8);
+                var deckStr = sr.ReadToEnd();
+                try
+                {
+                    DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(deckStr);
+                    if (deckCardList.GetDeckType() == optionData.cardType)
+                    {
+                        m_deckList.Add(deckStr);
+                        int start = deckFiles[index].LastIndexOf("/") + 1;
+                        int end = deckFiles[index].LastIndexOf(".json");
+                        int count = end - start;
+                        string deckFileName = deckFiles[index].Substring(start, count);
+                        deckSceneManager.GetDeckSelectDropdown().options.Add(new Dropdown.OptionData()
+                        {
+                            text = deckFileName
+                        });
+                    }
+                }
+                catch{ }
+
                 sr.Close();
             }
         }
@@ -176,6 +203,7 @@ public class DeckManager : MonoBehaviour
         string deckFileName = deckSceneManager.GetDeckSelectDropdown().options[selectId].text;
 
         DeckDetail deckCardList = new DeckDetail();
+        deckCardList.type = optionData.cardType;
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
             string[] cardData = c.name.Split('^');
             if (cardData.Length < 2) {

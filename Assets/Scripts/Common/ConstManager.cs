@@ -20,10 +20,6 @@ public class ConstManager
     public static readonly string DIRECTORY_FULL_PATH_TO_EXE = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_EXE;
 #endif
 
-    public static readonly string JSON_FILE_PATH_TO_GOOGLE_DRIVE = DIRECTORY_FULL_PATH_TO_OPTION + "graphic-charter-448804-u7-70967cff7bfb.json";
-    public static readonly string GOOGLE_DRIVE_FOLDER_ID_TO_EXE = "1KfzsZjlDB9LpPGVhXD3i0iqufpkNkBh5";
-    public static readonly string GOOGLE_DRIVE_FOLDER_ID_TO_CARD = "1iK8lamB0BIbImrTOtP9N49uHjCZcgZjC";
-
     public enum PhotonObjectType
     {
         NONE = 0,

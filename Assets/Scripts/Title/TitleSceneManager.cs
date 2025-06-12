@@ -1,6 +1,3 @@
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -113,24 +110,6 @@ public class TitleSceneManager : MonoBehaviour
                         m_scrollRect.verticalNormalizedPosition = 0f;
                     }));
                 }));
-
-            /*StartCoroutine(DownloadFileList(
-                ConstManager.GOOGLE_DRIVE_FOLDER_ID_TO_EXE,
-                ConstManager.DIRECTORY_FULL_PATH_TO_EXE,
-                () => {
-                    StartCoroutine(DownloadFileList(
-                    ConstManager.GOOGLE_DRIVE_FOLDER_ID_TO_CARD,
-                    ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES,
-                    () => {
-                        StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
-                            AssetBundleManager.Instance().SetCardTextList();
-                            FadeManager.Instance().OnStart("HomeScene");
-                        }, (string str) => {
-                            m_textMeshPro.text += str;
-                            m_scrollRect.verticalNormalizedPosition = 0f;
-                        }));
-                    }));
-                }));*/
         }
     }
 
@@ -153,22 +132,6 @@ public class TitleSceneManager : MonoBehaviour
         }
         m_images[imageIndex].gameObject.SetActive(true);
         imageIndex++;
-    }
-
-    private DriveService CreateDriveService()
-    {
-        GoogleCredential credential;
-        using (var stream = new FileStream(ConstManager.JSON_FILE_PATH_TO_GOOGLE_DRIVE, FileMode.Open, FileAccess.Read))
-        {
-            credential = GoogleCredential.FromStream(stream).CreateScoped(DriveService.ScopeConstants.Drive);
-        }
-        // Drive APIのサービスを作成
-        DriveService service = new DriveService(new BaseClientService.Initializer()
-        {
-            HttpClientInitializer = credential,
-            ApplicationName = "Google Drive Sample",
-        });
-        return service;
     }
 
 
@@ -226,82 +189,6 @@ public class TitleSceneManager : MonoBehaviour
             m_textMeshPro.text += req.error + "\n";
         }
     }
-
-    // TODO Googleドライブへのアクセスをやめたので破棄
-    /*public IEnumerator DownloadFileList(string folderId, string dlPath, Action action)
-    {
-        DriveService service = CreateDriveService();
-
-        var request = service.Files.List();
-        request.Q = "'" + folderId + "' in parents";
-        request.Fields = "nextPageToken, files(id, name, size, createdTime)";
-        files = new List<Google.Apis.Drive.v3.Data.File>();
-
-        while (files.Count == 0 || !string.IsNullOrEmpty(request.PageToken))
-        {
-            var result = request.ExecuteAsync();
-            while (!result.IsCompleted)
-            {
-                yield return null;
-            }
-
-            if (result.IsCompletedSuccessfully)
-            {
-                files.AddRange(result.Result.Files);
-                request.PageToken = result.Result.NextPageToken;
-            }
-            else
-            {
-                m_textMeshPro.text += "Is Completed Error " + folderId;
-            }
-        }
-
-        m_textMeshPro.text += "DownloadFilePath : " + dlPath + "\n";
-        m_textMeshPro.text += "DownloadFileList : " + files.Count + "\n";
-        yield return null;
-
-        foreach (var file in files)
-        {
-            isDownload = true;
-
-            if (File.Exists(dlPath + file.Name))
-            {
-                isDownload = false;
-                continue;
-            }
-
-            var str = "Name: " + file.Name + " ID: " + file.Id + " Size: " + file.Size + "byte CreatedTime: " + file.CreatedTimeDateTimeOffset;
-            Debug.Log(str);
-            m_textMeshPro.text += "DownloadFile : " + str + "\n";
-            m_scrollRect.verticalNormalizedPosition = 0f;
-            yield return null;
-
-            fileSize = 0;
-            if (file.Size.HasValue)
-            {
-                fileSize = file.Size.Value;
-            }
-
-            var serviceRequest = service.Files.Get(file.Id);
-            var fileStream = new FileStream(Path.Combine(dlPath, file.Name), FileMode.Create, FileAccess.Write);
-            serviceRequest.MediaDownloader.ProgressChanged += DownloadProgress;
-            serviceRequest.Download(fileStream);
-            fileStream.Close();
-
-            while (isDownload)
-            {
-                yield return null;
-            }
-        }
-
-        action();
-    }
-
-    public void DownloadProgress(IDownloadProgress dlP)
-    {
-        isDownload = dlP.Status != DownloadStatus.Completed;
-        Debug.Log("Size:" + (dlP.BytesDownloaded / fileSize) * 100);
-    }*/
 }
 
 [System.Serializable]

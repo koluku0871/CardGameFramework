@@ -84,7 +84,7 @@ public class CardOptionWindow : MonoBehaviour
         Dictionary<string, UnityAction> actionList = new Dictionary<string, UnityAction>();
 
         actionList.Add("ドロー&コア&リフレッシュステップ", () => {
-                FieldCardManager.Instance().AddHandFromDeck(true, 1);
+                FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
                 PlayerFieldManager.Instance().OnClickPlusButton();
                 PlayerFieldManager.Instance().SetCorePos(ConstManager.CorePosType.TRASH, ConstManager.CorePosType.RESERVE);
                 PlayerFieldManager.Instance().SetAllMyCardToRecovery();
@@ -122,7 +122,7 @@ public class CardOptionWindow : MonoBehaviour
             Close();
         });
         actionList.Add("ドロー&リフレッシュステップ", () => {
-                FieldCardManager.Instance().AddHandFromDeck(true, 1);
+                FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
                 PlayerFieldManager.Instance().SetCorePos(ConstManager.CorePosType.TRASH, ConstManager.CorePosType.RESERVE);
                 PlayerFieldManager.Instance().SetAllMyCardToRecovery();
                 Close();
@@ -146,12 +146,12 @@ public class CardOptionWindow : MonoBehaviour
         });
 
         actionList.Add("デッキの上からX枚を手札に加える", () => {
-            FieldCardManager.Instance().AddHandFromDeck(true, numButtonTextNum);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, numButtonTextNum);
             CloseOnSound();
         });
 
         actionList.Add("デッキの下からX枚を手札に加える", () => {
-            FieldCardManager.Instance().AddHandFromDeck(false, numButtonTextNum);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, false, numButtonTextNum);
             CloseOnSound();
         });
 
@@ -162,17 +162,17 @@ public class CardOptionWindow : MonoBehaviour
         });
 
         actionList.Add("デッキの上からX枚を手元に置く", () => {
-            FieldCardManager.Instance().AddAtHandFromDeck(true, numButtonTextNum);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
             CloseOnSound();
         });
 
         actionList.Add("デッキの上からX枚をトラッシュに送る", () => {
-            var cardList = FieldCardManager.Instance().AddTrashOrExclusionFromDeck(true, numButtonTextNum, true);
+            var cardList = FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         });
         actionList.Add("デッキの上からX枚を除外一覧に送る", () => {
-            var cardList = FieldCardManager.Instance().AddTrashOrExclusionFromDeck(true, numButtonTextNum, false);
+            var cardList = FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         });
@@ -193,13 +193,13 @@ public class CardOptionWindow : MonoBehaviour
 
         actionList.Add("デッキから手札に加える", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddHandFromDeck(list[0], list[1]);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, list[0], list[1]);
             CloseOnSound();
         });
 
         actionList.Add("デッキから手元に置く", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddAtHandFromDeck(list[0], list[1]);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, list[0], list[1]);
             CloseOnSound();
         });
 
@@ -208,14 +208,14 @@ public class CardOptionWindow : MonoBehaviour
         actionList.Add("デッキからトラッシュに送る", () => {
             string[] list = target.name.Split('^');
             List<bool> isTrashList = new List<bool>() { true, false };
-            FieldCardManager.Instance().AddTrashOrExclusionFromDeck(list[0], list[1], true);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.TRASH, list[0], list[1]);
             CloseOnSound();
         });
 
         actionList.Add("デッキから除外一覧に送る", () => {
             string[] list = target.name.Split('^');
             List<bool> isTrashList = new List<bool>() { true, false };
-            FieldCardManager.Instance().AddTrashOrExclusionFromDeck(list[0], list[1], false);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.EXCLUSION, list[0], list[1]);
             CloseOnSound();
         });
 
@@ -224,12 +224,12 @@ public class CardOptionWindow : MonoBehaviour
 
         actionList.Add("デッキから契約カードを手札に加える", () => {
             FieldCardManager.Instance().AddHandFromDeckToContract();
-            FieldCardManager.Instance().AddHandFromDeck(true, 3);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 3);
             CloseOnSound();
         });
 
         actionList.Add("デッキから契約カードを手札に加えない", () => {
-            FieldCardManager.Instance().AddHandFromDeck(true, 4);
+            FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 4);
             CloseOnSound();
         });
 
@@ -467,7 +467,7 @@ public class CardOptionWindow : MonoBehaviour
     {
         CardListWindow.Instance().Close();
         List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
-        List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetExclusion();
+        List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetDeckOrTrashOrExclusion(OPTION_TYPE.EXCLUSION);
         for (int index = 0; index < cardList.Count; index++)
         {
             openCardList.Add(cardList[index]);
@@ -484,7 +484,7 @@ public class CardOptionWindow : MonoBehaviour
             () => {
                 CardListWindow.Instance().Close();
                 List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
-                List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetExclusion();
+                List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetDeckOrTrashOrExclusion(OPTION_TYPE.EXCLUSION);
                 for (int index = 0; index < cardList.Count; index++)
                 {
                     openCardList.Add(cardList[index]);
@@ -513,7 +513,7 @@ public class CardOptionWindow : MonoBehaviour
                 if (playField != null)
                 {
                     List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
-                    List<DeckManager.CardDetail> cardList = playField.GetExclusion();
+                    List<DeckManager.CardDetail> cardList = playField.GetDeckOrTrashOrExclusion(OPTION_TYPE.EXCLUSION);
                     for (int index = 0; index < cardList.Count; index++)
                     {
                         openCardList.Add(cardList[index]);
@@ -547,7 +547,7 @@ public class CardOptionWindow : MonoBehaviour
             "除外一覧から手札に加える", OPTION_TYPE.EXCLUSION, OPTION_TYPE.CARD_LIST,
             () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddHandFromExclusion(list[0], list[1]);
+                FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.EXCLUSION, OPTION_TYPE.HAND, list[0], list[1]);
                 OpenExclusionListToMine();
             }
         );
@@ -556,7 +556,7 @@ public class CardOptionWindow : MonoBehaviour
             "除外一覧から手元に置く", OPTION_TYPE.EXCLUSION, OPTION_TYPE.CARD_LIST,
             () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddAtHandFromExclusion(list[0], list[1]);
+                FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.EXCLUSION, OPTION_TYPE.AT_HAND, list[0], list[1]);
                 OpenExclusionListToMine();
             }
         );
@@ -566,7 +566,7 @@ public class CardOptionWindow : MonoBehaviour
     {
         CardListWindow.Instance().Close();
         List <DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
-        List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetTrash();
+        List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetDeckOrTrashOrExclusion(OPTION_TYPE.TRASH);
         for (int index = 0; index < cardList.Count; index++)
         {
             openCardList.Add(cardList[index]);
@@ -583,7 +583,7 @@ public class CardOptionWindow : MonoBehaviour
             () => {
                 CardListWindow.Instance().Close();
                 List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
-                List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetTrash();
+                List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetDeckOrTrashOrExclusion(OPTION_TYPE.TRASH);
                 for (int index = 0; index < cardList.Count; index++)
                 {
                     openCardList.Add(cardList[index]);
@@ -612,7 +612,7 @@ public class CardOptionWindow : MonoBehaviour
                 if (playField != null)
                 {
                     List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
-                    List<DeckManager.CardDetail> cardList = playField.GetTrash();
+                    List<DeckManager.CardDetail> cardList = playField.GetDeckOrTrashOrExclusion(OPTION_TYPE.TRASH);
                     for (int index = 0; index < cardList.Count; index++)
                     {
                         openCardList.Add(cardList[index]);
@@ -645,7 +645,7 @@ public class CardOptionWindow : MonoBehaviour
             "トラッシュから手札に加える", OPTION_TYPE.TRASH, OPTION_TYPE.CARD_LIST,
             () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddHandFromTrash(list[0], list[1]);
+                FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.TRASH, OPTION_TYPE.HAND, list[0], list[1]);
                 OpenTrashListToMine();
             }
         );
@@ -654,7 +654,7 @@ public class CardOptionWindow : MonoBehaviour
             "トラッシュから手元に置く", OPTION_TYPE.TRASH, OPTION_TYPE.CARD_LIST,
             () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddAtHandFromTrash(list[0], list[1]);
+                FieldCardManager.Instance().AddSrcFromDst(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, list[0], list[1]);
                 OpenTrashListToMine();
             }
         );
@@ -663,7 +663,7 @@ public class CardOptionWindow : MonoBehaviour
             "トラッシュから除外一覧に送る", OPTION_TYPE.TRASH, OPTION_TYPE.CARD_LIST,
             () => {
                 string[] list = target.name.Split('^');
-                var card = FieldCardManager.Instance().RemoveTrash(list[0], list[1]);
+                var card = FieldCardManager.Instance().RemoveTrashOrExclusion(OPTION_TYPE.TRASH, list[0], list[1]);
                 FieldCardManager.Instance().AddTrashOrExclusion(card, false);
                 OpenTrashListToMine();
             }
@@ -673,7 +673,7 @@ public class CardOptionWindow : MonoBehaviour
             "トラッシュからフィールドに出す", OPTION_TYPE.TRASH, OPTION_TYPE.CARD_LIST,
             () => {
                 string[] list = target.name.Split('^');
-                var card = FieldCardManager.Instance().RemoveTrash(list[0], list[1]);
+                var card = FieldCardManager.Instance().RemoveTrashOrExclusion(OPTION_TYPE.TRASH, list[0], list[1]);
                 PlayerFieldManager.Instance().CreateCard(target.name);
                 OpenTrashListToMine();
             }

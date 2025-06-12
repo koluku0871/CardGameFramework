@@ -1,9 +1,11 @@
 ﻿using Photon.Pun;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
+using static CardOptionWindow;
 using static CoreManager;
 
 public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
@@ -66,6 +68,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     private List<GameObject> m_soulCoreList = new List<GameObject>();
     private List<GameObject> m_coreList = new List<GameObject>();
 
+    private ExitGames.Client.Photon.Hashtable m_customRoomProperties = new ExitGames.Client.Photon.Hashtable();
+
     private static PlayerFieldManager instance = null;
     public static PlayerFieldManager Instance()
     {
@@ -97,147 +101,187 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         SetButton(m_photonView.IsMine);
     }
 
+    private bool SetActive(Selectable obj, bool isActive)
+    {
+        bool isNotNull = obj != null && obj.gameObject != null;
+        if (isNotNull)
+        {
+            obj.gameObject.SetActive(isActive);
+        }
+        return isNotNull;
+    }
+
     public void SetButton(bool IsMine)
     {
-        m_optionButton.gameObject.SetActive(IsMine);
-        m_markButton.gameObject.SetActive(false);
-        m_countPlusButton.gameObject.SetActive(IsMine);
-        m_countMinusButton.gameObject.SetActive(IsMine);
-        m_lifePlusButton.gameObject.SetActive(IsMine);
-        m_lifeMinusButton.gameObject.SetActive(false);
-        m_soulPlusButton.gameObject.SetActive(IsMine);
-        m_soulMinusButton.gameObject.SetActive(IsMine);
-        m_plusButton.gameObject.SetActive(IsMine);
-        m_minusButton.gameObject.SetActive(IsMine);
+        if (SetActive(m_optionButton, IsMine))
+        {
+            m_optionButton.onClick.AddListener(() => {
+                CardOptionWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.STEP);
+            });
+        }
 
-        m_countPlusButton.onClick.AddListener(() => {
-            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
-            core.transform.SetParent(m_coreField);
-            float offset = 20;
-            float sizeX = m_count.rectTransform.sizeDelta.x * m_count.rectTransform.localScale.x - offset;
-            float sizeY = m_count.rectTransform.sizeDelta.y * m_count.rectTransform.localScale.y - offset + 5;
-            float posX = m_count.rectTransform.position.x - ((int)(sizeX) / 2 - ((offset / 3 * 2) * (m_countCoreList.Count % 5)));
-            float posY = m_count.rectTransform.position.y + ((int)(sizeY) / 2 - ((offset -5) * (m_countCoreList.Count / 5)));
-            core.transform.position = new Vector3(posX, posY, 0);
-            core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
-                int coreIndex = m_countCoreList.IndexOf(core);
-                if (coreIndex != -1)
+        if (SetActive(m_markButton, false))
+        {
+            m_markButton.onClick.AddListener(() => {
+                GameObject mark = PhotonNetwork.Instantiate("Prefab/Battle/Mark", Vector3.zero, Quaternion.identity);
+                mark.transform.SetParent(m_markField);
+                mark.transform.localPosition = Vector3.zero;
+                mark.transform.localScale = Vector3.one;
+                mark.transform.localRotation = Quaternion.identity;
+                mark.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                    mark.SetActive(false);
+                });
+            });
+        }
+
+        if (SetActive(m_countPlusButton, IsMine) && m_count != null && m_countCoreList != null)
+        {
+            m_countPlusButton.onClick.AddListener(() => {
+                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
+                core.transform.SetParent(m_coreField);
+                float offset = 20;
+                float sizeX = m_count.rectTransform.sizeDelta.x * m_count.rectTransform.localScale.x - offset;
+                float sizeY = m_count.rectTransform.sizeDelta.y * m_count.rectTransform.localScale.y - offset + 5;
+                float posX = m_count.rectTransform.position.x - ((int)(sizeX) / 2 - ((offset / 3 * 2) * (m_countCoreList.Count % 5)));
+                float posY = m_count.rectTransform.position.y + ((int)(sizeY) / 2 - ((offset - 5) * (m_countCoreList.Count / 5)));
+                core.transform.position = new Vector3(posX, posY, 0);
+                core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                    int coreIndex = m_countCoreList.IndexOf(core);
+                    if (coreIndex != -1)
+                    {
+                        m_countCoreList.RemoveAt(coreIndex);
+                        core.SetActive(false);
+                    }
+                });
+                m_countCoreList.Add(core);
+            });
+        }
+
+        if (SetActive(m_countMinusButton, IsMine) && m_countCoreList != null)
+        {
+            m_countMinusButton.onClick.AddListener(() => {
+                if (m_countCoreList != null && m_countCoreList.Count > 0)
                 {
-                    m_countCoreList.RemoveAt(coreIndex);
+                    GameObject core = m_countCoreList[m_countCoreList.Count - 1];
+                    m_countCoreList.Remove(core);
                     core.SetActive(false);
                 }
             });
-            m_countCoreList.Add(core);
-        });
-        m_countMinusButton.onClick.AddListener(() => {
-            if (m_countCoreList != null && m_countCoreList.Count > 0)
-            {
-                GameObject core = m_countCoreList[m_countCoreList.Count - 1];
-                m_countCoreList.Remove(core);
-                core.SetActive(false);
-            }
-        });
+        }
 
-        m_lifePlusButton.onClick.AddListener(() => {
-            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
-            core.transform.SetParent(m_coreField);
-            float offset = 10;
-            float sizeX = m_life.rectTransform.sizeDelta.x * m_life.rectTransform.localScale.x - offset;
-            float sizeY = m_life.rectTransform.sizeDelta.y * m_life.rectTransform.localScale.y - offset;
-            core.transform.position = new Vector3(
-                m_life.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                m_life.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
-                0);
-            core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
-                int index = m_coreList.IndexOf(core);
-                if (index != -1)
+        if (SetActive(m_lifePlusButton, IsMine))
+        {
+            m_lifePlusButton.onClick.AddListener(() => {
+                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
+                core.transform.SetParent(m_coreField);
+                float offset = 10;
+                float sizeX = m_life.rectTransform.sizeDelta.x * m_life.rectTransform.localScale.x - offset;
+                float sizeY = m_life.rectTransform.sizeDelta.y * m_life.rectTransform.localScale.y - offset;
+                core.transform.position = new Vector3(
+                    m_life.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                    m_life.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                    0);
+                core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                    int index = m_coreList.IndexOf(core);
+                    if (index != -1)
+                    {
+                        m_coreList.RemoveAt(index);
+                        core.SetActive(false);
+                    }
+                });
+                m_coreList.Add(core);
+            });
+        }
+
+        SetActive(m_lifeMinusButton, false);
+
+        if (SetActive(m_soulPlusButton, IsMine))
+        {
+            m_soulPlusButton.onClick.AddListener(() => {
+                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/SoulCore", Vector3.zero, Quaternion.identity);
+                core.transform.SetParent(m_coreField);
+                float offset = 10;
+                float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
+                float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
+                core.transform.position = new Vector3(
+                    m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                    m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                    0);
+                core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                    int index = m_soulCoreList.IndexOf(core);
+                    if (index != -1)
+                    {
+                        m_soulCoreList.RemoveAt(index);
+                        core.SetActive(false);
+                    }
+                });
+                m_soulCoreList.Add(core);
+            });
+        }
+
+        if (SetActive(m_soulMinusButton, IsMine))
+        {
+            m_soulMinusButton.onClick.AddListener(() => {
+                if (m_soulCoreList != null && m_soulCoreList.Count > 0)
                 {
-                    m_coreList.RemoveAt(index);
+                    GameObject core = m_soulCoreList[m_soulCoreList.Count - 1];
+                    m_soulCoreList.Remove(core);
                     core.SetActive(false);
                 }
             });
-            m_coreList.Add(core);
-        });
+        }
 
-        m_soulPlusButton.onClick.AddListener(() => {
-            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/SoulCore", Vector3.zero, Quaternion.identity);
-            core.transform.SetParent(m_coreField);
-            float offset = 10;
-            float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
-            float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
-            core.transform.position = new Vector3(
-                m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
-                0);
-            core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
-                int index = m_soulCoreList.IndexOf(core);
-                if (index != -1)
+        if (SetActive(m_plusButton, IsMine))
+        {
+            m_plusButton.onClick.AddListener(() => {
+                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
+                core.transform.SetParent(m_coreField);
+                float offset = 10;
+                float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
+                float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
+                core.transform.position = new Vector3(
+                    m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
+                    m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
+                    0);
+                core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                    int index = m_coreList.IndexOf(core);
+                    if (index != -1)
+                    {
+                        m_coreList.RemoveAt(index);
+                        core.SetActive(false);
+                    }
+                });
+                m_coreList.Add(core);
+            });
+        }
+
+        if (SetActive(m_minusButton, IsMine))
+        {
+            m_minusButton.onClick.AddListener(() => {
+                if (m_coreList != null && m_coreList.Count > 0)
                 {
-                    m_soulCoreList.RemoveAt(index);
+                    GameObject core = m_coreList[m_coreList.Count - 1];
+                    m_coreList.Remove(core);
                     core.SetActive(false);
                 }
             });
-            m_soulCoreList.Add(core);
-        });
-        m_soulMinusButton.onClick.AddListener(() => {
-            if (m_soulCoreList != null && m_soulCoreList.Count > 0)
-            {
-                GameObject core = m_soulCoreList[m_soulCoreList.Count - 1];
-                m_soulCoreList.Remove(core);
-                core.SetActive(false);
-            }
-        });
-
-        m_optionButton.onClick.AddListener(() => {
-            CardOptionWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.STEP);
-        });
-
-        m_plusButton.onClick.AddListener(() => {
-            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
-            core.transform.SetParent(m_coreField);
-            float offset = 10;
-            float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
-            float sizeY = m_reserve.rectTransform.sizeDelta.y * m_reserve.rectTransform.localScale.y - offset;
-            core.transform.position = new Vector3(
-                m_reserve.rectTransform.position.x + (int)UnityEngine.Random.Range(-((int)sizeX / 2), (int)sizeX / 2),
-                m_reserve.rectTransform.position.y + (int)UnityEngine.Random.Range(-((int)sizeY / 2), (int)sizeY / 2),
-                0);
-            core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
-                int index = m_coreList.IndexOf(core);
-                if (index != -1)
-                {
-                    m_coreList.RemoveAt(index);
-                    core.SetActive(false);
-                }
-            });
-            m_coreList.Add(core);
-        });
-        m_minusButton.onClick.AddListener(() => {
-            if (m_coreList != null && m_coreList.Count > 0)
-            {
-                GameObject core = m_coreList[m_coreList.Count - 1];
-                m_coreList.Remove(core);
-                core.SetActive(false);
-            }
-        });
-
-        m_markButton.onClick.AddListener(() => {
-            GameObject mark = PhotonNetwork.Instantiate("Prefab/Battle/Mark", Vector3.zero, Quaternion.identity);
-            mark.transform.SetParent(m_markField);
-            mark.transform.localPosition = Vector3.zero;
-            mark.transform.localScale = Vector3.one;
-            mark.transform.localRotation = Quaternion.identity;
-            mark.GetComponent<TouchManager>().SetAction(null, null, null, () => {
-                mark.SetActive(false);
-            });
-        });
+        }
     }
 
     public void SetInitCore()
     {
-        int life = int.Parse(m_customRoomProperties["Life"].ToString());
-        int soulCoreNum = int.Parse(m_customRoomProperties["SoulCore"].ToString());
-        int coreNum = int.Parse(m_customRoomProperties["Core"].ToString());
+        int life = 0;
+        int soulCoreNum = 0;
+        int coreNum = 0;
+
+        m_customRoomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+
+        if (m_customRoomProperties["Type"].ToString() == "bs")
+        {
+            life = int.Parse(m_customRoomProperties["Life"].ToString());
+            soulCoreNum = int.Parse(m_customRoomProperties["SoulCore"].ToString());
+            coreNum = int.Parse(m_customRoomProperties["Core"].ToString());
+        }
 
         if (m_life != null)
         {
@@ -416,7 +460,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (m_fieldCardManager != null)
         {
-            m_fieldCardManager.SetDeckDetail(JsonUtility.FromJson<DeckManager.DeckDetail>(deckDetailJson));
+            m_fieldCardManager.SetDeckOrTrashOrExclusion(OPTION_TYPE.DECK, JsonUtility.FromJson<DeckManager.DeckDetail>(deckDetailJson));
             m_fieldCardManager.ShuffleDeck();
             m_fieldCardManager.InitSetting();
         }

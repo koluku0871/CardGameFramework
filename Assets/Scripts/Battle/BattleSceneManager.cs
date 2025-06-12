@@ -45,6 +45,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public static string m_type = "";
     public static string m_playerName = "";
     public static string m_playerName1 = "";
     public static string m_playerName2 = "";
@@ -60,21 +61,25 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
         foreach (var prop in PhotonNetwork.CurrentRoom.CustomProperties)
         {
-            if (prop.Key.ToString() == "playerName1")
+            string key = prop.Key.ToString();
+            string value = prop.Value.ToString();
+            switch (key)
             {
-                m_playerName1 = prop.Value.ToString();
-            }
-            else if (prop.Key.ToString() == "playerName2")
-            {
-                m_playerName2 = prop.Value.ToString();
-            }
-            else if (prop.Key.ToString() == "playerDeck1")
-            {
-                m_playerDeck1 = prop.Value.ToString();
-            }
-            else if (prop.Key.ToString() == "playerDeck2")
-            {
-                m_playerDeck2 = prop.Value.ToString();
+                case "Type":
+                    m_type = value;
+                    break;
+                case "playerName1":
+                    m_playerName1 = value;
+                    break;
+                case "playerName2":
+                    m_playerName2 = value;
+                    break;
+                case "playerDeck1":
+                    m_playerDeck1 = value;
+                    break;
+                case "playerDeck2":
+                    m_playerDeck2 = value;
+                    break;
             }
         }
 
@@ -84,6 +89,12 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         base.OnLeftRoom();
+
+        PhotonNetwork.LeaveLobby();
+    }
+    public override void OnLeftLobby()
+    {
+        base.OnLeftLobby();
 
         PhotonNetwork.Disconnect();
     }
@@ -108,7 +119,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             Debug.LogError("m_playerName1 = " + m_playerName1);
             m_fieldPanel.localRotation = Quaternion.Euler(0, 0, 0);
 
-            GameObject obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField", Vector3.zero, Quaternion.identity);
+            GameObject obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField_" + m_type, Vector3.zero, Quaternion.identity);
             PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
             obj.SetActive(true);
             obj.transform.localPosition = Vector3.zero;
@@ -148,7 +159,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             Debug.LogError("m_playerName2 = " + m_playerName2);
             m_fieldPanel.localRotation = Quaternion.Euler(0, 0, 180);
 
-            GameObject obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField", Vector3.zero, Quaternion.Euler(0, 0, 180));
+            GameObject obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField_" + m_type, Vector3.zero, Quaternion.Euler(0, 0, 180));
             PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
             obj.SetActive(true);
             obj.transform.localPosition = Vector3.zero;

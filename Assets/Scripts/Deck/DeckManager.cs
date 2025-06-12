@@ -57,12 +57,16 @@ public class DeckManager : MonoBehaviour
     }
 
     public void CheckDeckDirectory() {
+        OptionData optionData = new OptionData();
+        optionData.LoadTxt();
+
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
         deckSceneManager.GetDeckSelectDropdown().ClearOptions();
         deckSceneManager.GetDeckSelectDropdown().options.Add(new Dropdown.OptionData()
         {
             text = "no select"
         });
+
         var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
         if (!Directory.Exists(directoryPath)) {
             Directory.CreateDirectory(directoryPath);
@@ -160,6 +164,9 @@ public class DeckManager : MonoBehaviour
     }
 
     public void OnClickToDeckSaveButton() {
+        OptionData optionData = new OptionData();
+        optionData.LoadTxt();
+
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
         var selectId = deckSceneManager.GetDeckSelectDropdown().value;
         if (1 > selectId) {

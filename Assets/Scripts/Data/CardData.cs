@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using UnityEngine;
 
 public class BaseData
@@ -124,9 +123,4 @@ public class CardDataFromJson
     public string CardType;
     public List<string> Lv = new List<string>();
     public string Text;
-}
-
-public class CardOptionData
-{
-
 }

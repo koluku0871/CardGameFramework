@@ -27,17 +27,10 @@ public class HomeSceneManager : MonoBehaviour
     {
         AudioSourceManager.Instance().PlayOneShot((int)AudioSourceManager.BGM_NUM.HOME_1, true);
 
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;
+        OptionData optionData = new OptionData();
+        optionData.IsFileExists();
+        optionData.LoadTxt();
 
-        if (!Directory.Exists(directoryPath))
-        {
-            Directory.CreateDirectory(directoryPath);
-        }
-
-        string[] optFiles = Directory.GetFiles(directoryPath, "opt.json", SearchOption.AllDirectories);
-        StreamReader sr = new StreamReader(optFiles[0], Encoding.UTF8);
-        OptionData optionData = JsonUtility.FromJson<OptionData>(sr.ReadToEnd());
-        sr.Close();
         m_nameInputField.text = optionData.name;
         if (string.IsNullOrEmpty(m_nameInputField.text))
         {
@@ -45,15 +38,21 @@ public class HomeSceneManager : MonoBehaviour
         }
 
         m_typeDropdown.ClearOptions();
+        int typeIndex = 0;
         foreach (var type in AssetBundleManager.Instance().AssetBundleBaseCardDataKeys)
         {
             m_typeDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
             {
                 text = type
             });
+            if (type == optionData.cardType)
+            {
+                m_typeDropdown.value = typeIndex;
+            }
+            typeIndex++;
         }
         //m_packTypeDropdown.value = m_packTypeDropdown.options.Count - 1;
-        m_typeDropdown.value = -1;
+        //m_typeDropdown.value = -1;
 
         m_updateDropdown.ClearOptions();
         int index = 0;
@@ -121,19 +120,14 @@ public class HomeSceneManager : MonoBehaviour
             return;
         }
 
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;
-
-        if (!Directory.Exists(directoryPath))
-        {
-            Directory.CreateDirectory(directoryPath);
-        }
-
         OptionData optionData = new OptionData();
+        optionData.IsFileExists();
+        optionData.LoadTxt();
+
         optionData.name = m_nameInputField.text;
         m_nameText.text = m_nameInputField.text;
         optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
-        StreamWriter streamWriter = new StreamWriter(directoryPath + "opt.json");
-        streamWriter.WriteLine(JsonUtility.ToJson(optionData));
-        streamWriter.Close();
+
+        optionData.SaveTxt();
     }
 }

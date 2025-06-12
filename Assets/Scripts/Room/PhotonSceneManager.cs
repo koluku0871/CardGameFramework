@@ -126,13 +126,11 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinedLobby();
 
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;
-        string[] deckFiles = Directory.GetFiles(directoryPath, "opt.json", SearchOption.AllDirectories);
         try
         {
-            StreamReader sr = new StreamReader(deckFiles[0], Encoding.UTF8);
-            OptionData optionData = JsonUtility.FromJson<OptionData>(sr.ReadToEnd());
-            sr.Close();
+            OptionData optionData = new OptionData();
+            optionData.LoadTxt();
+
             PhotonNetwork.NickName = optionData.name;
             if (string.IsNullOrEmpty(PhotonNetwork.NickName))
             {

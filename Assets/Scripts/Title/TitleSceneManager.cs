@@ -67,10 +67,17 @@ public class TitleSceneManager : MonoBehaviour
             Directory.CreateDirectory(path);
         }
 
-        path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION;
-        if (!Directory.Exists(path))
+        OptionData optionData = new OptionData();
+        optionData.IsFileExists();
+        if (!optionData.IsFileExists())
         {
-            Directory.CreateDirectory(path);
+            optionData.name = "Player";
+            optionData.SaveTxt();
+        }
+        else
+        {
+            optionData.LoadTxt();
+            optionData.SaveTxt();
         }
 
         path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "favoriteCardData.json";
@@ -79,27 +86,6 @@ public class TitleSceneManager : MonoBehaviour
             FavoriteData data = new FavoriteData();
             StreamWriter streamWriter = new StreamWriter(path);
             streamWriter.WriteLine(JsonUtility.ToJson(data));
-            streamWriter.Close();
-        }
-
-        OptionData optionData = new OptionData();
-        path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "opt.json";
-        if (!File.Exists(path))
-        {
-            optionData.name = "Player";
-
-            StreamWriter streamWriter = new StreamWriter(path);
-            streamWriter.WriteLine(JsonUtility.ToJson(optionData));
-            streamWriter.Close();
-        }
-        else
-        {
-            StreamReader streamReader = new StreamReader(path, Encoding.UTF8);
-            optionData = JsonUtility.FromJson<OptionData>(streamReader.ReadToEnd());
-            streamReader.Close();
-
-            StreamWriter streamWriter = new StreamWriter(path);
-            streamWriter.WriteLine(JsonUtility.ToJson(optionData));
             streamWriter.Close();
         }
 

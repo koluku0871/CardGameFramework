@@ -35,9 +35,6 @@ public class TitleSceneManager : MonoBehaviour
 
     private List<Google.Apis.Drive.v3.Data.File> files = new List<Google.Apis.Drive.v3.Data.File>();
 
-    private bool isDownload = false;
-    private long fileSize = 0;
-
     public float timeOut = 0.1f;
     private float timeElapsed;
 

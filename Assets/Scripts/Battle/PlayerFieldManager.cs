@@ -1,12 +1,8 @@
 ﻿using Photon.Pun;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 using static CardOptionWindow;
-using static CoreManager;
 
 public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -460,8 +456,20 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (m_fieldCardManager != null)
         {
-            m_fieldCardManager.SetDeckOrTrashOrExclusion(OPTION_TYPE.DECK, JsonUtility.FromJson<DeckManager.DeckDetail>(deckDetailJson));
-            m_fieldCardManager.ShuffleDeck();
+            DeckManager.DeckDetail jsonDeckDetail = JsonUtility.FromJson<DeckManager.DeckDetail>(deckDetailJson);
+
+            m_fieldCardManager.SetDeckDetail(OPTION_TYPE.DECK, jsonDeckDetail.cardDetailList);
+            m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.DECK);
+
+            if (BattleSceneManager.m_type == "digimon")
+            {
+                m_fieldCardManager.SetDeckDetail(OPTION_TYPE.DIGITAMA, jsonDeckDetail.subCardDetailList);
+                m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.DIGITAMA);
+            }
+
+            m_fieldCardManager.SetDeckDetail(OPTION_TYPE.TOKEN, jsonDeckDetail.tokenCardDetailList);
+
+
             m_fieldCardManager.InitSetting();
         }
     }

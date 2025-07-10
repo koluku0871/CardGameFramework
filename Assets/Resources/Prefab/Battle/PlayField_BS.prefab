@@ -640,7 +640,7 @@ GameObject:
   - component: {fileID: 8877928168764329292}
   - component: {fileID: 6186015901845612012}
   m_Layer: 5
-  m_Name: PlayField_BS
+  m_Name: PlayField_bs
   m_TagString: PlayField
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -757,6 +757,10 @@ MonoBehaviour:
   m_trashCardCountText: {fileID: 7845965515521062014}
   m_exclusionCard: {fileID: 7500934614305101914}
   m_exclusionCardCountText: {fileID: 6312265420909902245}
+  m_securltyCard: {fileID: 0}
+  m_securltyCardCountText: {fileID: 0}
+  m_digitamaCard: {fileID: 0}
+  m_digitamaCardCountText: {fileID: 0}
   m_atHandContent: {fileID: 4252596862915086201}
   m_atHandCard: {fileID: 4893728446082852936}
   m_handContent: {fileID: 8809806411725641811}

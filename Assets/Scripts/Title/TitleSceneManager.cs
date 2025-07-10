@@ -1,12 +1,14 @@
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using static UnityEngine.Networking.UnityWebRequest;
 
 public class TitleSceneManager : MonoBehaviour
 {
@@ -20,10 +22,13 @@ public class TitleSceneManager : MonoBehaviour
     private AssetBundleManager m_assetBundleManager = null;
 
     [SerializeField]
+    private MouseManager m_mouseManager = null;
+
+    [SerializeField]
     private ScrollRect m_scrollRect = null;
 
     [SerializeField]
-    private TMPro.TextMeshProUGUI m_textMeshPro = null;
+    public TMPro.TextMeshProUGUI m_textMeshPro = null;
 
     [SerializeField]
     private List<Image> m_images = new List<Image>();
@@ -34,6 +39,20 @@ public class TitleSceneManager : MonoBehaviour
 
     public float timeOut = 0.1f;
     private float timeElapsed;
+
+    private Process _process;
+    private static ApiResponseDataToFileList apiResponseData = null;
+
+    private static TitleSceneManager instance = null;
+    public static TitleSceneManager Instance()
+    {
+        return instance;
+    }
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     void Start()
     {
@@ -52,6 +71,10 @@ public class TitleSceneManager : MonoBehaviour
             Instantiate(m_assetBundleManager);
         }
 
+        if (MouseManager.Instance() == null)
+        {
+            Instantiate(m_mouseManager);
+        }
         string path = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
         if (!Directory.Exists(path))
         {
@@ -86,6 +109,31 @@ public class TitleSceneManager : MonoBehaviour
             streamWriter.Close();
         }
 
+        path = ConstManager.DIRECTORY_PATH + "/ResLoad.exe";
+        if (File.Exists(path))
+        {
+            _process = new Process();
+
+            // プロセスを起動するときに使用する値のセットを指定
+            _process.StartInfo = new ProcessStartInfo
+            {
+                FileName = path,
+                UseShellExecute = false,
+                WorkingDirectory = ConstManager.DIRECTORY_PATH,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true,
+            };
+
+            _process.OutputDataReceived += OnStandardOut;
+
+            _process.EnableRaisingEvents = true;
+            _process.Exited += DisposeProcess;
+
+            _process.Start();
+            _process.BeginOutputReadLine();
+        }
+
         path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "DLlock.json";
         if (File.Exists(path))
         {
@@ -99,18 +147,44 @@ public class TitleSceneManager : MonoBehaviour
         }
         else
         {
-            StartCoroutine(RequesFileList(
-                optionData.apiPath,
-                () => {
-                    StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
-                        AssetBundleManager.Instance().SetCardTextList();
-                        FadeManager.Instance().OnStart("HomeScene");
-                    }, (string str) => {
-                        m_textMeshPro.text += str;
-                        m_scrollRect.verticalNormalizedPosition = 0f;
-                    }));
+            StartCoroutine(RequesFileList(() => {
+                StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
+                    AssetBundleManager.Instance().SetCardTextList();
+                    FadeManager.Instance().OnStart("HomeScene");
+                }, (string str) => {
+                    m_textMeshPro.text += str;
+                    m_scrollRect.verticalNormalizedPosition = 0f;
                 }));
+            }));
         }
+    }
+
+    private static void OnStandardOut(object sender, DataReceivedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(e.Data))
+        {
+            return;
+        }
+
+        try
+        {
+            apiResponseData = JsonUtility.FromJson<ApiResponseDataToFileList>(e.Data);
+        }
+        catch
+        {
+            TitleSceneManager.Instance().m_textMeshPro.text += "DownloadFilePath : " + e.Data + "\n";
+        }
+        UnityEngine.Debug.Log(e.Data);
+    }
+
+    private void DisposeProcess(object sender, EventArgs e)
+    {
+        if (_process == null || _process.HasExited) return;
+
+        _process.StandardInput.Close();
+        _process.CloseMainWindow();
+        _process.Dispose();
+        _process = null;
     }
 
     private void Update()
@@ -135,59 +209,83 @@ public class TitleSceneManager : MonoBehaviour
     }
 
 
-    public IEnumerator RequesFileList(string apiPath, Action action)
+    public IEnumerator RequesFileList(Action action)
     {
+        string directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
         while (UnityEngine.Application.internetReachability == NetworkReachability.NotReachable)
         {
             m_textMeshPro.text += "Connect Network ..." + "\n";
             yield return new WaitForSeconds(1f);
         }
 
-        UnityWebRequest req = UnityWebRequest.Get(apiPath);
-        yield return req.SendWebRequest();
+        yield return new WaitUntil(() => apiResponseData != null);
 
-        if (req.result == Result.Success)
+        List<string> pathList = new List<string>();
+        foreach (var fileData in apiResponseData.res)
         {
-            Debug.Log(req.downloadHandler.text);
+            m_textMeshPro.text += "UnityWebRequestPath : " + fileData.url + "\n";
 
-            ApiResponseDataToFileList apiResponseData = JsonUtility.FromJson<ApiResponseDataToFileList>(req.downloadHandler.text);
-
-            foreach (var fileData in apiResponseData.res)
+            foreach (var data in fileData.list.Split(","))
             {
-                m_textMeshPro.text += "UnityWebRequestPath : " + fileData.url + "\n";
-
-                foreach (var data in fileData.list.Split(","))
+                directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
+                if (Path.GetExtension(data) == ".exe")
                 {
-                    string directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
-                    if (Path.GetExtension(data) == ".exe")
-                    {
-                        directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
-                    }
+                    directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
+                }
 
-                    if (File.Exists(directoryPath + data))
-                    {
-                        continue;
-                    }
+                string key = Path.GetFileNameWithoutExtension(directoryPath + data);
+                pathList.Add(key);
 
-                    m_textMeshPro.text += "DownloadFilePath : " + data + "\n";
+                if (File.Exists(directoryPath + data))
+                {
+                    continue;
+                }
 
-                    UnityWebRequest fileReq = UnityWebRequest.Get(fileData.url + "/" + data);
-                    yield return fileReq.SendWebRequest();
+                m_textMeshPro.text += "DownloadFilePath : " + data + "\n";
+                UnityEngine.Debug.Log(fileData.url + data);
 
-                    if (fileReq.result == Result.Success)
-                    {
-                        File.WriteAllBytes(directoryPath + data, fileReq.downloadHandler.data);
-                    }
+                using var fileStream = File.OpenWrite(directoryPath + data);
+                UnityWebRequest req = UnityWebRequest.Get(fileData.url + data);
+                yield return req.WriteToStreamAsync(fileStream);
+
+                while (!req.isDone)
+                {
+                    yield return new WaitForSeconds(1f);
                 }
             }
+        }
 
-            action();
-        }
-        else
+        directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
+        string[] assetbundleFiles = Directory.GetFiles(directoryPath, "*.assetbundle", SearchOption.AllDirectories);
+
+        for (int index = 0; index < assetbundleFiles.Length; index++)
         {
-            m_textMeshPro.text += "Is Completed Error " + apiPath + "\n";
-            m_textMeshPro.text += req.error + "\n";
+            string key = Path.GetFileNameWithoutExtension(assetbundleFiles[index]);
+            if (pathList.Contains(key))
+            {
+                continue;
+            }
+            m_textMeshPro.text += "DeleteFilePath : " + assetbundleFiles[index] + "\n";
+            UnityEngine.Debug.Log(assetbundleFiles[index]);
+            File.Delete(assetbundleFiles[index]);
         }
+
+        directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
+        string[] exeFiles = Directory.GetFiles(directoryPath, "*.exe", SearchOption.AllDirectories);
+
+        for (int index = 0; index < exeFiles.Length; index++)
+        {
+            string key = Path.GetFileNameWithoutExtension(exeFiles[index]);
+            if (pathList.Contains(key))
+            {
+                continue;
+            }
+            m_textMeshPro.text += "DeleteFilePath : " + exeFiles[index] + "\n";
+            UnityEngine.Debug.Log(exeFiles[index]);
+            File.Delete(exeFiles[index]);
+        }
+
+        action();
     }
 }
 

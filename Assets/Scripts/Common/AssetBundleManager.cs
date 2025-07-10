@@ -4,21 +4,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+
+[Serializable]
 public class AssetBundleBase
 {
     public AssetBundle assetBundle = null;
 }
 
+[Serializable]
 public class AssetBundleBaseText : AssetBundleBase
 {
     public List<TextAsset> textAssetList = new List<TextAsset>();
 }
 
+[Serializable]
 public class AssetBundleBaseSprite : AssetBundleBase
 {
     public UnityEngine.U2D.SpriteAtlas spriteAtlas = null;
 }
 
+[Serializable]
 public class AssetBundleBaseCardData
 {
     public Dictionary<string, AssetBundleBaseText> assetBundleTextList = new Dictionary<string, AssetBundleBaseText>();
@@ -46,7 +51,8 @@ public class AssetBundleManager : MonoBehaviour
         }
     }
 
-    private Dictionary<string, AssetBundleBaseCardData> m_assetBundleCardDataList = new Dictionary<string, AssetBundleBaseCardData>();
+
+    public Dictionary<string, AssetBundleBaseCardData> m_assetBundleCardDataList = new Dictionary<string, AssetBundleBaseCardData>();
     public AssetBundleBaseCardData AssetBundleBaseCardData
     {
         get
@@ -77,7 +83,7 @@ public class AssetBundleManager : MonoBehaviour
 
     public IEnumerator ReadFileList(Action action, Action<string> logAction)
     {
-        string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_text.assetbundle", SearchOption.TopDirectoryOnly);
+        string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_text_.*.assetbundle", SearchOption.TopDirectoryOnly);
         foreach (string file in fs)
         {
             string key = Path.GetFileNameWithoutExtension(file);
@@ -102,7 +108,7 @@ public class AssetBundleManager : MonoBehaviour
                 yield return null;
             }
 
-            Debug.Log("textCount : " + request.allAssets.Length);
+            //Debug.Log("textCount : " + request.allAssets.Length);
             List<TextAsset> textAssetList = new List<TextAsset>();
             foreach (var asset in request.allAssets)
             {
@@ -111,7 +117,7 @@ public class AssetBundleManager : MonoBehaviour
                     continue;
                 }
                 TextAsset textAsset = (TextAsset)asset;
-                Debug.Log("Asset : " + textAsset.name + " text : " + textAsset.text);
+                //Debug.Log("Asset : " + textAsset.name + " text : " + textAsset.text);
                 textAssetList.Add(textAsset);
             }
             m_assetBundleCardDataList[type].assetBundleTextList[key].textAssetList = textAssetList;
@@ -119,7 +125,7 @@ public class AssetBundleManager : MonoBehaviour
 
         yield return null;
 
-        fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
+        fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
         foreach (string file in fs)
         {
             string key = Path.GetFileNameWithoutExtension(file);
@@ -214,9 +220,17 @@ public class AssetBundleManager : MonoBehaviour
             {
                 foreach (var textAsset in assetBundle.Value.textAssetList)
                 {
-                    Debug.Log("Asset : " + textAsset.name + " text : " + textAsset.text);
-                    CardData cardData = new CardData(JsonUtility.FromJson<CardDataFromJson>(textAsset.text));
-                    cardData.assetBundleSpriteName = assetBundle.Key.Replace("_text", "_spriteatlas");
+                    //Debug.Log("Asset : " + textAsset.name + " text : " + textAsset.text);
+                    CardData cardData = null;
+                    try
+                    {
+                        cardData = new CardData(JsonUtility.FromJson<CardDataFromJsonToBs>(textAsset.text));
+                    }
+                    catch
+                    {
+                        cardData = new CardData(JsonUtility.FromJson<CardDataFromJsonToDigimon>(textAsset.text));
+                    }
+                    cardData.assetBundleSpriteName = assetBundle.Key.Replace("_text_", "_spriteatlas_");
                     cardData.fileName = textAsset.name;
 
                     if (!m_assetBundleCardDataList[type].baseData.packDatas.ContainsKey(cardData.PackNo))

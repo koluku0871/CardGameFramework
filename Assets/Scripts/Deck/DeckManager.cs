@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Coffee.UIExtensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -15,16 +14,35 @@ public class DeckManager : MonoBehaviour
     public class CardDetail {
         public string tag = "";
         public string cardId = "";
+
+        public string ToString()
+        {
+            return tag + "^" + cardId;
+        }
     }
 
     [Serializable]
     public class DeckDetail {
         public string type = "";
+        public List<CardDetail> aceCardDetailList = new List<CardDetail>();
         public List<CardDetail> cardDetailList = new List<CardDetail>();
         public List<CardDetail> subCardDetailList = new List<CardDetail>();
+        public List<CardDetail> tokenCardDetailList = new List<CardDetail>();
 
         public void Add(CardDetail cardDetail) {
             cardDetailList.Add(cardDetail);
+        }
+        public void AddToSub(CardDetail cardDetail)
+        {
+            subCardDetailList.Add(cardDetail);
+        }
+        public void AddToToken(CardDetail cardDetail)
+        {
+            tokenCardDetailList.Add(cardDetail);
+        }
+        public void AddToAce(CardDetail cardDetail)
+        {
+            aceCardDetailList.Add(cardDetail);
         }
 
         public string GetDeckType()
@@ -36,26 +54,44 @@ public class DeckManager : MonoBehaviour
             return type;
         }
 
-        /// <summary>
-        /// BS契約チェック
-        /// </summary>
-        /// <returns></returns>
-        public bool IsInContract()
+        public bool IsAce(int num, CardDetail cardDetail)
         {
-            foreach (CardDetail cardDetail in cardDetailList)
+            int count = 0;
+            foreach(var aceCardDetail in aceCardDetailList)
             {
-                CardData data = AssetBundleManager.Instance().GetBaseData(cardDetail.tag, cardDetail.cardId);
-                if (!data.CardCategory.Contains("契約"))
+                if (aceCardDetail.ToString() != cardDetail.ToString())
                 {
                     continue;
                 }
-
-                return true;
+                count++;
             }
-
-            return false;
+            Debug.Log(cardDetail.ToString() + " : " + num + " : " + count);
+            return num <= count;
         }
     }
+
+    /// <summary>
+    /// BS契約チェック
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsInContract(List<CardDetail> cardDetailList)
+    {
+        foreach (CardDetail cardDetail in cardDetailList)
+        {
+            CardData data = AssetBundleManager.Instance().GetBaseData(cardDetail.tag, cardDetail.cardId);
+            if (!data.CardCategory.Contains("契約"))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    [SerializeField]
+    private Material m_effectMaterial = null;
 
     public List<string> m_deckList = new List<string>();
 
@@ -125,6 +161,14 @@ public class DeckManager : MonoBehaviour
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
             Destroy(c.gameObject);
         }
+        foreach (Transform c in deckSceneManager.GetSubDeckContent().transform)
+        {
+            Destroy(c.gameObject);
+        }
+        foreach (Transform c in deckSceneManager.GetTokenDeckContent().transform)
+        {
+            Destroy(c.gameObject);
+        }
 
         yield return null;
 
@@ -132,9 +176,28 @@ public class DeckManager : MonoBehaviour
         try
         {
             DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(m_deckList[selectId-1]);
+            Dictionary<string, int> strings = new Dictionary<string, int>();
             foreach (CardDetail card in deckCardList.cardDetailList)
             {
-                AddCard(card.tag, card.cardId);
+                if (!strings.ContainsKey(card.ToString()))
+                {
+                    strings.Add(card.ToString(), 1);
+                }
+                else
+                {
+                    strings[card.ToString()]++;
+                }
+                AddCard(card.tag, card.cardId, deckSceneManager.GetDeckContent(), deckCardList.IsAce(strings[card.ToString()], card));
+            }
+
+            foreach (CardDetail card in deckCardList.subCardDetailList)
+            {
+                AddCard(card.tag, card.cardId, deckSceneManager.GetSubDeckContent());
+            }
+
+            foreach (CardDetail card in deckCardList.tokenCardDetailList)
+            {
+                AddCard(card.tag, card.cardId, deckSceneManager.GetTokenDeckContent());
             }
         }
         catch
@@ -210,10 +273,50 @@ public class DeckManager : MonoBehaviour
                 continue;
             }
             var cardId = cardData[1];
-            deckCardList.Add(new CardDetail(){
-                tag = cardData[0], cardId = cardId
+            CardDetail cardDetail = new CardDetail()
+            {
+                tag = cardData[0],
+                cardId = cardId
+            };
+            deckCardList.Add(cardDetail);
+
+            ShinyEffectForUGUI shiny = c.GetComponent<ShinyEffectForUGUI>();
+            if (shiny != null)
+            {
+                deckCardList.AddToAce(cardDetail);
+            }
+        }
+
+        foreach (Transform c in deckSceneManager.GetSubDeckContent().transform)
+        {
+            string[] cardData = c.name.Split('^');
+            if (cardData.Length < 2)
+            {
+                continue;
+            }
+            var cardId = cardData[1];
+            deckCardList.AddToSub(new CardDetail()
+            {
+                tag = cardData[0],
+                cardId = cardId
             });
         }
+
+        foreach (Transform c in deckSceneManager.GetTokenDeckContent().transform)
+        {
+            string[] cardData = c.name.Split('^');
+            if (cardData.Length < 2)
+            {
+                continue;
+            }
+            var cardId = cardData[1];
+            deckCardList.AddToToken(new CardDetail()
+            {
+                tag = cardData[0],
+                cardId = cardId
+            });
+        }
+
         string deckData = JsonUtility.ToJson(deckCardList);
         Debug.Log(deckData);
         StreamWriter streamWriter = new StreamWriter(directoryPath + deckFileName + ".json");
@@ -232,18 +335,57 @@ public class DeckManager : MonoBehaviour
         }
 
         DeckDetail deckCardList = new DeckDetail();
+        deckCardList.type = AssetBundleManager.Instance().CardType;
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
             string[] cardData = c.name.Split('^');
             if (cardData.Length < 2) {
                 continue;
             }
             var cardId = cardData[1];
-            deckCardList.Add(new CardDetail()
+            CardDetail cardDetail = new CardDetail()
+            {
+                tag = cardData[0],
+                cardId = cardId
+            };
+            deckCardList.Add(cardDetail);
+
+            ShinyEffectForUGUI shiny = c.GetComponent<ShinyEffectForUGUI>();
+            if (shiny != null)
+            {
+                deckCardList.AddToAce(cardDetail);
+            }
+        }
+
+        foreach (Transform c in deckSceneManager.GetSubDeckContent().transform)
+        {
+            string[] cardData = c.name.Split('^');
+            if (cardData.Length < 2)
+            {
+                continue;
+            }
+            var cardId = cardData[1];
+            deckCardList.AddToSub(new CardDetail()
             {
                 tag = cardData[0],
                 cardId = cardId
             });
         }
+
+        foreach (Transform c in deckSceneManager.GetTokenDeckContent().transform)
+        {
+            string[] cardData = c.name.Split('^');
+            if (cardData.Length < 2)
+            {
+                continue;
+            }
+            var cardId = cardData[1];
+            deckCardList.AddToToken(new CardDetail()
+            {
+                tag = cardData[0],
+                cardId = cardId
+            });
+        }
+
         string deckData = JsonUtility.ToJson(deckCardList);
         Debug.Log(deckData);
         StreamWriter streamWriter = new StreamWriter(directoryPath + deckFileName + ".json");
@@ -268,31 +410,51 @@ public class DeckManager : MonoBehaviour
             int i = rnd.Next(0, packNameList.Count);
             string fileName = packNameList[i];
             string targetTag = key;
-            AddCard(targetTag, fileName);
+            AddCard(targetTag, fileName, deckSceneManager.GetDeckContent());
             index = deckSceneManager.GetDeckContent().childCount;
         }
     }
 
     public void OnClickToDeckClearButton() {
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
-        foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
+        foreach ( Transform c in deckSceneManager.GetActiveDeckContent().transform ) {
             Destroy(c.gameObject);
         }
         StartCoroutine(UpdateDeckCardCountCoroutine());
     }
 
-    public void AddCard(string tag, string cardId) {
-        if (IsDuplicateLimit(tag, cardId)) {
+    public void AddCard(string tag, string cardId, RectTransform parent = null, bool isAce = false)
+    {
+        DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
+        if (parent == null)
+        {
+            parent = deckSceneManager.GetActiveDeckContent();
+        }
+
+        if (IsDuplicateLimit(tag, cardId, parent)) {
             return;
         }
 
-        DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
-
         GameObject cardObj = new GameObject(tag + "^" + cardId);
-        cardObj.transform.SetParent(deckSceneManager.GetDeckContent());
+        cardObj.transform.SetParent(parent);
         cardObj.transform.localScale = Vector3.one;
+        
         Image cardImage = cardObj.AddComponent<Image>();
         cardImage.sprite = AssetBundleManager.Instance().GetBaseData(tag, cardId).Sprite;
+
+        if (isAce)
+        {
+            ShinyEffectForUGUI shiny = cardObj.AddComponent<ShinyEffectForUGUI>();
+            shiny.location = 0;
+            shiny.width = 0.25f;
+            shiny.softness = 1;
+            shiny.brightness = 1;
+            shiny.rotation = 0;
+            shiny.highlight = 1;
+            shiny.effectMaterial = m_effectMaterial;
+            shiny.PlayToLoop();
+        }
+
         EventTrigger cardEventTrigger = cardObj.AddComponent<EventTrigger>();
         cardEventTrigger.triggers = new List<EventTrigger.Entry>();
         // マウスオーバー
@@ -316,34 +478,72 @@ public class DeckManager : MonoBehaviour
                 return;
             }
 
-            switch((pointerEventData as PointerEventData).pointerId)
-            {
-                case -1:
-                    Debug.Log("Left Click");
-                    AddCard(tag, cardId);
-                    break;
-                case -2:
-                    Debug.Log("Right Click");
-                    Destroy(cardObj);
-                    StartCoroutine(UpdateDeckCardCountCoroutine());
-                    break;
-                case -3:
-                    Debug.Log("Middle Click");
-                    CardDetailManager.Instance().isLock = !CardDetailManager.Instance().isLock;
-                    break;
-            }
+            MouseManager.Instance().OnClick((pointerEventData as PointerEventData).pointerId, (int pointerId, bool isDoubleClick) => {
+                switch (pointerId)
+                {
+                    case -1:
+                        if (isDoubleClick)
+                        {
+                            Debug.Log("Left Double Click");
+                            ShinyEffectForUGUI shiny = cardObj.GetComponent<ShinyEffectForUGUI>();
+                            if (shiny == null)
+                            {
+                                shiny = cardObj.AddComponent<ShinyEffectForUGUI>();
+                            }
+                            shiny.location = 0;
+                            shiny.width = 0.25f;
+                            shiny.softness = 1;
+                            shiny.brightness = 1;
+                            shiny.rotation = 0;
+                            shiny.highlight = 1;
+                            shiny.effectMaterial = m_effectMaterial;
+                            shiny.PlayToLoop();
+                        }
+                        else
+                        {
+                            Debug.Log("Left Click");
+                            AddCard(tag, cardId);
+                        }
+                        break;
+                    case -2:
+                        if (isDoubleClick)
+                        {
+                            Debug.Log("Right Double Click");
+                            ShinyEffectForUGUI shiny = cardObj.GetComponent<ShinyEffectForUGUI>();
+                            if (shiny != null)
+                            {
+                                Destroy(shiny);
+                            }
+                        }
+                        else
+                        {
+                            Debug.Log("Right Click");
+                            Destroy(cardObj);
+                            StartCoroutine(UpdateDeckCardCountCoroutine());
+                        }
+                        break;
+                    case -3:
+                        Debug.Log("Middle Click");
+                        CardDetailManager.Instance().isLock = !CardDetailManager.Instance().isLock;
+                        break;
+                }
+            });
         });
         cardEventTrigger.triggers.Add(entry);
 
         UpdateDeckCardCount();
     }
 
-    private bool IsDuplicateLimit(string tag, string cardId) {
+    private bool IsDuplicateLimit(string tag, string cardId, RectTransform parent) {
         if (ConstManager.DECK_CARD_DUPLICATE_OK_LIST.Contains(cardId)) {
             return false;
         }
 
         int maxDuplicateCount = ConstManager.DECK_CARD_DUPLICATE_COUNT;
+        if (AssetBundleManager.Instance().CardType == "digimon")
+        {
+            maxDuplicateCount = ConstManager.DECK_CARD_DUPLICATE_COUNT + 1;
+        }
 
         if (ConstManager.DECK_CARD_DUPLICATE_5_NG_LIST.Contains(cardId))
         {
@@ -362,7 +562,7 @@ public class DeckManager : MonoBehaviour
 
         var duplicateCount = 0;
         var deckSceneManager = DeckSceneManager.Instance();
-        foreach (Transform child in deckSceneManager.GetDeckContent()) {
+        foreach (Transform child in parent.transform) {
             if (child.name == tag + "^" + cardId) {
                 duplicateCount++;
             }
@@ -377,15 +577,39 @@ public class DeckManager : MonoBehaviour
     private void UpdateDeckCardCount() {
         List<Transform> cardList = new List<Transform>();
         var deckSceneManager = DeckSceneManager.Instance();
+
         foreach (Transform child in deckSceneManager.GetDeckContent()) {
             cardList.Add(child);
         }
-        
         cardList.Sort((obj1, obj2) => string.Compare(obj1.name, obj2.name));
         foreach (var obj in cardList) {
             obj.SetSiblingIndex(cardList.Count - 1);
         }
-
         deckSceneManager.GetDeckCardCountText().text = "デッキ枚数：" + cardList.Count.ToString("D2");
+
+        cardList = new List<Transform>();
+        foreach (Transform child in deckSceneManager.GetSubDeckContent())
+        {
+            cardList.Add(child);
+        }
+        cardList.Sort((obj1, obj2) => string.Compare(obj1.name, obj2.name));
+        foreach (var obj in cardList)
+        {
+            obj.SetSiblingIndex(cardList.Count - 1);
+        }
+        deckSceneManager.GetSubDeckCardCountText().text = "デッキ枚数：" + cardList.Count.ToString("D2");
+
+        cardList = new List<Transform>();
+        foreach (Transform child in deckSceneManager.GetTokenDeckContent())
+        {
+            cardList.Add(child);
+        }
+        cardList.Sort((obj1, obj2) => string.Compare(obj1.name, obj2.name));
+        foreach (var obj in cardList)
+        {
+            obj.SetSiblingIndex(cardList.Count - 1);
+        }
+        deckSceneManager.GetTokenDeckCardCountText().text = "デッキ枚数：" + cardList.Count.ToString("D2");
+
     }
 }

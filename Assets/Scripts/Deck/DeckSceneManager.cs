@@ -44,6 +44,18 @@ public class DeckSceneManager : MonoBehaviour
     [SerializeField]
     private RectTransform m_deckContent = null;
 
+    [SerializeField]
+    private Text m_subDeckCardCountText = null;
+
+    [SerializeField]
+    private RectTransform m_subDeckContent = null;
+
+    [SerializeField]
+    private Text m_tokenDeckCardCountText = null;
+
+    [SerializeField]
+    private RectTransform m_tokenDeckContent = null;
+
     [Header("検索結果")]
 
     [SerializeField]
@@ -137,14 +149,52 @@ public class DeckSceneManager : MonoBehaviour
         return m_targetCardDetail;
     }
 
+    public RectTransform GetActiveDeckContent()
+    {
+        if (m_deckContent.gameObject.activeInHierarchy)
+        {
+            return GetDeckContent();
+        }
+        else if (m_subDeckContent.gameObject.activeInHierarchy)
+        {
+            return GetSubDeckContent();
+        }
+        else if (m_tokenDeckContent.gameObject.activeInHierarchy)
+        {
+            return GetTokenDeckContent();
+        }
+
+        return null;
+    }
+
     public RectTransform GetDeckContent()
     {
         return m_deckContent;
     }
 
+    public RectTransform GetSubDeckContent()
+    {
+        return m_subDeckContent;
+    }
+
+    public RectTransform GetTokenDeckContent()
+    {
+        return m_tokenDeckContent;
+    }
+
     public Text GetDeckCardCountText()
     {
         return m_deckCardCountText;
+    }
+
+    public Text GetSubDeckCardCountText()
+    {
+        return m_subDeckCardCountText;
+    }
+
+    public Text GetTokenDeckCardCountText()
+    {
+        return m_subDeckCardCountText;
     }
 
     public Text GetSearchCardCountText()
@@ -155,10 +205,31 @@ public class DeckSceneManager : MonoBehaviour
     public void OnClickToCloseButton()
     {
         FavoriteData favoriteData = new FavoriteData();
-        foreach (var cardData in favoriteCardDatas)
+        if (favoriteData.cardDetails == null)
         {
-            favoriteData.cardDetails.Add(new DeckManager.CardDetail() { tag = cardData.PackNo, cardId = cardData.CardNo });
+            favoriteData.cardDetails = new List<DeckManager.CardDetail>();
         }
+
+        if (favoriteCardDatas != null)
+        {
+            foreach (var cardData in favoriteCardDatas)
+            {
+                if (cardData == null)
+                {
+                    continue;
+                }
+                if (string.IsNullOrEmpty(cardData.PackNo))
+                {
+                    continue;
+                }
+                if (string.IsNullOrEmpty(cardData.CardNo))
+                {
+                    continue;
+                }
+                favoriteData.cardDetails.Add(new DeckManager.CardDetail() { tag = cardData.PackNo, cardId = cardData.CardNo });
+            }
+        }
+        
         StreamWriter streamWriter = new StreamWriter(ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "favoriteCardData.json");
         streamWriter.WriteLine(JsonUtility.ToJson(favoriteData));
         streamWriter.Close();
@@ -275,11 +346,26 @@ public class DeckSceneManager : MonoBehaviour
 
             if (oldSelectId != selectId)
             {
-                foreach (var item in cardData.CardType.Split("・"))
+                if (!string.IsNullOrEmpty(cardData.CardType))
                 {
-                    cardTypeList.Add(item);
+                    var cardTypeSplit = cardData.CardType.Split("・");
+                    if (cardTypeSplit.Length > 1)
+                    {
+                        foreach (var item in cardTypeSplit)
+                        {
+                            cardTypeList.Add(item);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(cardData.CardType))
+                    {
+                        cardTypeList.Add(cardData.CardType);
+                    }
                 }
-                categoryList.Add(cardData.CardCategory);
+
+                if (!string.IsNullOrEmpty(cardData.CardCategory))
+                {
+                    categoryList.Add(cardData.CardCategory);
+                }
             }
 
             if (!CheckCardData(cardData))

@@ -13,7 +13,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
 
     private CardOptionWindow.OPTION_TYPE m_optionType = CardOptionWindow.OPTION_TYPE.NONE;
 
-    private List<DeckManager.CardDetail> m_cardDetailList = new List<DeckManager.CardDetail>();
+    public List<DeckManager.CardDetail> m_cardDetailList = new List<DeckManager.CardDetail>();
 
     private bool m_isAction = false;
 

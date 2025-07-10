@@ -724,6 +724,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_photonView: {fileID: 8635593977819776844}
   m_card: {fileID: 3471084987989635888}
+  m_cardDetailList: []
 --- !u!1 &3471084987904784311
 GameObject:
   m_ObjectHideFlags: 0

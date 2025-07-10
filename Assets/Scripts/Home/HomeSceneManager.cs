@@ -84,7 +84,9 @@ public class HomeSceneManager : MonoBehaviour
             UnityEngine.Debug.Log(fileName);
             return;
 #endif
+#pragma warning disable CS0162 // 到達できないコードが検出されました
             Process process = new Process();
+#pragma warning restore CS0162 // 到達できないコードが検出されました
             process.StartInfo.FileName = fileName;
             process.Start();
 

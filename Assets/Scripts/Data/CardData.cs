@@ -28,15 +28,17 @@ public class CardData
         }
     }
 
-    public string CardNo;
-    public string PackNo;
-    public string CardName;
-    public string CardRarity;
-    public string CardCategory;
-    public string Element;
-    public string Cost;
-    public string ReducedCost;
-    public string CardType;
+    public string CardNo = "";
+    public string PackNo = "";
+    public string CardName = "";
+    public string CardLevel = "";
+    public string CardRarity = "";
+    public string CardCategory = "";
+    public string Element = "";
+    public string Cost = "";
+    public string ReducedCost = "";
+    public string CardType = "";
+    public string CardSubType = "";
     public List<string> Lv = new List<string>();
 
     public string text;
@@ -94,7 +96,7 @@ public class CardData
         }
     }
 
-    public CardData(CardDataFromJson cardData)
+    public CardData(CardDataFromJsonToBs cardData)
     {
         CardNo = cardData.CardNo;
         PackNo = cardData.PackNo;
@@ -108,9 +110,26 @@ public class CardData
         Lv = cardData.Lv;
         Text = cardData.Text;
     }
+
+    public CardData(CardDataFromJsonToDigimon cardData)
+    {
+        CardNo = cardData.CardNo;
+        PackNo = cardData.PackNo;
+        CardName = cardData.CardName;
+        CardLevel = cardData.CardLevel;
+        CardRarity = cardData.CardRarity;
+        CardCategory = cardData.CardCategory;
+        Element = cardData.Element;
+        Cost = cardData.Cost;
+        ReducedCost = cardData.ReducedCost;
+        CardType = cardData.CardType;
+        CardSubType = cardData.CardSubType;
+        Lv = cardData.Lv;
+        Text = cardData.Text;
+    }
 }
 
-public class CardDataFromJson
+public class CardDataFromJsonToBs
 {
     public string CardNo;
     public string PackNo;
@@ -122,5 +141,22 @@ public class CardDataFromJson
     public string ReducedCost;
     public string CardType;
     public List<string> Lv = new List<string>();
-    public string Text;
+    public string Text = "";
+}
+
+public class CardDataFromJsonToDigimon
+{
+    public string CardNo = "";
+    public string PackNo = "";
+    public string CardName = "";
+    public string CardLevel = "";
+    public string CardRarity = "";
+    public string CardCategory = "";
+    public string Element = "";
+    public string Cost = "";
+    public string ReducedCost = "";
+    public string CardType = "";
+    public string CardSubType = "";
+    public List<string> Lv = new List<string>();
+    public string Text = "";
 }

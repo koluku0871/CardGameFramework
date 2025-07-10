@@ -309,6 +309,7 @@ RectTransform:
   - {fileID: 1735613195}
   - {fileID: 1003306583}
   - {fileID: 871733592}
+  - {fileID: 1914187444}
   - {fileID: 1360973127}
   - {fileID: 1829633201}
   m_Father: {fileID: 1758245446}
@@ -1306,6 +1307,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1891637802}
   m_CullTransparentMesh: 0
+--- !u!1 &1914187443
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1914187444}
+  m_Layer: 5
+  m_Name: CostPanel
+  m_TagString: CostPanel
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1914187444
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914187443}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 426197439}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -377, y: 0}
+  m_SizeDelta: {x: 744, y: 600}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2010185030
 GameObject:
   m_ObjectHideFlags: 0
@@ -1613,6 +1649,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: CardOptionWindow
+      objectReference: {fileID: 0}
+    - target: {fileID: 4735218173996979657, guid: 499877bb3e7be7642b591e14bf66ad90,
+        type: 3}
+      propertyPath: m_Value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1475,6 +1475,8 @@ MonoBehaviour:
     type: 3}
   m_assetBundleManager: {fileID: 5507470352115371558, guid: afdd4456c4b646342b250861ed1e7837,
     type: 3}
+  m_mouseManager: {fileID: 3713919395509795414, guid: d8fc7234f10ef7c4baa91a1f307a5e83,
+    type: 3}
   m_scrollRect: {fileID: 588698893}
   m_textMeshPro: {fileID: 2098397778}
   m_images:

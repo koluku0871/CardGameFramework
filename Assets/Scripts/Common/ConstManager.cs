@@ -9,16 +9,14 @@ public class ConstManager
     public const string DIRECTORY_PATH_TO_EXE = "/exe/";
 
 #if UNITY_EDITOR
-    public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_DECK;
-    public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_OPTION;
-    public static readonly string DIRECTORY_FULL_PATH_TO_BUNDLES = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_BUNDLES;
-    public static readonly string DIRECTORY_FULL_PATH_TO_EXE = UnityEngine.Application.persistentDataPath + DIRECTORY_PATH_TO_EXE;
+    public static readonly string DIRECTORY_PATH = "E:/UnityProject/CardGameFramework/data";
 #else
-    public static readonly string DIRECTORY_FULL_PATH_TO_DECK = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_DECK;
-    public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_OPTION;
-    public static readonly string DIRECTORY_FULL_PATH_TO_BUNDLES = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_BUNDLES;
-    public static readonly string DIRECTORY_FULL_PATH_TO_EXE = UnityEngine.Application.dataPath + DIRECTORY_PATH_TO_EXE;
+    public static readonly string DIRECTORY_PATH = UnityEngine.Application.dataPath;
 #endif
+    public static readonly string DIRECTORY_FULL_PATH_TO_DECK = DIRECTORY_PATH + DIRECTORY_PATH_TO_DECK;
+    public static readonly string DIRECTORY_FULL_PATH_TO_OPTION = DIRECTORY_PATH + DIRECTORY_PATH_TO_OPTION;
+    public static readonly string DIRECTORY_FULL_PATH_TO_BUNDLES = DIRECTORY_PATH + DIRECTORY_PATH_TO_BUNDLES;
+    public static readonly string DIRECTORY_FULL_PATH_TO_EXE = DIRECTORY_PATH + DIRECTORY_PATH_TO_EXE;
 
     public enum PhotonObjectType
     {

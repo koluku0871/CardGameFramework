@@ -231,16 +231,19 @@ public class CardDetailManager : MonoBehaviour
 
             levelClassList.Add(levelClass);
         }
-        if(data.CardCategory.Contains("ネクサス"))
+        if (!string.IsNullOrEmpty(data.CardCategory))
         {
-            if (levelClassList.Count < 1)
+            if (data.CardCategory.Contains("ネクサス"))
             {
-                levelClassList.Add(new LevelClass()
+                if (levelClassList.Count < 1)
                 {
-                    level = "1",
-                    bp = "",
-                    core = "0",
-                });
+                    levelClassList.Add(new LevelClass()
+                    {
+                        level = "1",
+                        bp = "",
+                        core = "0",
+                    });
+                }
             }
         }
 

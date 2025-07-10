@@ -208,6 +208,8 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     {
         base.OnLeftRoom();
 
+        m_closeButton.interactable = false;
+
         roomAnimManager.SetActiveToRoomContents(false);
     }
 
@@ -427,10 +429,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
 
     private void UpdatePlayerList()
     {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            m_startButton.interactable = true;
-        }
+        m_startButton.interactable = PhotonNetwork.IsMasterClient;
 
         foreach (Transform content in m_playerNameContent.transform)
         {

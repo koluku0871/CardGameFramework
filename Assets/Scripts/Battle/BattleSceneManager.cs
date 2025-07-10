@@ -97,13 +97,13 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         base.OnLeftLobby();
 
         PhotonNetwork.Disconnect();
+
+        FadeManager.Instance().OnStart("HomeScene");
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
         base.OnDisconnected(cause);
-
-        FadeManager.Instance().OnStart("HomeScene");
     }
 
     public void SetUi()
@@ -203,7 +203,9 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
     public void OnClickToCloseButton()
     {
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
+
+        FadeManager.Instance().OnStart("HomeScene");
     }
 
     public static string GetPlayerName(PhotonView photonView)

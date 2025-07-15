@@ -152,16 +152,12 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     {
         base.OnCreatedRoom();
 
-        SetCustomRoomProperties();
-
         OnJoinOrCreateRoom();
     }
 
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
-
-        SetCustomRoomProperties();
 
         OnJoinOrCreateRoom();
     }
@@ -179,6 +175,8 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         roomAnimManager.SetActiveToRoomContents(true);
 
         UpdatePlayerList();
+
+        SetCustomRoomProperties();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -569,6 +567,8 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     public void MoveBattleScene()
     {
         PhotonNetwork.IsMessageQueueRunning = false;
+
+        m_battlePlayerManager.SetRoomHash();
 
         FadeManager.Instance().OnStart("BattleScene", false);
     }

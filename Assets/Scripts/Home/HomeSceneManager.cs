@@ -48,6 +48,7 @@ public class HomeSceneManager : MonoBehaviour
             if (type == optionData.cardType)
             {
                 m_typeDropdown.value = typeIndex;
+                AssetBundleManager.Instance().CardType = type;
             }
             typeIndex++;
         }
@@ -129,6 +130,7 @@ public class HomeSceneManager : MonoBehaviour
         optionData.name = m_nameInputField.text;
         m_nameText.text = m_nameInputField.text;
         optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
+        AssetBundleManager.Instance().CardType = optionData.cardType;
 
         optionData.SaveTxt();
     }

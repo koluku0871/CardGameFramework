@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static CardOptionWindow;
 
 public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragHandler, IEndDragHandler, IPunObservable
 {
@@ -286,22 +287,22 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             case "Deck":
                 // ドラッグで戻すとデッキの上に戻る
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
-                FieldCardManager.Instance().AddDeckFromFieldOrBurstOrFlash(true, m_image, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.DECK, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
                 break;
             case "Trash":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
-                FieldCardManager.Instance().AddTrashOrExclusionFromFieldOrBurstOrFlash(m_image, list[0], list[1], true);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.TRASH, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
                 break;
             case "Exclusion":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
-                FieldCardManager.Instance().AddTrashOrExclusionFromFieldOrBurstOrFlash(m_image, list[0], list[1], false);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.EXCLUSION, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
                 break;
             case "Hand":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
-                FieldCardManager.Instance().AddHandFromFieldOrBurstOrFlash(m_image, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.HAND, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
                 break;
             case "AtHand":

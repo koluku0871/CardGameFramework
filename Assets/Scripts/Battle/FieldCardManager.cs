@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using Newtonsoft.Json.Linq;
+using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +13,7 @@ public class FieldCardManager : MonoBehaviour
     [Serializable]
     public class FieldCardData
     {
-        public DeckManager.DeckDetail deckDetail = new DeckManager.DeckDetail();
+        public List<CardDetail> deckDetailList = new List<CardDetail>();
 
         public List<string> atHandList = new List<string>();
 
@@ -22,13 +23,13 @@ public class FieldCardManager : MonoBehaviour
 
         public string flash = "";
 
-        public DeckManager.DeckDetail trashDetail = new DeckManager.DeckDetail();
+        public List<CardDetail> trashDetailList = new List<CardDetail>();
 
-        public DeckManager.DeckDetail exclusionDetail = new DeckManager.DeckDetail();
+        public List<CardDetail> exclusionDetailList = new List<CardDetail>();
 
-        public DeckManager.DeckDetail securltyDetail = new DeckManager.DeckDetail();
+        public List<CardDetail> securltyDetailList = new List<CardDetail>();
 
-        public DeckManager.DeckDetail digitamaDetail = new DeckManager.DeckDetail();
+        public List<CardDetail> digitamaDetailList = new List<CardDetail>();
     }
 
     [SerializeField]
@@ -53,6 +54,18 @@ public class FieldCardManager : MonoBehaviour
     private Text m_exclusionCardCountText = null;
 
     [SerializeField]
+    private Image m_securltyCard = null;
+
+    [SerializeField]
+    private Text m_securltyCardCountText = null;
+
+    [SerializeField]
+    private Image m_digitamaCard = null;
+
+    [SerializeField]
+    private Text m_digitamaCardCountText = null;
+
+    [SerializeField]
     private RectTransform m_atHandContent = null;
 
     [SerializeField]
@@ -64,15 +77,17 @@ public class FieldCardManager : MonoBehaviour
     [SerializeField]
     private Image m_handCard = null;
 
-    private DeckManager.DeckDetail m_deckDetail = new DeckManager.DeckDetail();
+    private List<CardDetail> m_deckDetailList = new List<CardDetail>();
 
-    private DeckManager.DeckDetail m_trashDetail = new DeckManager.DeckDetail();
+    private List<CardDetail> m_aceDetailList = new List<CardDetail>();
 
-    private DeckManager.DeckDetail m_exclusionDetail = new DeckManager.DeckDetail();
+    private List<CardDetail> m_trashDetailList = new List<CardDetail>();
 
-    private DeckManager.DeckDetail m_securltyDetail = new DeckManager.DeckDetail();
+    private List<CardDetail> m_exclusionDetailList = new List<CardDetail>();
 
-    private DeckManager.DeckDetail m_digitamaDetail = new DeckManager.DeckDetail();
+    private List<CardDetail> m_securltyDetailList = new List<CardDetail>();
+
+    private List<CardDetail> m_digitamaDetailList = new List<CardDetail>();
 
     private static FieldCardManager instance = null;
     public static FieldCardManager Instance()
@@ -89,7 +104,6 @@ public class FieldCardManager : MonoBehaviour
             m_atHandCard.gameObject.SetActive(false);
         }
         
-
         m_handCard.gameObject.SetActive(false);
 
         // m_trashCard.gameObject.SetActive(false);
@@ -97,30 +111,42 @@ public class FieldCardManager : MonoBehaviour
 
     public void InitSetting()
     {
-        if (m_deckDetail.IsInContract())
+        if (BattleSceneManager.m_type == "bs")
         {
-            CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.CONTRACT);
+            if (DeckManager.IsInContract(m_deckDetailList))
+            {
+                CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.CONTRACT);
+            }
+            else
+            {
+                AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 4);
+            }
         }
-        else
+
+        if (BattleSceneManager.m_type == "digimon")
         {
-            AddSrcFromDst(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 4);
+            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
+            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SECURLTY, true, 5);
         }
+    }
+
+    public EventTrigger GetOrAddComponentToEventTrigger(GameObject obj, EventTrigger.Entry entry)
+    {
+        EventTrigger cardEventTrigger = obj.GetComponent<EventTrigger>();
+        if (cardEventTrigger == null)
+        {
+            cardEventTrigger = obj.AddComponent<EventTrigger>();
+        }
+        cardEventTrigger.triggers = new List<EventTrigger.Entry>();
+        cardEventTrigger.triggers.Add(entry);
+        return cardEventTrigger;
     }
 
     public void SetActiveToButton(bool isActive)
     {
-        EventTrigger cardEventTrigger = null;
-
         bool isMine = isActive && m_photonView.IsMine;
         if (isMine)
         {
-            // デッキ
-            cardEventTrigger = m_deckCard.GetComponent<EventTrigger>();
-            if (cardEventTrigger == null)
-            {
-                cardEventTrigger = m_deckCard.gameObject.AddComponent<EventTrigger>();
-            }
-            cardEventTrigger.triggers = new List<EventTrigger.Entry>();
             // マウスクリック
             EventTrigger.Entry entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerClick;
@@ -145,18 +171,63 @@ public class FieldCardManager : MonoBehaviour
                         break;
                 }
             });
-            cardEventTrigger.triggers.Add(entry);
+            GetOrAddComponentToEventTrigger(m_deckCard.gameObject, entry);
+
+            // マウスクリック
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerClick;
+            entry.callback.AddListener((pointerEventData) => {
+                bool isPointerEvent = pointerEventData is PointerEventData;
+                if (!isPointerEvent)
+                {
+                    return;
+                }
+
+                switch ((pointerEventData as PointerEventData).pointerId)
+                {
+                    case -1:
+                        Debug.Log("Left Click");
+                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.SECURLTY);
+                        break;
+                    case -2:
+                        Debug.Log("Right Click");
+                        break;
+                    case -3:
+                        Debug.Log("Middle Click");
+                        break;
+                }
+            });
+            GetOrAddComponentToEventTrigger(m_securltyCard.gameObject, entry);
+
+            // マウスクリック
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerClick;
+            entry.callback.AddListener((pointerEventData) => {
+                bool isPointerEvent = pointerEventData is PointerEventData;
+                if (!isPointerEvent)
+                {
+                    return;
+                }
+
+                switch ((pointerEventData as PointerEventData).pointerId)
+                {
+                    case -1:
+                        Debug.Log("Left Click");
+                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DIGITAMA);
+                        break;
+                    case -2:
+                        Debug.Log("Right Click");
+                        break;
+                    case -3:
+                        Debug.Log("Middle Click");
+                        break;
+                }
+            });
+            GetOrAddComponentToEventTrigger(m_digitamaCard.gameObject, entry);
         }
 
         if (isActive)
         {
-            // トラッシュ
-            cardEventTrigger = m_trashCard.GetComponent<EventTrigger>();
-            if (cardEventTrigger == null)
-            {
-                cardEventTrigger = m_trashCard.gameObject.AddComponent<EventTrigger>();
-            }
-            cardEventTrigger.triggers = new List<EventTrigger.Entry>();
             // マウスクリック
             EventTrigger.Entry entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerClick;
@@ -181,15 +252,8 @@ public class FieldCardManager : MonoBehaviour
                         break;
                 }
             });
-            cardEventTrigger.triggers.Add(entry);
+            GetOrAddComponentToEventTrigger(m_trashCard.gameObject, entry);
 
-            // 除外
-            cardEventTrigger = m_exclusionCard.GetComponent<EventTrigger>();
-            if (cardEventTrigger == null)
-            {
-                cardEventTrigger = m_exclusionCard.gameObject.AddComponent<EventTrigger>();
-            }
-            cardEventTrigger.triggers = new List<EventTrigger.Entry>();
             // マウスクリック
             entry = new EventTrigger.Entry();
             entry.eventID = EventTriggerType.PointerClick;
@@ -214,80 +278,15 @@ public class FieldCardManager : MonoBehaviour
                         break;
                 }
             });
-            cardEventTrigger.triggers.Add(entry);
+            GetOrAddComponentToEventTrigger(m_exclusionCard.gameObject, entry);
         }
-    }
-
-    public void SetDeckOrTrashOrExclusion(CardOptionWindow.OPTION_TYPE option, DeckManager.DeckDetail deckDetail)
-    {
-        switch (option)
-        {
-            case OPTION_TYPE.DECK:
-                m_deckDetail = deckDetail;
-                m_deckCardCountText.text = m_deckDetail.cardDetailList.Count.ToString();
-                break;
-            case OPTION_TYPE.TRASH:
-                m_trashDetail = deckDetail;
-                m_trashCardCountText.text = m_trashDetail.cardDetailList.Count.ToString();
-                break;
-            case OPTION_TYPE.EXCLUSION:
-                m_exclusionDetail = deckDetail;
-                m_exclusionCardCountText.text = m_exclusionDetail.cardDetailList.Count.ToString();
-                break;
-        }
-    }
-
-    public void AddDeckFromDeck(bool isUp, Image card, string tag, string cardId)
-    {
-        List<DeckManager.CardDetail> cardDetailList = RemoveDeck(tag, cardId);
-        AddDeck(isUp, cardDetailList[0]);
-        // Destroy(card.gameObject);
-    }
-
-    public void AddDeckFromHandOrAtHand(bool isUp, Image card, string tag, string cardId)
-    {
-        AddDeck(isUp, new DeckManager.CardDetail() { tag = tag, cardId = cardId });
-        Destroy(card.gameObject);
-    }
-
-    public void AddDeckFromFieldOrBurstOrFlash(bool isUp, Image card, string tag, string cardId)
-    {
-        AddDeck(isUp, new DeckManager.CardDetail() { tag = tag, cardId = cardId });
-        card.sprite = CardDetailManager.Instance().GetSleeveSprite();
-        card.name = "";
-        card.gameObject.SetActive(false);
-    }
-
-    public DeckManager.CardDetail AddDeckFromTrash(bool isUp, string tag, string cardId)
-    {
-        DeckManager.CardDetail cardDetail = RemoveTrashOrExclusion(OPTION_TYPE.TRASH, tag, cardId);
-        AddDeck(isUp, cardDetail);
-        return cardDetail;
-    }
-
-    public DeckManager.CardDetail AddDeckFromExclusion(bool isUp, string tag, string cardId)
-    {
-        DeckManager.CardDetail cardDetail = RemoveTrashOrExclusion(OPTION_TYPE.EXCLUSION, tag, cardId);
-        AddDeck(isUp, cardDetail);
-        return cardDetail;
-    }
-
-    public void AddDeck(bool isUp, DeckManager.CardDetail cardDetail)
-    {
-        int index = 0;
-        if (!isUp)
-        {
-            index = m_deckDetail.cardDetailList.Count;
-        }
-        m_deckDetail.cardDetailList.Insert(index, cardDetail);
-        m_deckCardCountText.text = m_deckDetail.cardDetailList.Count.ToString();
     }
 
     public List<DeckManager.CardDetail> RemoveDeckToContract()
     {
         List<DeckManager.CardDetail> cardDetailList = new List<DeckManager.CardDetail>();
 
-        foreach (DeckManager.CardDetail cardDetail in m_deckDetail.cardDetailList)
+        foreach (DeckManager.CardDetail cardDetail in m_deckDetailList)
         {
             CardData data = AssetBundleManager.Instance().GetBaseData(cardDetail.tag, cardDetail.cardId);
             if (!data.CardCategory.Contains("契約"))
@@ -296,90 +295,66 @@ public class FieldCardManager : MonoBehaviour
             }
 
             cardDetailList.Add(cardDetail);
-            m_deckDetail.cardDetailList.Remove(cardDetail);
+            m_deckDetailList.Remove(cardDetail);
             break;
         }
 
         return cardDetailList;
     }
 
-    public List<DeckManager.CardDetail> RemoveDeck(string tag, string cardId)
+    public void ShuffleCardDetailList(CardOptionWindow.OPTION_TYPE option)
     {
-        List<DeckManager.CardDetail> cardDetailList = new List<DeckManager.CardDetail>();
-
-        foreach (DeckManager.CardDetail cardDetail in m_deckDetail.cardDetailList)
-        {
-            if (cardDetail.tag != tag || cardDetail.cardId != cardId)
-            {
-                continue;
-            }
-
-            cardDetailList.Add(cardDetail);
-            m_deckDetail.cardDetailList.Remove(cardDetail);
-            break;
-        }
-        m_deckCardCountText.text = m_deckDetail.cardDetailList.Count.ToString();
-
-        return cardDetailList;
-    }
-
-    public List<DeckManager.CardDetail> RemoveDeck(bool isUp, int count)
-    {
-        int index = 0;
-        if (!isUp)
-        {
-            index = m_deckDetail.cardDetailList.Count - count;
-        }
-        List<DeckManager.CardDetail> cardDetailList = m_deckDetail.cardDetailList.GetRange(index, count);
-        m_deckDetail.cardDetailList.RemoveRange(index, count);
-        m_deckCardCountText.text = m_deckDetail.cardDetailList.Count.ToString();
-
-        return cardDetailList;
-    }
-
-    public List<DeckManager.CardDetail> GetDeck(bool isUp, int count)
-    {
-        int index = 0;
-        if (!isUp)
-        {
-            index = m_deckDetail.cardDetailList.Count - count;
-        }
-
-        return m_deckDetail.cardDetailList.GetRange(index, count);
-    }
-
-    public List<DeckManager.CardDetail> GetDeckOrTrashOrExclusion(CardOptionWindow.OPTION_TYPE option)
-    {
-        List<DeckManager.CardDetail> cardDetailList = new List<CardDetail>();
+        List<CardDetail> deckDetailList = new List<CardDetail>();
         switch (option)
         {
             case OPTION_TYPE.DECK:
-                cardDetailList = m_deckDetail.cardDetailList;
+                deckDetailList = m_deckDetailList;
                 break;
             case OPTION_TYPE.TRASH:
-                if (m_trashDetail != null && m_trashDetail.cardDetailList != null)
-                {
-                    cardDetailList = m_trashDetail.cardDetailList;
-                }
+                deckDetailList = m_trashDetailList;
                 break;
             case OPTION_TYPE.EXCLUSION:
-                if (m_exclusionDetail != null && m_exclusionDetail.cardDetailList != null)
-                {
-                    cardDetailList = m_exclusionDetail.cardDetailList;
-                }
+                deckDetailList = m_exclusionDetailList;
+                break;
+            case OPTION_TYPE.SECURLTY:
+                deckDetailList = m_securltyDetailList;
+                break;
+            case OPTION_TYPE.DIGITAMA:
+                deckDetailList = m_digitamaDetailList;
+                break;
+            case OPTION_TYPE.TOKEN:
+                deckDetailList = m_aceDetailList;
                 break;
         }
-        return cardDetailList;
-    }
 
-    public void ShuffleDeck()
-    {
-        for (int index = 0; index < m_deckDetail.cardDetailList.Count; index++)
+        for (int index = 0; index < deckDetailList.Count; index++)
         {
-            DeckManager.CardDetail tmp = m_deckDetail.cardDetailList[index];
-            int randomIndex = UnityEngine.Random.Range(0, m_deckDetail.cardDetailList.Count);
-            m_deckDetail.cardDetailList[index] = m_deckDetail.cardDetailList[randomIndex];
-            m_deckDetail.cardDetailList[randomIndex] = tmp;
+            DeckManager.CardDetail tmp = deckDetailList[index];
+            int randomIndex = UnityEngine.Random.Range(0, deckDetailList.Count);
+            deckDetailList[index] = deckDetailList[randomIndex];
+            deckDetailList[randomIndex] = tmp;
+        }
+
+        switch (option)
+        {
+            case OPTION_TYPE.DECK:
+                m_deckDetailList = deckDetailList;
+                break;
+            case OPTION_TYPE.TRASH:
+                m_trashDetailList = deckDetailList;
+                break;
+            case OPTION_TYPE.EXCLUSION:
+                m_exclusionDetailList = deckDetailList;
+                break;
+            case OPTION_TYPE.SECURLTY:
+                m_securltyDetailList = deckDetailList;
+                break;
+            case OPTION_TYPE.DIGITAMA:
+                m_digitamaDetailList = deckDetailList;
+                break;
+            case OPTION_TYPE.TOKEN:
+                m_aceDetailList = deckDetailList;
+                break;
         }
     }
 
@@ -392,92 +367,7 @@ public class FieldCardManager : MonoBehaviour
             Debug.LogWarning("契約スピリットがデッキに入っていません");
         }
 
-        AddHand(cardDetailList);
-    }
-
-    public void AddHandFromAtHand(Image card, string tag, string cardId)
-    {
-        AddHand(new List<DeckManager.CardDetail>() { new DeckManager.CardDetail() { tag = tag, cardId = cardId } });
-        Destroy(card.gameObject);
-    }
-
-    public void AddHandFromFieldOrBurstOrFlash(Image card, string tag, string cardId)
-    {
-        AddHand(new List<DeckManager.CardDetail>() { new DeckManager.CardDetail() { tag = tag, cardId = cardId } });
-        card.sprite = CardDetailManager.Instance().GetSleeveSprite();
-        card.name = "";
-        card.gameObject.SetActive(false);
-    }
-
-    public List<DeckManager.CardDetail> AddSrcFromDst(
-        CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, int count
-    ){
-        List<DeckManager.CardDetail> cardDetailList = new List<CardDetail>();
-        switch (optionSrc)
-        {
-            case OPTION_TYPE.DECK:
-                cardDetailList = RemoveDeck(isUp, count);
-                break;
-        }
-        AddDst(optionDst, cardDetailList);
-        return cardDetailList;
-    }
-
-    public List<DeckManager.CardDetail> AddSrcFromDst(
-        CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, string tag, string cardId
-    ){
-        List<DeckManager.CardDetail> cardDetailList = new List<CardDetail>();
-        switch (optionSrc)
-        {
-            case OPTION_TYPE.DECK:
-                cardDetailList = RemoveDeck(tag, cardId);
-                break;
-            case OPTION_TYPE.TRASH:
-                cardDetailList.Add(RemoveTrashOrExclusion(OPTION_TYPE.TRASH, tag, cardId));
-                break;
-            case OPTION_TYPE.EXCLUSION:
-                cardDetailList.Add(RemoveTrashOrExclusion(OPTION_TYPE.EXCLUSION, tag, cardId));
-                break;
-        }
-        AddDst(optionDst, cardDetailList);
-        return cardDetailList;
-    }
-
-    public void AddDst(CardOptionWindow.OPTION_TYPE option, List<DeckManager.CardDetail> cardDetailList)
-    {
-        switch (option)
-        {
-            case OPTION_TYPE.HAND:
-                AddHand(cardDetailList);
-                break;
-            case OPTION_TYPE.AT_HAND:
-                AddAtHand(cardDetailList);
-                break;
-            case CardOptionWindow.OPTION_TYPE.TRASH:
-                foreach (var cardDetail in cardDetailList)
-                {
-                    AddTrashOrExclusion(cardDetail, true);
-                }
-                break;
-            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
-                foreach (var cardDetail in cardDetailList)
-                {
-                    AddTrashOrExclusion(cardDetail, false);
-                }
-                break;
-        }
-    }
-
-    public void AddHand(List<DeckManager.CardDetail> cardDetailList)
-    {
-        foreach (var cardDetail in cardDetailList)
-        {
-            Image card = CreateCard(cardDetail, true, m_handCard, m_handContent,
-                (Image target, string tag, string cardId) => {
-                    CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.HAND);
-                });
-            card.name = m_handCard.name;
-        }
+        AddCardDetailList(OPTION_TYPE.HAND, cardDetailList);
     }
 
     public List<GameObject> GetHandGameObject()
@@ -492,40 +382,431 @@ public class FieldCardManager : MonoBehaviour
         }
         return handObjectList;
     }
-    
 
-    public void AddAtHandFromHand(Image card, string tag, string cardId)
+    public void SetDeckDetail(CardOptionWindow.OPTION_TYPE option, List<CardDetail> deckDetailList)
     {
-        AddAtHand(new List<DeckManager.CardDetail>() { new DeckManager.CardDetail() { tag = tag, cardId = cardId } });
-        Destroy(card.gameObject);
-    }
-
-    public void AddAtHandFromFieldOrBurstOrFlash(Image card, string tag, string cardId)
-    {
-        AddAtHand(new List<DeckManager.CardDetail>() { new DeckManager.CardDetail() { tag = tag, cardId = cardId } });
-        card.sprite = CardDetailManager.Instance().GetSleeveSprite();
-        card.name = "";
-        card.gameObject.SetActive(false);
-    }
-
-    public void AddAtHand(List<DeckManager.CardDetail> cardDetailList)
-    {
-        if (m_atHandCard == null || m_atHandContent == null)
+        switch (option)
         {
-            return;
-        }
-
-        foreach (var cardDetail in cardDetailList)
-        {
-            Image card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
-                (Image target, string tag, string cardId) => {
-                    CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);
-                });
-            card.name = m_atHandCard.name;
+            case OPTION_TYPE.DECK:
+                m_deckDetailList = deckDetailList;
+                m_deckCardCountText.text = m_deckDetailList.Count.ToString();
+                break;
+            case OPTION_TYPE.TRASH:
+                m_trashDetailList = deckDetailList;
+                m_trashCardCountText.text = m_trashDetailList.Count.ToString();
+                break;
+            case OPTION_TYPE.EXCLUSION:
+                m_exclusionDetailList = deckDetailList;
+                m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
+                break;
+            case OPTION_TYPE.SECURLTY:
+                m_securltyDetailList = deckDetailList;
+                m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+                break;
+            case OPTION_TYPE.DIGITAMA:
+                m_digitamaDetailList = deckDetailList;
+                m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+                break;
+            case OPTION_TYPE.TOKEN:
+                m_aceDetailList = deckDetailList;
+                break;
         }
     }
 
+    public List<CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option)
+    {
+        List<CardDetail> cardDetailList = new List<CardDetail>();
+        switch (option)
+        {
+            case OPTION_TYPE.DECK:
+                cardDetailList = m_deckDetailList;
+                break;
+            case OPTION_TYPE.TRASH:
+                if (m_trashDetailList != null)
+                {
+                    cardDetailList = m_trashDetailList;
+                }
+                break;
+            case OPTION_TYPE.EXCLUSION:
+                if (m_exclusionDetailList != null)
+                {
+                    cardDetailList = m_exclusionDetailList;
+                }
+                break;
+            case OPTION_TYPE.SECURLTY:
+                if (m_securltyDetailList != null)
+                {
+                    cardDetailList = m_securltyDetailList;
+                }
+                break;
+            case OPTION_TYPE.DIGITAMA:
+                if (m_digitamaDetailList != null)
+                {
+                    cardDetailList = m_digitamaDetailList;
+                }
+                break;
+            case OPTION_TYPE.TOKEN:
+                if (m_aceDetailList != null)
+                {
+                    cardDetailList = m_aceDetailList;
+                }
+                break;
+        }
+        return cardDetailList;
+    }
 
+    public void AddDstFromSrc(OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, string tag, string cardId)
+    {
+        DeckManager.CardDetail cardDetailList = RemoveCardDetail(optionSrc, tag, cardId)[0];
+        AddCardDetailList(optionDst, isUp, cardDetailList);
+    }
+
+    public void AddDstFromSrc(CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, Image card, string tag, string cardId)
+    {
+        RemoveCardImage(optionSrc, card);
+        AddCardDetailList(optionDst, isUp, new DeckManager.CardDetail() { tag = tag, cardId = cardId });
+    }
+
+    public DeckManager.CardDetail AddDstFromSrc(
+        CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, Image card, string tag, string cardId)
+    {
+        RemoveCardImage(optionSrc, card);
+        DeckManager.CardDetail cardDetail = new DeckManager.CardDetail() { tag = tag, cardId = cardId };
+        AddCardDetailList(optionDst, new List<DeckManager.CardDetail>() { cardDetail });
+        return cardDetail;
+    }
+
+    public List<CardDetail> AddDstFromSrc(
+        CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, int count
+    ){
+        List<CardDetail> cardDetailList = new List<CardDetail>();
+        int index = 0;
+        switch (optionSrc)
+        {
+            case CardOptionWindow.OPTION_TYPE.DECK:
+                if (!isUp)
+                {
+                    index = m_deckDetailList.Count - count;
+                }
+                cardDetailList = m_deckDetailList.GetRange(index, count);
+                m_deckDetailList.RemoveRange(index, count);
+                m_deckCardCountText.text = m_deckDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.TRASH:
+                if (!isUp)
+                {
+                    index = m_trashDetailList.Count - count;
+                }
+                cardDetailList = m_trashDetailList.GetRange(index, count);
+                m_trashDetailList.RemoveRange(index, count);
+                m_trashCardCountText.text = m_trashDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
+                if (!isUp)
+                {
+                    index = m_exclusionDetailList.Count - count;
+                }
+                cardDetailList = m_exclusionDetailList.GetRange(index, count);
+                m_exclusionDetailList.RemoveRange(index, count);
+                m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+                if (!isUp)
+                {
+                    index = m_securltyDetailList.Count - count;
+                }
+                cardDetailList = m_securltyDetailList.GetRange(index, count);
+                m_securltyDetailList.RemoveRange(index, count);
+                m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+                if (!isUp)
+                {
+                    index = m_digitamaDetailList.Count - count;
+                }
+                cardDetailList = m_digitamaDetailList.GetRange(index, count);
+                m_digitamaDetailList.RemoveRange(index, count);
+                m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+                break;
+        }
+        AddCardDetailList(optionDst, cardDetailList);
+        return cardDetailList;
+    }
+
+    public List<DeckManager.CardDetail> AddDstFromSrc(
+        CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, string tag, string cardId
+    ){
+        List<DeckManager.CardDetail> cardDetailList = RemoveCardDetail(optionSrc, tag, cardId);
+        AddCardDetailList(optionDst, cardDetailList);
+        return cardDetailList;
+    }
+
+
+
+    public List<CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
+    {
+        List<CardDetail> cardDetailList = new List<CardDetail>();
+        int index = 0;
+        switch (option)
+        {
+            case CardOptionWindow.OPTION_TYPE.DECK:
+                if (!isUp)
+                {
+                    index = m_deckDetailList.Count - count;
+                }
+                cardDetailList = m_deckDetailList.GetRange(index, count);
+                break;
+            case CardOptionWindow.OPTION_TYPE.TRASH:
+                if (!isUp)
+                {
+                    index = m_trashDetailList.Count - count;
+                }
+                cardDetailList = m_trashDetailList.GetRange(index, count);
+                break;
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
+                if (!isUp)
+                {
+                    index = m_exclusionDetailList.Count - count;
+                }
+                cardDetailList = m_exclusionDetailList.GetRange(index, count);
+                break;
+            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+                if (!isUp)
+                {
+                    index = m_securltyDetailList.Count - count;
+                }
+                cardDetailList = m_securltyDetailList.GetRange(index, count);
+                break;
+            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+                if (!isUp)
+                {
+                    index = m_digitamaDetailList.Count - count;
+                }
+                cardDetailList = m_digitamaDetailList.GetRange(index, count);
+                break;
+        }
+        return cardDetailList;
+    }
+
+    public void AddCardDetailList(CardOptionWindow.OPTION_TYPE option, bool isUp, DeckManager.CardDetail cardDetail)
+    {
+        int index = 0;
+        switch (option)
+        {
+            case CardOptionWindow.OPTION_TYPE.DECK:
+                if (!isUp)
+                {
+                    index = m_deckDetailList.Count;
+                }
+                m_deckDetailList.Insert(index, cardDetail);
+                m_deckCardCountText.text = m_deckDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.TRASH:
+                if (!isUp)
+                {
+                    index = m_trashDetailList.Count;
+                }
+                m_trashDetailList.Insert(index, cardDetail);
+                m_trashCardCountText.text = m_trashDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
+                if (!isUp)
+                {
+                    index = m_exclusionDetailList.Count;
+                }
+                m_exclusionDetailList.Insert(index, cardDetail);
+                m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+                if (!isUp)
+                {
+                    index = m_securltyDetailList.Count;
+                }
+                m_securltyDetailList.Insert(index, cardDetail);
+                m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+                break;
+            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+                if (!isUp)
+                {
+                    index = m_digitamaDetailList.Count;
+                }
+                m_digitamaDetailList.Insert(index, cardDetail);
+                m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+                break;
+        }
+    }
+
+    public void AddCardDetailList(CardOptionWindow.OPTION_TYPE option, List<DeckManager.CardDetail> cardDetailList)
+    {
+        switch (option)
+        {
+            case OPTION_TYPE.HAND:
+                foreach (var cardDetail in cardDetailList)
+                {
+                    Image card = CreateCard(cardDetail, true, m_handCard, m_handContent,
+                        (Image target, string tag, string cardId) => {
+                            CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.HAND);
+                        });
+                    card.name = m_handCard.name;
+                }
+                break;
+            case OPTION_TYPE.AT_HAND:
+                if (m_atHandCard == null || m_atHandContent == null)
+                {
+                    return;
+                }
+
+                foreach (var cardDetail in cardDetailList)
+                {
+                    Image card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
+                        (Image target, string tag, string cardId) => {
+                            CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);
+                        });
+                    card.name = m_atHandCard.name;
+                }
+                break;
+            case CardOptionWindow.OPTION_TYPE.DECK:
+                foreach (var cardDetail in cardDetailList)
+                {
+                    m_deckDetailList.Add(cardDetail);
+                    m_deckCardCountText.text = m_deckDetailList.Count.ToString();
+                }
+                break;
+            case CardOptionWindow.OPTION_TYPE.TRASH:
+                foreach (var cardDetail in cardDetailList)
+                {
+                    m_trashDetailList.Add(cardDetail);
+                    m_trashCardCountText.text = m_trashDetailList.Count.ToString();
+                }
+                break;
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
+                foreach (var cardDetail in cardDetailList)
+                {
+                    m_exclusionDetailList.Add(cardDetail);
+                    m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
+                }
+                break;
+            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+                foreach (var cardDetail in cardDetailList)
+                {
+                    m_securltyDetailList.Add(cardDetail);
+                    m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+                }
+                break;
+            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+                foreach (var cardDetail in cardDetailList)
+                {
+                    m_digitamaDetailList.Add(cardDetail);
+                    m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+                }
+                break;
+        }
+    }
+
+    public List<DeckManager.CardDetail> RemoveCardDetail(CardOptionWindow.OPTION_TYPE option, string tag, string cardId)
+    {
+        List<DeckManager.CardDetail> cardDetailList = new List<DeckManager.CardDetail>();
+        int count = 0;
+        switch (option)
+        {
+            case OPTION_TYPE.DECK:
+                foreach (DeckManager.CardDetail cardDetail in m_deckDetailList)
+                {
+                    if (cardDetail.tag != tag || cardDetail.cardId != cardId)
+                    {
+                        continue;
+                    }
+
+                    cardDetailList.Add(cardDetail);
+                    m_deckDetailList.Remove(cardDetail);
+                    break;
+                }
+                m_deckCardCountText.text = m_deckDetailList.Count.ToString();
+                break;
+            case OPTION_TYPE.TRASH:
+                foreach (var cardDetail in m_trashDetailList)
+                {
+                    if (cardDetail.tag != tag || cardDetail.cardId != cardId)
+                    {
+                        continue;
+                    }
+                    cardDetailList.Add(cardDetail);
+                    m_trashDetailList.Remove(cardDetail);
+                    break;
+                }
+                count = m_trashDetailList.Count;
+                m_trashCardCountText.text = count.ToString();
+                if (count <= 0)
+                {
+                    // m_trashCard.gameObject.SetActive(false);
+                }
+                break;
+            case OPTION_TYPE.EXCLUSION:
+                foreach (var cardDetail in m_exclusionDetailList)
+                {
+                    if (cardDetail.tag != tag || cardDetail.cardId != cardId)
+                    {
+                        continue;
+                    }
+                    cardDetailList.Add(cardDetail);
+                    m_exclusionDetailList.Remove(cardDetail);
+                    break;
+                }
+                count = m_exclusionDetailList.Count;
+                m_exclusionCardCountText.text = count.ToString();
+                if (count <= 0) { }
+                break;
+            case OPTION_TYPE.SECURLTY:
+                foreach (var cardDetail in m_securltyDetailList)
+                {
+                    if (cardDetail.tag != tag || cardDetail.cardId != cardId)
+                    {
+                        continue;
+                    }
+                    cardDetailList.Add(cardDetail);
+                    m_securltyDetailList.Remove(cardDetail);
+                    break;
+                }
+                count = m_securltyDetailList.Count;
+                m_securltyCardCountText.text = count.ToString();
+                if (count <= 0) { }
+                break;
+            case OPTION_TYPE.DIGITAMA:
+                foreach (var cardDetail in m_digitamaDetailList)
+                {
+                    if (cardDetail.tag != tag || cardDetail.cardId != cardId)
+                    {
+                        continue;
+                    }
+                    cardDetailList.Add(cardDetail);
+                    m_digitamaDetailList.Remove(cardDetail);
+                    break;
+                }
+                count = m_digitamaDetailList.Count;
+                m_digitamaCardCountText.text = count.ToString();
+                if (count <= 0) { }
+                break;
+        }
+        return cardDetailList;
+    }
+
+    public void RemoveCardImage(CardOptionWindow.OPTION_TYPE option, Image card)
+    {
+        switch(option)
+        {
+            case OPTION_TYPE.HAND:
+            case OPTION_TYPE.AT_HAND:
+                Destroy(card.gameObject);
+                break;
+            case OPTION_TYPE.FIELD:
+            case OPTION_TYPE.BURST:
+            case OPTION_TYPE.FLASH:
+                card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                card.name = "";
+                card.gameObject.SetActive(false);
+                break;
+        }
+    }
 
     public void SetCardToStand(Image card)
     {
@@ -540,101 +821,6 @@ public class FieldCardManager : MonoBehaviour
     public void SetCardToDualRest(Image card)
     {
         card.rectTransform.localRotation = Quaternion.Euler(0, 0, -180);
-    }
-
-    public void RemoveField(Image card)
-    {
-        Destroy(card.gameObject);
-    }
-
-    public DeckManager.CardDetail AddTrashOrExclusionFromHandOrAtHand(Image card, string tag, string cardId, bool isTrash)
-    {
-        DeckManager.CardDetail cardDetail = new DeckManager.CardDetail() { tag = tag, cardId = cardId };
-        AddTrashOrExclusion(cardDetail, isTrash);
-        Destroy(card.gameObject);
-        return cardDetail;
-    }
-
-    public void AddTrashOrExclusionFromFieldOrBurstOrFlash(Image card, string tag, string cardId, bool isTrash)
-    {
-        AddTrashOrExclusion(new DeckManager.CardDetail() { tag = tag, cardId = cardId }, isTrash);
-        card.sprite = CardDetailManager.Instance().GetSleeveSprite();
-        card.name = "";
-        card.gameObject.SetActive(false);
-    }
-
-    public void AddTrashOrExclusion(string tag, string cardId, bool isTrash)
-    {
-        AddTrashOrExclusion(new DeckManager.CardDetail() { tag = tag, cardId = cardId }, isTrash);
-    }
-
-    public void AddTrashOrExclusion(DeckManager.CardDetail cardDetail, bool isTrash)
-    {
-        if (isTrash)
-        {
-            m_trashDetail.cardDetailList.Add(cardDetail);
-            m_trashCardCountText.text = m_trashDetail.cardDetailList.Count.ToString();
-            return;
-        }
-
-        m_exclusionDetail.cardDetailList.Add(cardDetail);
-        m_exclusionCardCountText.text = m_exclusionDetail.cardDetailList.Count.ToString();
-    }
-
-    public DeckManager.CardDetail RemoveTrashOrExclusion(CardOptionWindow.OPTION_TYPE option, string tag, string cardId)
-    {
-        DeckManager.CardDetail trashCard = null;
-        int count = 0;
-        switch (option)
-        {
-            case OPTION_TYPE.TRASH:
-                foreach (var cardDetail in m_trashDetail.cardDetailList)
-                {
-                    if (cardDetail.tag != tag || cardDetail.cardId != cardId)
-                    {
-                        continue;
-                    }
-
-                    trashCard = new DeckManager.CardDetail()
-                    {
-                        tag = cardDetail.tag,
-                        cardId = cardDetail.cardId
-                    };
-
-                    m_trashDetail.cardDetailList.Remove(cardDetail);
-                    break;
-                }
-                count = m_trashDetail.cardDetailList.Count;
-                m_trashCardCountText.text = count.ToString();
-                if (count <= 0)
-                {
-                    // m_trashCard.gameObject.SetActive(false);
-                }
-                break;
-            case OPTION_TYPE.EXCLUSION:
-                foreach (var cardDetail in m_exclusionDetail.cardDetailList)
-                {
-                    if (cardDetail.tag != tag || cardDetail.cardId != cardId)
-                    {
-                        continue;
-                    }
-
-                    trashCard = new DeckManager.CardDetail()
-                    {
-                        tag = cardDetail.tag,
-                        cardId = cardDetail.cardId
-                    };
-
-                    m_exclusionDetail.cardDetailList.Remove(cardDetail);
-                    break;
-                }
-
-                count = m_exclusionDetail.cardDetailList.Count;
-                m_exclusionCardCountText.text = count.ToString();
-                if (count <= 0) { }
-                break;
-        }
-        return trashCard;
     }
 
     public Image CreateCard(DeckManager.CardDetail cardDetail, bool isInstantiate, Image targetImage,
@@ -660,12 +846,7 @@ public class FieldCardManager : MonoBehaviour
         copied.rectTransform.localRotation = Quaternion.Euler(0, 0, 0);
         copied.rectTransform.localScale = targetImage.rectTransform.localScale;
         copied.sprite = CardDetailManager.Instance().GetCardSprite(cardDetail);
-        EventTrigger cardEventTrigger = copied.GetComponent<EventTrigger>();
-        if (cardEventTrigger == null)
-        {
-            cardEventTrigger = copied.gameObject.AddComponent<EventTrigger>();
-        }
-        cardEventTrigger.triggers = new List<EventTrigger.Entry>();
+
         // マウスオーバー
         EventTrigger.Entry entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerEnter;
@@ -677,7 +858,8 @@ public class FieldCardManager : MonoBehaviour
             CardDetailManager.Instance().SetSprite(copied.sprite);
             CardDetailManager.Instance().SetCardDetail(tag, fileName);
         });
-        cardEventTrigger.triggers.Add(entry);
+        EventTrigger cardEventTrigger = GetOrAddComponentToEventTrigger(copied.gameObject, entry);
+
         // マウスクリック
         entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerClick;
@@ -728,7 +910,7 @@ public class FieldCardManager : MonoBehaviour
 
         FieldCardData fieldCardData = JsonUtility.FromJson<FieldCardData>(fieldCardManagerDataJson);
 
-        SetDeckOrTrashOrExclusion(OPTION_TYPE.DECK, fieldCardData.deckDetail);
+        SetDeckDetail(OPTION_TYPE.DECK, fieldCardData.deckDetailList);
 
         List<GameObject> handObjectList = new List<GameObject>();
         foreach (Transform hand in m_handContent)
@@ -841,15 +1023,18 @@ public class FieldCardManager : MonoBehaviour
             copied.gameObject.SetActive(true);
         }
 
-        SetDeckOrTrashOrExclusion(OPTION_TYPE.TRASH, fieldCardData.trashDetail);
-        SetDeckOrTrashOrExclusion(OPTION_TYPE.EXCLUSION, fieldCardData.exclusionDetail);
+        SetDeckDetail(OPTION_TYPE.TRASH, fieldCardData.trashDetailList);
+        SetDeckDetail(OPTION_TYPE.EXCLUSION, fieldCardData.exclusionDetailList);
+
+        SetDeckDetail(OPTION_TYPE.SECURLTY, fieldCardData.securltyDetailList);
+        SetDeckDetail(OPTION_TYPE.DIGITAMA, fieldCardData.digitamaDetailList);
     }
 
     public string GetFieldCardManagerDataJson()
     {
         FieldCardData fieldCardData = new FieldCardData();
 
-        fieldCardData.deckDetail = m_deckDetail;
+        fieldCardData.deckDetailList = m_deckDetailList;
 
         foreach (Transform hand in m_handContent)
         {
@@ -871,11 +1056,11 @@ public class FieldCardManager : MonoBehaviour
             }
         }
 
-        fieldCardData.trashDetail = m_trashDetail;
-        fieldCardData.exclusionDetail = m_exclusionDetail;
+        fieldCardData.trashDetailList = m_trashDetailList;
+        fieldCardData.exclusionDetailList = m_exclusionDetailList;
 
-        fieldCardData.securltyDetail = m_securltyDetail;
-        fieldCardData.digitamaDetail = m_digitamaDetail;
+        fieldCardData.securltyDetailList = m_securltyDetailList;
+        fieldCardData.digitamaDetailList = m_digitamaDetailList;
 
         return JsonUtility.ToJson(fieldCardData);
     }

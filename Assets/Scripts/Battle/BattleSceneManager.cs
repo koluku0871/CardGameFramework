@@ -1,7 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -27,11 +26,6 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         return instance;
     }
 
-    private void Awake()
-    {
-        instance = this;
-    }
-
     private static bool m_isPlayer = false;
     public static bool IsPlayer
     {
@@ -52,8 +46,10 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     public static string m_playerDeck1 = "";
     public static string m_playerDeck2 = "";
 
-    private void Start()
+    public void Awake()
     {
+        instance = this;
+
         AudioSourceManager.Instance().PlayOneShot((int)AudioSourceManager.BGM_NUM.BATTLE_1, true);
 
         PhotonNetwork.IsMessageQueueRunning = true;

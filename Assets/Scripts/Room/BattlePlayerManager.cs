@@ -27,7 +27,7 @@ public class BattlePlayerManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             ExitGames.Client.Photon.Hashtable customRoomProperties = new ExitGames.Client.Photon.Hashtable();
-            customRoomProperties.Add("Type", "bs");
+            customRoomProperties.Add("Type", AssetBundleManager.Instance().CardType);
             customRoomProperties.Add("Core", 3);
             customRoomProperties.Add("SoulCore", 1);
             customRoomProperties.Add("Life", 5);

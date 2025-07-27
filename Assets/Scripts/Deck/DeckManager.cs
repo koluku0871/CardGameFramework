@@ -209,53 +209,6 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    public void OnClickToDeckCheckButton()
-    {
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
-        string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
-        for (int index = 0; index < deckFiles.Length; index++)
-        {
-            StreamReader sr = new StreamReader(deckFiles[index], Encoding.UTF8);
-            DeckDetail deckDetail = JsonUtility.FromJson<DeckDetail>(sr.ReadToEnd());
-            sr.Close();
-
-            bool isHit = false;
-            List<CardDetail> cardDetailList = new List<CardDetail>();
-            foreach (var cardDetail in deckDetail.cardDetailList)
-            {
-                if (cardDetail.cardId.Split("-").Length != 1)
-                {
-                    cardDetailList.Add(new CardDetail() { tag = cardDetail.tag, cardId = cardDetail.cardId });
-                }
-                else
-                {
-                    isHit = true;
-                    var splitId = cardDetail.cardId.Split("_");
-                    var cardId = splitId[0] + "-" + splitId[1];
-                    if (splitId.Length > 2)
-                    {
-                        cardId = cardId + "_" + splitId[2];
-                    }
-
-                    cardDetailList.Add(new CardDetail() { tag = cardDetail.tag, cardId = cardId });
-                }
-            }
-
-            if (!isHit)
-            {
-                continue;
-            }
-
-            deckDetail.cardDetailList.Clear();
-            deckDetail.cardDetailList.AddRange(cardDetailList);
-            string deckData = JsonUtility.ToJson(deckDetail);
-
-            StreamWriter streamWriter = new StreamWriter(deckFiles[index]);
-            streamWriter.WriteLine(deckData);
-            streamWriter.Close();
-        }
-    }
-
     public void OnClickToDeckSaveButton() {
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
         var selectId = deckSceneManager.GetDeckSelectDropdown().value;

@@ -284,9 +284,6 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
 
     private void CheckDeckDirectory()
     {
-        OptionData optionData = new OptionData();
-        optionData.LoadTxt();
-
         m_deckSelectDropdown.ClearOptions();
         m_deckSelectDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
         {
@@ -309,7 +306,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
                 try
                 {
                     DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(deckStr);
-                    if (deckCardList.GetDeckType() == optionData.cardType)
+                    if (deckCardList.GetDeckType() == AssetBundleManager.Instance().CardType)
                     {
                         m_deckList.Add(deckStr);
                         int start = deckFiles[index].LastIndexOf("/") + 1;

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -94,6 +95,11 @@ public class DeckManager : MonoBehaviour
     private Material m_effectMaterial = null;
 
     public List<string> m_deckList = new List<string>();
+
+    public int m_maxRandomCount = 40;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_maxRandomCountText = null;
 
     private static DeckManager instance = null;
     public static DeckManager Instance() {
@@ -266,7 +272,7 @@ public class DeckManager : MonoBehaviour
         string deckFileName = deckSceneManager.GetDeckSelectDropdown().options[selectId].text;
 
         DeckDetail deckCardList = new DeckDetail();
-        deckCardList.type = optionData.cardType;
+        deckCardList.type = AssetBundleManager.Instance().CardType;
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
             string[] cardData = c.name.Split('^');
             if (cardData.Length < 2) {
@@ -398,21 +404,25 @@ public class DeckManager : MonoBehaviour
     public void OnClickToDeckRCreateButton()
     {
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
-        (var key, var packNameList) = deckSceneManager.GetPackNameList();
-        if (packNameList == null || packNameList.Count < 12)
+        List<CardData> cardDatas = deckSceneManager.GetCardDatas();
+        if (cardDatas == null || cardDatas.Count < 1)
         {
             return;
         }
         int index = 0;
         System.Random rnd = new System.Random();
-        while (index < 40)
+        while (index < m_maxRandomCount)
         {
-            int i = rnd.Next(0, packNameList.Count);
-            string fileName = packNameList[i];
-            string targetTag = key;
+            int i = rnd.Next(0, cardDatas.Count);
             AddCard(targetTag, fileName, deckSceneManager.GetDeckContent());
             index = deckSceneManager.GetDeckContent().childCount;
         }
+    }
+
+    public void OnClickToDeckRandomCreateMaxNumButton(int num)
+    {
+        m_maxRandomCount = num;
+        m_maxRandomCountText.text = m_maxRandomCount.ToString();
     }
 
     public void OnClickToDeckClearButton() {

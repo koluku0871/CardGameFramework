@@ -262,4 +262,9 @@ public class CardDetailManager : MonoBehaviour
         m_text.text = data.Text;
         m_text.gameObject.SetActive(true);
     }
+
+    public void OnClickToCopyBuffer()
+    {
+        GUIUtility.systemCopyBuffer = m_cardName.text;
+    }
 }

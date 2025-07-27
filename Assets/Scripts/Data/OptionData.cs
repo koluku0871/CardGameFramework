@@ -11,6 +11,7 @@ public class OptionData : JsonFileData
     public float homeBgmVolume = 0.1f;
     public float battleBgmVolume = 0.1f;
     public float deckBgmVolume = 0.1f;
+    public float seVolume = 0.1f;
     public string apiPath = "https://ss971571.stars.ne.jp/list.php";
 
     public OptionData()
@@ -33,6 +34,7 @@ public class OptionData : JsonFileData
             this.homeBgmVolume = optionData.homeBgmVolume;
             this.battleBgmVolume = optionData.battleBgmVolume;
             this.deckBgmVolume = optionData.deckBgmVolume;
+            this.seVolume = optionData.seVolume;
             this.apiPath = optionData.apiPath;
 
             return true;

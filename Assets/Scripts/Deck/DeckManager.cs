@@ -361,6 +361,10 @@ public class DeckManager : MonoBehaviour
         while (index < m_maxRandomCount)
         {
             int i = rnd.Next(0, cardDatas.Count);
+            string fileName = cardDatas[i].CardNo;
+            string targetTag = cardDatas[i].PackNo;
+            Debug.LogWarning(fileName);
+            Debug.LogWarning(targetTag);
             AddCard(targetTag, fileName, deckSceneManager.GetDeckContent());
             index = deckSceneManager.GetDeckContent().childCount;
         }

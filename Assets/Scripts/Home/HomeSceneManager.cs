@@ -18,6 +18,18 @@ public class HomeSceneManager : MonoBehaviour
     private TMPro.TMP_Dropdown m_typeDropdown = null;
 
     [SerializeField]
+    private UnityEngine.UI.Slider m_homeBgmSlider = null;
+
+    [SerializeField]
+    private UnityEngine.UI.Slider m_battleBgmSlider = null;
+
+    [SerializeField]
+    private UnityEngine.UI.Slider m_deckBgmSlider = null;
+
+    [SerializeField]
+    private UnityEngine.UI.Slider m_seSlider = null;
+
+    [SerializeField]
     private TMPro.TMP_Dropdown m_updateDropdown = null;
 
     [SerializeField]
@@ -54,6 +66,11 @@ public class HomeSceneManager : MonoBehaviour
         }
         //m_packTypeDropdown.value = m_packTypeDropdown.options.Count - 1;
         //m_typeDropdown.value = -1;
+
+        m_homeBgmSlider.value = optionData.homeBgmVolume;
+        m_battleBgmSlider.value = optionData.battleBgmVolume;
+        m_deckBgmSlider.value = optionData.deckBgmVolume;
+        m_seSlider.value = optionData.seVolume;
 
         m_updateDropdown.ClearOptions();
         int index = 0;
@@ -131,6 +148,11 @@ public class HomeSceneManager : MonoBehaviour
         m_nameText.text = m_nameInputField.text;
         optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
         AssetBundleManager.Instance().CardType = optionData.cardType;
+
+        optionData.homeBgmVolume = m_homeBgmSlider.value;
+        optionData.battleBgmVolume = m_battleBgmSlider.value;
+        optionData.deckBgmVolume = m_deckBgmSlider.value;
+        optionData.seVolume = m_seSlider.value;
 
         optionData.SaveTxt();
     }

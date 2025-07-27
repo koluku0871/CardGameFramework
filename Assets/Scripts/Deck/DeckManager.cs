@@ -115,9 +115,6 @@ public class DeckManager : MonoBehaviour
     }
 
     public void CheckDeckDirectory() {
-        OptionData optionData = new OptionData();
-        optionData.LoadTxt();
-
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
         deckSceneManager.GetDeckSelectDropdown().ClearOptions();
         deckSceneManager.GetDeckSelectDropdown().options.Add(new Dropdown.OptionData()
@@ -139,7 +136,7 @@ public class DeckManager : MonoBehaviour
                 try
                 {
                     DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(deckStr);
-                    if (deckCardList.GetDeckType() == optionData.cardType)
+                    if (deckCardList.GetDeckType() == AssetBundleManager.Instance().CardType)
                     {
                         m_deckList.Add(deckStr);
                         int start = deckFiles[index].LastIndexOf("/") + 1;
@@ -260,9 +257,6 @@ public class DeckManager : MonoBehaviour
     }
 
     public void OnClickToDeckSaveButton() {
-        OptionData optionData = new OptionData();
-        optionData.LoadTxt();
-
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
         var selectId = deckSceneManager.GetDeckSelectDropdown().value;
         if (1 > selectId) {

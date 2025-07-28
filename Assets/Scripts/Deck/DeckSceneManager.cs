@@ -779,11 +779,6 @@ public class DeckSceneManager : MonoBehaviour
             }
 
             if (!cardData.CardName.Contains(m_cardNameInputField.text)
-                && !cardData.CardType.Contains(m_cardNameInputField.text)
-                && !cardData.CardSubType.Contains(m_cardNameInputField.text)
-                && !cardData.CardCategory.Contains(m_cardNameInputField.text)
-                && !cardData.Cost.Contains(m_cardNameInputField.text)
-                && !cardData.CardRarity.Contains(m_cardNameInputField.text)
                 && !cardData.Text.Contains(m_cardNameInputField.text))
             {
                 return false;

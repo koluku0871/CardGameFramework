@@ -37,11 +37,6 @@ public class ConstManager
         EXCLUSION,
     }
 
-    public static readonly Dictionary<int, string> CardElementType = new Dictionary<int, string>()
-    {
-        {0,"All"}, {1,"赤"}, {2,"青"}, {3,"緑"}, {4,"黄"}, {5,"白"}, {6,"紫"}
-    };
-
     // https://www.battlespirits.com/rule/limited.php
     // 禁止カード
     public static readonly List<string> DECK_CARD_NG_LIST = new List<string>()

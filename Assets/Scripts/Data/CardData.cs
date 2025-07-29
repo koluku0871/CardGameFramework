@@ -28,17 +28,33 @@ public class CardData
         }
     }
 
-    public string CardNo = "";
-    public string PackNo = "";
-    public string CardName = "";
-    public string CardLevel = "";
-    public string CardRarity = "";
-    public string CardCategory = "";
-    public string Element = "";
-    public string Cost = "";
-    public string ReducedCost = "";
-    public string CardType = "";
-    public string CardSubType = "";
+    public enum ConstParam
+    {
+        CardNo = 1,
+        PackNo,
+        CardName,
+        CardLevel,
+        CardRarity,
+        CardCategory,
+        Element,
+        Cost,
+        ReducedCost,
+        CardType,
+        CardSubType,
+        Max
+    }
+
+    public string CardNo;
+    public string PackNo;
+    public string CardName;
+    public string CardLevel;
+    public string CardRarity;
+    public string CardCategory;
+    public string Element;
+    public string Cost;
+    public string ReducedCost;
+    public string CardType;
+    public string CardSubType;
     public List<string> Lv = new List<string>();
 
     public string text;
@@ -131,32 +147,32 @@ public class CardData
 
 public class CardDataFromJsonToBs
 {
-    public string CardNo;
-    public string PackNo;
-    public string CardName;
-    public string CardRarity;
-    public string CardCategory;
-    public string Element;
-    public string Cost;
-    public string ReducedCost;
-    public string CardType;
+    public string CardNo = "null";
+    public string PackNo = "null";
+    public string CardName = "null";
+    public string CardRarity = "null";
+    public string CardCategory = "null";
+    public string Element = "null";
+    public string Cost = "null";
+    public string ReducedCost = "null";
+    public string CardType = "null";
     public List<string> Lv = new List<string>();
-    public string Text = "";
+    public string Text = "null";
 }
 
 public class CardDataFromJsonToDigimon
 {
-    public string CardNo = "";
-    public string PackNo = "";
-    public string CardName = "";
-    public string CardLevel = "";
-    public string CardRarity = "";
-    public string CardCategory = "";
-    public string Element = "";
-    public string Cost = "";
-    public string ReducedCost = "";
-    public string CardType = "";
-    public string CardSubType = "";
+    public string CardNo = "null";
+    public string PackNo = "null";
+    public string CardName = "null";
+    public string CardLevel = "null";
+    public string CardRarity = "null";
+    public string CardCategory = "null";
+    public string Element = "null";
+    public string Cost = "null";
+    public string ReducedCost = "null";
+    public string CardType = "null";
+    public string CardSubType = "null";
     public List<string> Lv = new List<string>();
-    public string Text = "";
+    public string Text = "null";
 }

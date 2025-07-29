@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using WebSocketSharp;
+using static UnityEditor.Progress;
+using static UnityEngine.Analytics.IAnalytic;
 
 public class DeckSceneManager : MonoBehaviour
 {
@@ -58,6 +61,14 @@ public class DeckSceneManager : MonoBehaviour
 
     [SerializeField]
     private TMP_InputField m_cardNameInputField = null;
+
+    [Header("カードソート")]
+
+    [SerializeField]
+    private Dropdown m_sortDropdown = null;
+
+    [SerializeField]
+    private Toggle m_sortToggle = null;
 
     [Header("カード詳細")]
 
@@ -415,6 +426,20 @@ public class DeckSceneManager : MonoBehaviour
             m_cardCostDropdown.value = 0;
             m_cardRarityDropdown.value = 0;
             m_cardNameInputField.text = "";
+
+            m_sortDropdown.ClearOptions();
+            m_sortDropdown.options.Add(new Dropdown.OptionData()
+            {
+                text = "default"
+            });
+            foreach (CardData.ConstParam Value in Enum.GetValues(typeof(CardData.ConstParam)))
+            {
+                m_sortDropdown.options.Add(new Dropdown.OptionData()
+                {
+                    text = Enum.GetName(typeof(CardData.ConstParam), Value)
+                });
+            }
+            m_sortDropdown.value = -1;
         }
         bool isAll = key == "All";
         for (int i = 0; i < packNameList.Count; i++)
@@ -531,6 +556,8 @@ public class DeckSceneManager : MonoBehaviour
             categoryList.Add("シンクロ＊リンク");
             categoryList.Add("エクシーズ＊リンク");
         }
+
+        SortToCardDataList((CardData.ConstParam)m_sortDropdown.value, m_sortToggle.isOn);
 
         searchCardCount = cardDatas.Count;
 
@@ -786,6 +813,123 @@ public class DeckSceneManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    private void SortToCardDataList(CardData.ConstParam index, bool isAscending)
+    {
+        switch(index)
+        {
+            case CardData.ConstParam.CardNo:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.CardNo.CompareTo(y.CardNo));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.CardNo.CompareTo(x.CardNo));
+                }
+                break;
+            case CardData.ConstParam.PackNo:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.PackNo.CompareTo(y.PackNo));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.PackNo.CompareTo(x.PackNo));
+                }
+                break;
+            case CardData.ConstParam.CardName:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.CardName.CompareTo(y.CardName));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.CardName.CompareTo(x.CardName));
+                }
+                break;
+            case CardData.ConstParam.CardLevel:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.CardLevel.CompareTo(y.CardLevel));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.CardLevel.CompareTo(x.CardLevel));
+                }
+                break;
+            case CardData.ConstParam.CardRarity:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.CardRarity.CompareTo(y.CardRarity));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.CardRarity.CompareTo(x.CardRarity));
+                }
+                break;
+            case CardData.ConstParam.CardCategory:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.CardCategory.CompareTo(y.CardCategory));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.CardCategory.CompareTo(x.CardCategory));
+                }
+                break;
+            case CardData.ConstParam.Element:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.Element.CompareTo(y.Element));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.Element.CompareTo(x.Element));
+                }
+                break;
+            case CardData.ConstParam.Cost:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.Cost.CompareTo(y.Cost));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.Cost.CompareTo(x.Cost));
+                }
+                break;
+            case CardData.ConstParam.ReducedCost:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.ReducedCost.CompareTo(y.ReducedCost));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.ReducedCost.CompareTo(x.ReducedCost));
+                }
+                break;
+            case CardData.ConstParam.CardType:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.CardType.CompareTo(y.CardType));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.CardType.CompareTo(x.CardType));
+                }
+                break;
+            case CardData.ConstParam.CardSubType:
+                if (isAscending)
+                {
+                    cardDatas.Sort((x, y) => x.CardSubType.CompareTo(y.CardSubType));
+                }
+                else
+                {
+                    cardDatas.Sort((x, y) => y.CardSubType.CompareTo(x.CardSubType));
+                }
+                break;
+        }
     }
 
     public void AddFavoriteCardData(string tag, string cardId)

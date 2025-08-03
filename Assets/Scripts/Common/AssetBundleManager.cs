@@ -302,14 +302,7 @@ public class AssetBundleManager : MonoBehaviour
                 {
                     //Debug.Log("Asset : " + textAsset.name + " text : " + textAsset.text);
                     CardData cardData = null;
-                    try
-                    {
-                        cardData = new CardData(JsonUtility.FromJson<CardDataFromJsonToBs>(textAsset.text));
-                    }
-                    catch
-                    {
-                        cardData = new CardData(JsonUtility.FromJson<CardDataFromJsonToDigimon>(textAsset.text));
-                    }
+                    cardData = new CardData(JsonUtility.FromJson<CardDataFromJson>(textAsset.text));
                     cardData.assetBundleSpriteName = assetBundle.Key.Replace("_text_", "_spriteatlas_");
                     cardData.fileName = textAsset.name;
 

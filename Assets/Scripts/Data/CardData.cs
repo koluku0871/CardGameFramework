@@ -112,22 +112,7 @@ public class CardData
         }
     }
 
-    public CardData(CardDataFromJsonToBs cardData)
-    {
-        CardNo = cardData.CardNo;
-        PackNo = cardData.PackNo;
-        CardName = cardData.CardName;
-        CardRarity = cardData.CardRarity;
-        CardCategory = cardData.CardCategory;
-        Element = cardData.Element;
-        Cost = cardData.Cost;
-        ReducedCost = cardData.ReducedCost;
-        CardType = cardData.CardType;
-        Lv = cardData.Lv;
-        Text = cardData.Text;
-    }
-
-    public CardData(CardDataFromJsonToDigimon cardData)
+    public CardData(CardDataFromJson cardData)
     {
         CardNo = cardData.CardNo;
         PackNo = cardData.PackNo;
@@ -145,22 +130,7 @@ public class CardData
     }
 }
 
-public class CardDataFromJsonToBs
-{
-    public string CardNo = "null";
-    public string PackNo = "null";
-    public string CardName = "null";
-    public string CardRarity = "null";
-    public string CardCategory = "null";
-    public string Element = "null";
-    public string Cost = "null";
-    public string ReducedCost = "null";
-    public string CardType = "null";
-    public List<string> Lv = new List<string>();
-    public string Text = "null";
-}
-
-public class CardDataFromJsonToDigimon
+public class CardDataFromJson
 {
     public string CardNo = "null";
     public string PackNo = "null";

@@ -504,6 +504,7 @@ public class DeckSceneManager : MonoBehaviour
                     {
                         cardSubTypeList.Add(cardData.CardSubType);
                     }
+                    Debug.Log(cardData.CardSubType);
                 }
 
                 if (!string.IsNullOrEmpty(cardData.CardCategory))

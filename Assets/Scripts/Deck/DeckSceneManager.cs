@@ -486,7 +486,18 @@ public class DeckSceneManager : MonoBehaviour
                         }
                         else
                         {
-                            cardTypeList.Add(cardData.CardType);
+                            cardTypeSplit = cardData.CardType.Split("/");
+                            if (cardTypeSplit.Length > 1)
+                            {
+                                foreach (var item in cardTypeSplit)
+                                {
+                                    cardTypeList.Add(item);
+                                }
+                            }
+                            else
+                            {
+                                cardTypeList.Add(cardData.CardType);
+                            }
                         }
                     }
                 }
@@ -502,9 +513,19 @@ public class DeckSceneManager : MonoBehaviour
                     }
                     else
                     {
-                        cardSubTypeList.Add(cardData.CardSubType);
+                        cardTypeSplit = cardData.CardSubType.Split("/");
+                        if (cardTypeSplit.Length > 1)
+                        {
+                            foreach (var item in cardTypeSplit)
+                            {
+                                cardSubTypeList.Add(item);
+                            }
+                        }
+                        else
+                        {
+                            cardSubTypeList.Add(cardData.CardSubType);
+                        }
                     }
-                    Debug.Log(cardData.CardSubType);
                 }
 
                 if (!string.IsNullOrEmpty(cardData.CardCategory))
@@ -519,7 +540,18 @@ public class DeckSceneManager : MonoBehaviour
                     }
                     else
                     {
-                        categoryList.Add(cardData.CardCategory);
+                        split = cardData.CardCategory.Split("/");
+                        if (split.Length > 1)
+                        {
+                            foreach (var item in split)
+                            {
+                                categoryList.Add(item);
+                            }
+                        }
+                        else
+                        {
+                            categoryList.Add(cardData.CardCategory);
+                        }
                     }
                 }
 

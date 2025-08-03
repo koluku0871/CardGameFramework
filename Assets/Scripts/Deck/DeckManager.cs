@@ -16,7 +16,7 @@ public class DeckManager : MonoBehaviour
         public string tag = "";
         public string cardId = "";
 
-        public string ToString()
+        public new string ToString()
         {
             return tag + "^" + cardId;
         }

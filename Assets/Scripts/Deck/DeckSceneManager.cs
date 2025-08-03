@@ -284,7 +284,7 @@ public class DeckSceneManager : MonoBehaviour
         {
             text = "no select"
         });
-        foreach (var packData in AssetBundleManager.Instance().AssetBundleBaseCardData.baseData.packNameList)
+        foreach (var packData in AssetBundleManager.Instance().AssetBundleBaseCardData.baseData.packNameList.OrderBy(c => c.Key))
         {
             m_packTypeDropdown.options.Add(new Dropdown.OptionData()
             {
@@ -380,7 +380,7 @@ public class DeckSceneManager : MonoBehaviour
         {
             packNameList.Add(key, assetBundleManager.AssetBundleBaseCardData.baseData.packNameList[key]);
         }
-        return packNameList;
+        return (Dictionary<string, List<string>>)packNameList.OrderBy(c => c.Key);
     }
 
     public void OnValueChangedToPackTypeDropdown()

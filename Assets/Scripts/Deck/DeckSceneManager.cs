@@ -6,9 +6,6 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using WebSocketSharp;
-using static UnityEditor.Progress;
-using static UnityEngine.Analytics.IAnalytic;
 
 public class DeckSceneManager : MonoBehaviour
 {
@@ -237,7 +234,7 @@ public class DeckSceneManager : MonoBehaviour
 
     public Text GetTokenDeckCardCountText()
     {
-        return m_subDeckCardCountText;
+        return m_tokenDeckCardCountText;
     }
 
     public Text GetSearchCardCountText()

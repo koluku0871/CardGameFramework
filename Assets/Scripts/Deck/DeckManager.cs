@@ -546,9 +546,11 @@ public class DeckManager : MonoBehaviour
         foreach (var obj in cardList) {
             obj.SetSiblingIndex(cardList.Count - 1);
         }
-        deckSceneManager.GetDeckCardCountText().text = "デッキ枚数：" + cardList.Count.ToString("D2");
+        int childCount = deckSceneManager.GetDeckContent().childCount;
+        Debug.Log("GetDeckCardCountText" + childCount);
+        deckSceneManager.GetDeckCardCountText().text = "デッキ枚数：" + childCount.ToString("D2");
 
-        cardList = new List<Transform>();
+        cardList.Clear();
         foreach (Transform child in deckSceneManager.GetSubDeckContent())
         {
             cardList.Add(child);
@@ -558,9 +560,11 @@ public class DeckManager : MonoBehaviour
         {
             obj.SetSiblingIndex(cardList.Count - 1);
         }
-        deckSceneManager.GetSubDeckCardCountText().text = "デッキ枚数：" + cardList.Count.ToString("D2");
+        childCount = deckSceneManager.GetSubDeckContent().childCount;
+        Debug.Log("GetSubDeckCardCountText" + childCount);
+        deckSceneManager.GetSubDeckCardCountText().text = "デッキ枚数：" + childCount.ToString("D2");
 
-        cardList = new List<Transform>();
+        cardList.Clear();
         foreach (Transform child in deckSceneManager.GetTokenDeckContent())
         {
             cardList.Add(child);
@@ -570,7 +574,9 @@ public class DeckManager : MonoBehaviour
         {
             obj.SetSiblingIndex(cardList.Count - 1);
         }
-        deckSceneManager.GetTokenDeckCardCountText().text = "デッキ枚数：" + cardList.Count.ToString("D2");
+        childCount = deckSceneManager.GetTokenDeckContent().childCount;
+        Debug.Log("GetTokenDeckCardCountText" + childCount);
+        deckSceneManager.GetTokenDeckCardCountText().text = "デッキ枚数：" + childCount.ToString("D2");
 
     }
 }

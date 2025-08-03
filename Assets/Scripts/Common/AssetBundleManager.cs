@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 
 [Serializable]
@@ -83,22 +84,67 @@ public class AssetBundleManager : MonoBehaviour
 
     public IEnumerator ReadFileList(Action action, Action<string> logAction)
     {
-        string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_text_.*.assetbundle", SearchOption.TopDirectoryOnly);
+        bool isCompleted = false;
+
+        var sequence = new CoroutineSequence(this);
+        string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_text_.a*.assetbundle", SearchOption.TopDirectoryOnly);
         foreach (string file in fs)
         {
-            string key = Path.GetFileNameWithoutExtension(file);
-            string type = key.Split('_')[0];
-            if (!m_assetBundleCardDataList.ContainsKey(type))
-            {
-                m_assetBundleCardDataList.Add(type, new AssetBundleBaseCardData());
-            }
+            sequence.Insert(0f, ReadFileToTxt(file, logAction));
+        }
 
-            if (m_assetBundleCardDataList[type].assetBundleTextList.ContainsKey(key))
-            {
-                continue;
-            }
+        sequence.OnCompleted(() => {
+            isCompleted = true;
+        });
+        sequence.Play();
 
-            logAction("ReadFilePath : " + file + "\n");
+        while (!isCompleted)
+        {
+            yield return null;
+        }
+
+        isCompleted = false;
+
+        fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_text_.b*.assetbundle", SearchOption.TopDirectoryOnly);
+        foreach (string file in fs)
+        {
+            sequence.Insert(0f, ReadFileAddTxt(file, logAction));
+        }
+
+        sequence.OnCompleted(() => {
+            isCompleted = true;
+        });
+        sequence.Play();
+
+        while (!isCompleted)
+        {
+            yield return null;
+        }
+
+        sequence = new CoroutineSequence(this);
+        fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
+        foreach (string file in fs)
+        {
+            sequence.Insert(0f, ReadFileToSpriteAtlas(file, logAction));
+        }
+
+        sequence.OnCompleted(() => {
+            action();
+        });
+        sequence.Play();
+    }
+
+    public IEnumerator ReadFileToTxt(string file, Action<string> logAction)
+    {
+        string key = Path.GetFileNameWithoutExtension(file);
+        string type = key.Split('_')[0];
+        if (!m_assetBundleCardDataList.ContainsKey(type))
+        {
+            m_assetBundleCardDataList.Add(type, new AssetBundleBaseCardData());
+        }
+
+        if (!m_assetBundleCardDataList[type].assetBundleTextList.ContainsKey(key))
+        {
             AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
             m_assetBundleCardDataList[type].assetBundleTextList.Add(key, new AssetBundleBaseText() { assetBundle = assetBundle });
             var request = assetBundle.LoadAllAssetsAsync();
@@ -107,6 +153,8 @@ public class AssetBundleManager : MonoBehaviour
             {
                 yield return null;
             }
+
+            logAction("ReadFilePath : " + file + "\n");
 
             //Debug.Log("textCount : " + request.allAssets.Length);
             List<TextAsset> textAssetList = new List<TextAsset>();
@@ -122,20 +170,54 @@ public class AssetBundleManager : MonoBehaviour
             }
             m_assetBundleCardDataList[type].assetBundleTextList[key].textAssetList = textAssetList;
         }
+    }
 
-        yield return null;
+    public IEnumerator ReadFileAddTxt(string file, Action<string> logAction)
+    {
+        string key = Path.GetFileNameWithoutExtension(file);
+        string type = key.Split('_')[0];
 
-        fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
-        foreach (string file in fs)
+        AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
+        var request = assetBundle.LoadAllAssetsAsync();
+        while (!request.isDone)
         {
-            string key = Path.GetFileNameWithoutExtension(file);
-            string type = key.Split('_')[0];
-            if (m_assetBundleCardDataList[type].assetBundleSpriteList.ContainsKey(key))
+            yield return null;
+        }
+
+        Dictionary<string, TextAsset> textAssetList = new Dictionary<string, TextAsset>();
+        foreach (var asset in request.allAssets)
+        {
+            if (asset.GetType() != typeof(TextAsset))
             {
                 continue;
             }
+            TextAsset textAsset = (TextAsset)asset;
+            //Debug.Log("Asset : " + textAsset.name + " text : " + textAsset.text);
+            textAssetList.Add(textAsset.name, textAsset);
+        }
 
-            logAction("ReadFilePath : " + file + "\n");
+        foreach(var assetBundleTextKey in m_assetBundleCardDataList[type].assetBundleTextList.Keys)
+        {
+            for(int i = 0; i < m_assetBundleCardDataList[type].assetBundleTextList[assetBundleTextKey].textAssetList.Count; i++)
+            {
+                var name = m_assetBundleCardDataList[type].assetBundleTextList[assetBundleTextKey].textAssetList[i].name;
+                if (!textAssetList.ContainsKey(name))
+                {
+                    continue;
+                }
+                m_assetBundleCardDataList[type].assetBundleTextList[assetBundleTextKey].textAssetList[i] = textAssetList[name];
+            }
+        }
+
+        logAction("ReadFilePath : " + file + "\n");
+    }
+
+    public IEnumerator ReadFileToSpriteAtlas(string file, Action<string> logAction)
+    {
+        string key = Path.GetFileNameWithoutExtension(file);
+        string type = key.Split('_')[0];
+        if (!m_assetBundleCardDataList[type].assetBundleSpriteList.ContainsKey(key))
+        {
             AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
             m_assetBundleCardDataList[type].assetBundleSpriteList.Add(key, new AssetBundleBaseSprite() { assetBundle = assetBundle });
             var request = assetBundle.LoadAllAssetsAsync();
@@ -145,6 +227,8 @@ public class AssetBundleManager : MonoBehaviour
                 yield return null;
             }
 
+            logAction("ReadFilePath : " + file + "\n");
+
             if (request.asset.GetType() == typeof(UnityEngine.U2D.SpriteAtlas))
             {
                 var atlas = (UnityEngine.U2D.SpriteAtlas)request.asset;
@@ -152,10 +236,6 @@ public class AssetBundleManager : MonoBehaviour
                 m_assetBundleCardDataList[type].assetBundleSpriteList[key].spriteAtlas = atlas;
             }
         }
-
-        yield return null;
-
-        action();
     }
 
     public Sprite GetCardSprite(string key, string name)

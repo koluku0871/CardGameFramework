@@ -21,10 +21,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     private Image m_image = null;
     private EventTrigger m_eventTrigger = null;
 
-    private Action pointerEnterAction = null;
-    private Action leftClickAction = null;
-    private Action rightClickAction = null;
-    private Action middleClickAction = null;
+    private System.Action pointerEnterAction = null;
+    private System.Action leftClickAction = null;
+    private System.Action rightClickAction = null;
+    private System.Action middleClickAction = null;
 
     [SerializeField]
     public string m_endTagStr = "";
@@ -37,6 +37,45 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         get
         {
             return m_endTagStr;
+        }
+    }
+
+    [SerializeField]
+    private Image m_isOverlapImage = null;
+
+    [SerializeField]
+    private HashSet<GameObject> m_overlapObjectList = new HashSet<GameObject>();
+
+    private List<Vector2> m_overlapPosList = new List<Vector2>();
+
+    [SerializeField]
+    private bool m_isOverlap = false;
+    public bool IsOverlap
+    {
+        set
+        {
+            m_isOverlap = value;
+            m_isOverlapImage.gameObject.SetActive(value);
+        }
+        get
+        {
+            return m_isOverlap;
+        }
+    }
+    public void AddOoverlapObjectList(GameObject overlapObject)
+    {
+        if (IsOverlap)
+        {
+            return;
+        }
+
+        m_overlapObjectList.Add(overlapObject);
+    }
+    public void RemoveOoverlapObjectList(GameObject overlapObject)
+    {
+        if (m_overlapObjectList.Contains(overlapObject))
+        {
+            m_overlapObjectList.Remove(overlapObject);
         }
     }
 
@@ -266,6 +305,37 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     {
         if (!m_photonView.IsMine) return;
 
+        m_overlapPosList.Clear();
+
+        if (IsOverlap)
+        {
+            foreach (var overlapObject in m_overlapObjectList)
+            {
+                // X
+                float x = 0;
+                float y = 0;
+                if (transform.position.x > overlapObject.transform.position.x)
+                {
+                    x = -(transform.position.x - overlapObject.transform.position.x);
+                }
+                else if (transform.position.x < overlapObject.transform.position.x)
+                {
+                    x =  overlapObject.transform.position.x - transform.position.x;
+                }
+
+                if (transform.position.y > overlapObject.transform.position.y)
+                {
+                    y = -(transform.position.y - overlapObject.transform.position.y);
+                }
+                else if (transform.position.y < overlapObject.transform.position.y)
+                {
+                    y = overlapObject.transform.position.y - transform.position.y;
+                }
+
+                m_overlapPosList.Add(new Vector2(x, y));
+            }
+        }
+
         transform.SetAsLastSibling();
     }
 
@@ -274,11 +344,23 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         if (!m_photonView.IsMine) return;
 
         transform.position = data.position;
+
+        if (IsOverlap)
+        {
+            int i = 0;
+            foreach (var overlapObject in m_overlapObjectList)
+            {
+                overlapObject.transform.position = data.position + m_overlapPosList[i];
+                i++;
+            }
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!m_photonView.IsMine) return;
+
+        m_overlapPosList.Clear();
 
         string[] list = m_image.name.Split('^');
 
@@ -323,6 +405,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         }
     }
 
+    /// <summary>
+    /// オブジェクトが触れている間
+    /// </summary>
+    /// <param name="coll"></param>
     void OnTriggerStay2D(Collider2D coll)
     {
         if (!m_photonView.IsMine) return;
@@ -330,6 +416,36 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         if (m_endTagStr == coll.gameObject.tag) return;
 
         m_endTagStr = coll.gameObject.tag;
+    }
+
+    /// <summary>
+    /// オブジェクトが離れた時
+    /// </summary>
+    /// <param name="coll"></param>
+    private void OnTriggerEnter2D(Collider2D coll)
+    {
+        if (!m_photonView.IsMine) return;
+
+        if (gameObject.tag != coll.gameObject.tag) return;
+
+        Debug.Log("OnTriggerEnter2D : " + coll.gameObject.name);
+
+        RemoveOoverlapObjectList(coll.gameObject);
+    }
+
+    /// <summary>
+    /// オブジェクトが重なっている間
+    /// </summary>
+    /// <param name="coll"></param>
+    private void OnTriggerExit2D(Collider2D coll)
+    {
+        if (!m_photonView.IsMine) return;
+
+        if (gameObject.tag != coll.gameObject.tag) return;
+
+        Debug.Log("OnTriggerExit2D : " + coll.gameObject.name);
+
+        AddOoverlapObjectList(coll.gameObject);
     }
 
     public Image GetImage()
@@ -342,10 +458,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         return gameObject.name;
     }
 
-    public void SetAction(Action pointerEnterAction = null,
-        Action leftClickAction = null,
-        Action rightClickAction = null,
-        Action middleClickAction = null)
+    public void SetAction(System.Action pointerEnterAction = null,
+        System.Action leftClickAction = null,
+        System.Action rightClickAction = null,
+        System.Action middleClickAction = null)
     {
         if (pointerEnterAction != null) this.pointerEnterAction = pointerEnterAction;
         if (leftClickAction != null) this.leftClickAction = leftClickAction;

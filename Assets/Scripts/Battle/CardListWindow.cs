@@ -44,7 +44,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
         foreach (var cardDetail in cardDetailList)
         {
             Image card = FieldCardManager.Instance().CreateCard(cardDetail, true, m_card, m_card.transform.parent,
-                (Image target, string tag, string cardId) => {
+                (Image target, string tag, string cardId, bool isDoubleClick) => {
                     if (!m_isAction || !m_photonView.IsMine) return;
                     CardOptionWindow.Instance().Open(target, m_optionType, CardOptionWindow.OPTION_TYPE.CARD_LIST,
                         (isAction) => {

@@ -781,6 +781,19 @@ public class CardOptionWindow : MonoBehaviour
             Close();
         });
 
+        actionList.Add("相手にも表示しつつ自分の除外一覧を確認する", () => {
+            CardListWindow.Instance().Close();
+            List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
+            List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.EXCLUSION);
+            for (int index = 0; index < cardList.Count; index++)
+            {
+                openCardList.Add(cardList[index]);
+            }
+
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.EXCLUSION, openCardList, true, true);
+            Close();
+        });
+
         actionList.Add("相手の除外一覧を確認する", () => {
             GameObject[] playFieldList = GameObject.FindGameObjectsWithTag("PlayField");
             FieldCardManager playField = null;
@@ -893,6 +906,19 @@ public class CardOptionWindow : MonoBehaviour
             }
 
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.TRASH, openCardList);
+            Close();
+        });
+
+        actionList.Add("相手にも表示しつつ自分のトラッシュを確認する", () => {
+            CardListWindow.Instance().Close();
+            List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
+            List<DeckManager.CardDetail> cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.TRASH);
+            for (int index = 0; index < cardList.Count; index++)
+            {
+                openCardList.Add(cardList[index]);
+            }
+
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.TRASH, openCardList, true, true);
             Close();
         });
 

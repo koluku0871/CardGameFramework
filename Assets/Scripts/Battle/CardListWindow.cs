@@ -19,6 +19,8 @@ public class CardListWindow : MonoBehaviour, IPunObservable
 
     private bool m_isWriting = true;
 
+    private bool m_isEnemyOpen = false;
+
     private static CardListWindow instance = null;
     public static CardListWindow Instance()
     {
@@ -93,12 +95,13 @@ public class CardListWindow : MonoBehaviour, IPunObservable
         }
     }
 
-    public void Open(CardOptionWindow.OPTION_TYPE optionType, List<DeckManager.CardDetail> cardDetailList, bool isAction = true)
+    public void Open(CardOptionWindow.OPTION_TYPE optionType, List<DeckManager.CardDetail> cardDetailList, bool isAction = true, bool isEnemyOpen = false)
     {
         m_optionType = optionType;
         m_cardDetailList = cardDetailList;
         m_isAction = isAction;
         m_isWriting = true;
+        m_isEnemyOpen = isEnemyOpen;
 
         CreateCardList(cardDetailList);
 
@@ -153,22 +156,21 @@ public class CardListWindow : MonoBehaviour, IPunObservable
                 switch (m_optionType)
                 {
                     case CardOptionWindow.OPTION_TYPE.DECK:
-                        stream.SendNext(transform.localScale);
-                        break;
                     case CardOptionWindow.OPTION_TYPE.SUB:
-                        stream.SendNext(transform.localScale);
-                        break;
                     case CardOptionWindow.OPTION_TYPE.DAMAGE:
+                    case CardOptionWindow.OPTION_TYPE.CARD_LIST:
                         stream.SendNext(transform.localScale);
                         break;
                     case CardOptionWindow.OPTION_TYPE.TRASH:
-                        stream.SendNext(Vector3.zero);
-                        break;
                     case CardOptionWindow.OPTION_TYPE.EXCLUSION:
-                        stream.SendNext(Vector3.zero);
-                        break;
-                    case CardOptionWindow.OPTION_TYPE.CARD_LIST:
-                        stream.SendNext(transform.localScale);
+                        if (m_isEnemyOpen)
+                        {
+                            stream.SendNext(transform.localScale);
+                        }
+                        else
+                        {
+                            stream.SendNext(Vector3.zero);
+                        }
                         break;
                     default:
                         stream.SendNext(Vector3.zero);

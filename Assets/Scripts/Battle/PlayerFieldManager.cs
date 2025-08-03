@@ -463,8 +463,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 
             if (BattleSceneManager.m_type == "digimon")
             {
-                m_fieldCardManager.SetDeckDetail(OPTION_TYPE.DIGITAMA, jsonDeckDetail.subCardDetailList);
-                m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.DIGITAMA);
+                m_fieldCardManager.SetDeckDetail(OPTION_TYPE.SUB, jsonDeckDetail.subCardDetailList);
+                m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.SUB);
             }
 
             m_fieldCardManager.SetDeckDetail(OPTION_TYPE.TOKEN, jsonDeckDetail.tokenCardDetailList);
@@ -529,16 +529,25 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         Image cardImage = FieldCardManager.Instance().CreateCard(
             new DeckManager.CardDetail() { tag = list[0], cardId = cardId }, false, card.GetComponent<Image>(), m_cardField,
             null,
-            (Image target, string targetTag, string targetCardId) => {
-                CardOptionWindow.Instance().Open(
-                    target,
-                    CardOptionWindow.OPTION_TYPE.FIELD,
-                    CardOptionWindow.OPTION_TYPE.FIELD_ROT);
+            (Image target, string targetTag, string targetCardId, bool isDoubleClick) => {
+                if (isDoubleClick)
+                {
+                    CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.FIELD);
+                }
+                else
+                {
+                    CardOptionWindow.Instance().Open(
+                        target,
+                        CardOptionWindow.OPTION_TYPE.FIELD,
+                        CardOptionWindow.OPTION_TYPE.FIELD_ROT);
+                }
             },
-            (Image target, string targetTag, string targetCardId) => {
-                CardOptionWindow.Instance().Open(
-                    target,
-                    CardOptionWindow.OPTION_TYPE.FIELD);
+            (Image target, string targetTag, string targetCardId, bool isDoubleClick) => {
+                TouchManager touchManager = target.GetComponent<TouchManager>();
+                if (touchManager != null)
+                {
+                    touchManager.IsOverlap = !touchManager.IsOverlap;
+                }
             });
         cardImage.name = name;
         cardImage.gameObject.SetActive(true);

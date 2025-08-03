@@ -155,7 +155,16 @@ public class CardListWindow : MonoBehaviour, IPunObservable
                     case CardOptionWindow.OPTION_TYPE.DECK:
                         stream.SendNext(transform.localScale);
                         break;
+                    case CardOptionWindow.OPTION_TYPE.SUB:
+                        stream.SendNext(transform.localScale);
+                        break;
+                    case CardOptionWindow.OPTION_TYPE.DAMAGE:
+                        stream.SendNext(transform.localScale);
+                        break;
                     case CardOptionWindow.OPTION_TYPE.TRASH:
+                        stream.SendNext(Vector3.zero);
+                        break;
+                    case CardOptionWindow.OPTION_TYPE.EXCLUSION:
                         stream.SendNext(Vector3.zero);
                         break;
                     case CardOptionWindow.OPTION_TYPE.CARD_LIST:

@@ -23,8 +23,8 @@ public class CardOptionWindow : MonoBehaviour
         STEP,
         TOKEN,              // トークン
 
-        SECURLTY,
-        DIGITAMA,
+        DAMAGE,
+        SUB,
     }
 
     [Serializable]
@@ -65,6 +65,9 @@ public class CardOptionWindow : MonoBehaviour
         return instance;
     }
 
+    string damageStr = "ダメージ";
+    string subStr = "サブデッキ";
+
     private void Awake()
     {
         instance = this;
@@ -75,6 +78,8 @@ public class CardOptionWindow : MonoBehaviour
                 SetButtonToCore();
                 break;
             case "digimon":
+                damageStr = "セキュリティ";
+                subStr = "デジタマ";
                 break;
         }
 
@@ -86,8 +91,8 @@ public class CardOptionWindow : MonoBehaviour
         SetButtonToField();
         SetButtonToExclusion();
         SetButtonToTrash();
-        SetButtonToSecurlty();
-        SetButtonToDigitama();
+        SetButtonToDamage();
+        SetButtonToSub();
 
         Close();
     }
@@ -195,40 +200,40 @@ public class CardOptionWindow : MonoBehaviour
         }
     }
 
-    private void SetButtonToSecurlty()
+    private void SetButtonToDamage()
     {
         Dictionary<OPTION_TYPE, Dictionary<string, UnityAction>> subOptionList = new Dictionary<OPTION_TYPE, Dictionary<string, UnityAction>>();
         Dictionary<string, UnityAction> actionList = new Dictionary<string, UnityAction>();
 
-        actionList.Add("セキュリティをシャッフルする", () => {
-            FieldCardManager.Instance().ShuffleCardDetailList(OPTION_TYPE.SECURLTY);
+        actionList.Add(damageStr + "をシャッフルする", () => {
+            FieldCardManager.Instance().ShuffleCardDetailList(OPTION_TYPE.DAMAGE);
             Close();
             AudioSourceManager.Instance().PlayOneShot(1);
         });
 
-        actionList.Add("セキュリティの上からX枚を公開する", () => {
-            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.SECURLTY, true, numButtonTextNum);
-            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.SECURLTY, cardList);
+        actionList.Add(damageStr + "の上からX枚を公開する", () => {
+            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DAMAGE, true, numButtonTextNum);
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DAMAGE, cardList);
             CloseOnSound();
         });
 
-        actionList.Add("セキュリティの上からX枚を手札に加える", () => {
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.HAND, true, numButtonTextNum);
+        actionList.Add(damageStr + "の上からX枚を手札に加える", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.HAND, true, numButtonTextNum);
             CloseOnSound();
         });
 
-        actionList.Add("セキュリティの下からX枚を手札に加える", () => {
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.HAND, false, numButtonTextNum);
+        actionList.Add(damageStr + "の下からX枚を手札に加える", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.HAND, false, numButtonTextNum);
             CloseOnSound();
         });
 
-        actionList.Add("セキュリティの上からX枚をトラッシュに送る", () => {
-            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.TRASH, true, numButtonTextNum);
+        actionList.Add(damageStr + "の上からX枚をトラッシュに送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         });
-        actionList.Add("セキュリティの上からX枚を除外一覧に送る", () => {
-            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
+        actionList.Add(damageStr + "の上からX枚を除外一覧に送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         });
@@ -236,41 +241,41 @@ public class CardOptionWindow : MonoBehaviour
         subOptionList.Add(OPTION_TYPE.NONE, actionList);
         actionList = new Dictionary<string, UnityAction>();
 
-        actionList.Add("セキュリティからフィールドに出す", () => {
+        actionList.Add(damageStr + "からフィールドに出す", () => {
             string[] list = target.name.Split('^');
-            var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.SECURLTY, list[0], list[1])[0];
+            var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.DAMAGE, list[0], list[1])[0];
             PlayerFieldManager.Instance().CreateCard(target.name);
             CloseOnSound();
         });
 
-        actionList.Add("セキュリティの上に戻す", () => {
+        actionList.Add(damageStr + "の上に戻す", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.SECURLTY, true, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.DAMAGE, true, list[0], list[1]);
             CloseOnSound();
         });
-        actionList.Add("セキュリティの下に戻す", () => {
+        actionList.Add(damageStr + "の下に戻す", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.SECURLTY, false, list[0], list[1]);
-            CloseOnSound();
-        });
-
-        actionList.Add("セキュリティから手札に加える", () => {
-            string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.HAND, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.DAMAGE, false, list[0], list[1]);
             CloseOnSound();
         });
 
-        actionList.Add("セキュリティからトラッシュに送る", () => {
+        actionList.Add(damageStr + "から手札に加える", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.HAND, list[0], list[1]);
+            CloseOnSound();
+        });
+
+        actionList.Add(damageStr + "からトラッシュに送る", () => {
             string[] list = target.name.Split('^');
             List<bool> isTrashList = new List<bool>() { true, false };
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.TRASH, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.TRASH, list[0], list[1]);
             CloseOnSound();
         });
 
-        actionList.Add("セキュリティから除外一覧に送る", () => {
+        actionList.Add(damageStr + "から除外一覧に送る", () => {
             string[] list = target.name.Split('^');
             List<bool> isTrashList = new List<bool>() { true, false };
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SECURLTY, OPTION_TYPE.EXCLUSION, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.EXCLUSION, list[0], list[1]);
             CloseOnSound();
         });
 
@@ -280,35 +285,35 @@ public class CardOptionWindow : MonoBehaviour
         {
             foreach (var action in subOption.Value)
             {
-                CreateOptionButton(action.Key, OPTION_TYPE.SECURLTY, subOption.Key, action.Value);
+                CreateOptionButton(action.Key, OPTION_TYPE.DAMAGE, subOption.Key, action.Value);
             }
         }
     }
 
-    private void SetButtonToDigitama()
+    private void SetButtonToSub()
     {
         Dictionary<OPTION_TYPE, Dictionary<string, UnityAction>> subOptionList = new Dictionary<OPTION_TYPE, Dictionary<string, UnityAction>>();
         Dictionary<string, UnityAction> actionList = new Dictionary<string, UnityAction>();
 
-        actionList.Add("デジタマをシャッフルする", () => {
-            FieldCardManager.Instance().ShuffleCardDetailList(OPTION_TYPE.DIGITAMA);
+        actionList.Add(subStr + "をシャッフルする", () => {
+            FieldCardManager.Instance().ShuffleCardDetailList(OPTION_TYPE.SUB);
             Close();
             AudioSourceManager.Instance().PlayOneShot(1);
         });
 
-        actionList.Add("デジタマの上からX枚を公開する", () => {
-            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DIGITAMA, true, numButtonTextNum);
-            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DIGITAMA, cardList);
+        actionList.Add(subStr + "の上からX枚を公開する", () => {
+            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.SUB, true, numButtonTextNum);
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.SUB, cardList);
             CloseOnSound();
         });
 
-        actionList.Add("デジタマの上からX枚をトラッシュに送る", () => {
-            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DIGITAMA, OPTION_TYPE.TRASH, true, numButtonTextNum);
+        actionList.Add(subStr + "の上からX枚をトラッシュに送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         });
-        actionList.Add("デジタマの上からX枚を除外一覧に送る", () => {
-            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DIGITAMA, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
+        actionList.Add(subStr + "の上からX枚を除外一覧に送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         });
@@ -316,41 +321,41 @@ public class CardOptionWindow : MonoBehaviour
         subOptionList.Add(OPTION_TYPE.NONE, actionList);
         actionList = new Dictionary<string, UnityAction>();
 
-        actionList.Add("デジタマからフィールドに出す", () => {
+        actionList.Add(subStr + "からフィールドに出す", () => {
             string[] list = target.name.Split('^');
-            var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.DIGITAMA, list[0], list[1])[0];
+            var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.SUB, list[0], list[1])[0];
             PlayerFieldManager.Instance().CreateCard(target.name);
             CloseOnSound();
         });
 
-        actionList.Add("デジタマの上に戻す", () => {
+        actionList.Add(subStr + "の上に戻す", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DIGITAMA, OPTION_TYPE.DIGITAMA, true, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.SUB, true, list[0], list[1]);
             CloseOnSound();
         });
-        actionList.Add("デジタマの下に戻す", () => {
+        actionList.Add(subStr + "の下に戻す", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DIGITAMA, OPTION_TYPE.DIGITAMA, false, list[0], list[1]);
-            CloseOnSound();
-        });
-
-        actionList.Add("デジタマから手札に加える", () => {
-            string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DIGITAMA, OPTION_TYPE.HAND, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.SUB, false, list[0], list[1]);
             CloseOnSound();
         });
 
-        actionList.Add("デジタマからトラッシュに送る", () => {
+        actionList.Add(subStr + "から手札に加える", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.HAND, list[0], list[1]);
+            CloseOnSound();
+        });
+
+        actionList.Add(subStr + "からトラッシュに送る", () => {
             string[] list = target.name.Split('^');
             List<bool> isTrashList = new List<bool>() { true, false };
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DIGITAMA, OPTION_TYPE.TRASH, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.TRASH, list[0], list[1]);
             CloseOnSound();
         });
 
-        actionList.Add("デジタマから除外一覧に送る", () => {
+        actionList.Add(subStr + "から除外一覧に送る", () => {
             string[] list = target.name.Split('^');
             List<bool> isTrashList = new List<bool>() { true, false };
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DIGITAMA, OPTION_TYPE.EXCLUSION, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.EXCLUSION, list[0], list[1]);
             CloseOnSound();
         });
 
@@ -360,7 +365,7 @@ public class CardOptionWindow : MonoBehaviour
         {
             foreach (var action in subOption.Value)
             {
-                CreateOptionButton(action.Key, OPTION_TYPE.DIGITAMA, subOption.Key, action.Value);
+                CreateOptionButton(action.Key, OPTION_TYPE.SUB, subOption.Key, action.Value);
             }
         }
     }
@@ -449,15 +454,15 @@ public class CardOptionWindow : MonoBehaviour
 
         if (BattleSceneManager.m_type == "digimon")
         {
-            actionList.Add("デッキからセキュリティに加える", () => {
+            actionList.Add("デッキから" + damageStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SECURLTY, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, list[0], list[1]);
                 CloseOnSound();
             });
 
-            actionList.Add("デッキからデジタマに加える", () => {
+            actionList.Add("デッキから" + subStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DIGITAMA, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, list[0], list[1]);
                 CloseOnSound();
             });
         }
@@ -525,17 +530,17 @@ public class CardOptionWindow : MonoBehaviour
 
         if (BattleSceneManager.m_type == "digimon")
         {
-            actionList.Add("手札からセキュリティに加える", () => {
+            actionList.Add("手札から" + damageStr + "に加える", () => {
                 string[] list = target.name.Split('^');
                 List<bool> isTrashList = new List<bool>() { true, false };
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.SECURLTY, target, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DAMAGE, target, list[0], list[1]);
                 CloseOnSound();
             });
 
-            actionList.Add("手札からデジタマに加える", () => {
+            actionList.Add("手札から" + subStr + "に加える", () => {
                 string[] list = target.name.Split('^');
                 List<bool> isTrashList = new List<bool>() { true, false };
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DIGITAMA, target, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.SUB, target, list[0], list[1]);
                 CloseOnSound();
             });
         }
@@ -653,15 +658,15 @@ public class CardOptionWindow : MonoBehaviour
 
         if (BattleSceneManager.m_type == "digimon")
         {
-            actionList.Add("フィールドからセキュリティに加える", () => {
+            actionList.Add("フィールドから" + damageStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.SECURLTY, target, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.DAMAGE, target, list[0], list[1]);
                 CloseOnSound();
             });
 
-            actionList.Add("フィールドからデジタマに加える", () => {
+            actionList.Add("フィールドから" + subStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.DIGITAMA, target, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.SUB, target, list[0], list[1]);
                 CloseOnSound();
             });
         }
@@ -835,15 +840,15 @@ public class CardOptionWindow : MonoBehaviour
 
         if (BattleSceneManager.m_type == "digimon")
         {
-            actionList.Add("除外一覧からセキュリティに加える", () => {
+            actionList.Add("除外一覧から" + damageStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.SECURLTY, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.DAMAGE, list[0], list[1]);
                 OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
             });
 
-            actionList.Add("除外一覧からデジタマに加える", () => {
+            actionList.Add("除外一覧から" + subStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.DIGITAMA, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.SUB, list[0], list[1]);
                 OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
             });
         }
@@ -949,15 +954,15 @@ public class CardOptionWindow : MonoBehaviour
 
         if (BattleSceneManager.m_type == "digimon")
         {
-            actionList.Add("トラッシュからセキュリティに加える", () => {
+            actionList.Add("トラッシュから" + damageStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.SECURLTY, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.DAMAGE, list[0], list[1]);
                 OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
             });
 
-            actionList.Add("トラッシュからデジタマに加える", () => {
+            actionList.Add("トラッシュから" + subStr + "に加える", () => {
                 string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.DIGITAMA, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.SUB, list[0], list[1]);
                 OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
             });
         }

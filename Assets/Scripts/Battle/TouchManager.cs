@@ -310,14 +310,14 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.AT_HAND, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
                 break;
-            case "Securlty":
+            case "Damage":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.SECURLTY, true, m_image, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.DAMAGE, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
                 break;
-            case "Digitama":
+            case "Sub":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.DIGITAMA, true, m_image, list[0], list[1]);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.SUB, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
                 break;
         }

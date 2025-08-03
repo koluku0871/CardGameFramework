@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using Photon.Pun;
+﻿using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,9 +26,9 @@ public class FieldCardManager : MonoBehaviour
 
         public List<CardDetail> exclusionDetailList = new List<CardDetail>();
 
-        public List<CardDetail> securltyDetailList = new List<CardDetail>();
+        public List<CardDetail> damageDetailList = new List<CardDetail>();
 
-        public List<CardDetail> digitamaDetailList = new List<CardDetail>();
+        public List<CardDetail> subDetailList = new List<CardDetail>();
     }
 
     [SerializeField]
@@ -54,16 +53,16 @@ public class FieldCardManager : MonoBehaviour
     private Text m_exclusionCardCountText = null;
 
     [SerializeField]
-    private Image m_securltyCard = null;
+    private Image m_damageCard = null;
 
     [SerializeField]
-    private Text m_securltyCardCountText = null;
+    private Text m_damageCardCountText = null;
 
     [SerializeField]
-    private Image m_digitamaCard = null;
+    private Image m_subCard = null;
 
     [SerializeField]
-    private Text m_digitamaCardCountText = null;
+    private Text m_subCardCountText = null;
 
     [SerializeField]
     private RectTransform m_atHandContent = null;
@@ -85,9 +84,9 @@ public class FieldCardManager : MonoBehaviour
 
     private List<CardDetail> m_exclusionDetailList = new List<CardDetail>();
 
-    private List<CardDetail> m_securltyDetailList = new List<CardDetail>();
+    private List<CardDetail> m_damageDetailList = new List<CardDetail>();
 
-    private List<CardDetail> m_digitamaDetailList = new List<CardDetail>();
+    private List<CardDetail> m_subDetailList = new List<CardDetail>();
 
     private static FieldCardManager instance = null;
     public static FieldCardManager Instance()
@@ -126,7 +125,7 @@ public class FieldCardManager : MonoBehaviour
         if (BattleSceneManager.m_type == "digimon")
         {
             AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
-            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SECURLTY, true, 5);
+            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
         }
     }
 
@@ -187,7 +186,7 @@ public class FieldCardManager : MonoBehaviour
                 {
                     case -1:
                         Debug.Log("Left Click");
-                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.SECURLTY);
+                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DAMAGE);
                         break;
                     case -2:
                         Debug.Log("Right Click");
@@ -197,7 +196,7 @@ public class FieldCardManager : MonoBehaviour
                         break;
                 }
             });
-            GetOrAddComponentToEventTrigger(m_securltyCard.gameObject, entry);
+            GetOrAddComponentToEventTrigger(m_damageCard.gameObject, entry);
 
             // マウスクリック
             entry = new EventTrigger.Entry();
@@ -213,7 +212,7 @@ public class FieldCardManager : MonoBehaviour
                 {
                     case -1:
                         Debug.Log("Left Click");
-                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DIGITAMA);
+                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.SUB);
                         break;
                     case -2:
                         Debug.Log("Right Click");
@@ -223,7 +222,7 @@ public class FieldCardManager : MonoBehaviour
                         break;
                 }
             });
-            GetOrAddComponentToEventTrigger(m_digitamaCard.gameObject, entry);
+            GetOrAddComponentToEventTrigger(m_subCard.gameObject, entry);
         }
 
         if (isActive)
@@ -316,11 +315,11 @@ public class FieldCardManager : MonoBehaviour
             case OPTION_TYPE.EXCLUSION:
                 deckDetailList = m_exclusionDetailList;
                 break;
-            case OPTION_TYPE.SECURLTY:
-                deckDetailList = m_securltyDetailList;
+            case OPTION_TYPE.DAMAGE:
+                deckDetailList = m_damageDetailList;
                 break;
-            case OPTION_TYPE.DIGITAMA:
-                deckDetailList = m_digitamaDetailList;
+            case OPTION_TYPE.SUB:
+                deckDetailList = m_subDetailList;
                 break;
             case OPTION_TYPE.TOKEN:
                 deckDetailList = m_aceDetailList;
@@ -346,11 +345,11 @@ public class FieldCardManager : MonoBehaviour
             case OPTION_TYPE.EXCLUSION:
                 m_exclusionDetailList = deckDetailList;
                 break;
-            case OPTION_TYPE.SECURLTY:
-                m_securltyDetailList = deckDetailList;
+            case OPTION_TYPE.DAMAGE:
+                m_damageDetailList = deckDetailList;
                 break;
-            case OPTION_TYPE.DIGITAMA:
-                m_digitamaDetailList = deckDetailList;
+            case OPTION_TYPE.SUB:
+                m_subDetailList = deckDetailList;
                 break;
             case OPTION_TYPE.TOKEN:
                 m_aceDetailList = deckDetailList;
@@ -399,13 +398,13 @@ public class FieldCardManager : MonoBehaviour
                 m_exclusionDetailList = deckDetailList;
                 m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
                 break;
-            case OPTION_TYPE.SECURLTY:
-                m_securltyDetailList = deckDetailList;
-                m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+            case OPTION_TYPE.DAMAGE:
+                m_damageDetailList = deckDetailList;
+                m_damageCardCountText.text = m_damageDetailList.Count.ToString();
                 break;
-            case OPTION_TYPE.DIGITAMA:
-                m_digitamaDetailList = deckDetailList;
-                m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+            case OPTION_TYPE.SUB:
+                m_subDetailList = deckDetailList;
+                m_subCardCountText.text = m_subDetailList.Count.ToString();
                 break;
             case OPTION_TYPE.TOKEN:
                 m_aceDetailList = deckDetailList;
@@ -433,16 +432,16 @@ public class FieldCardManager : MonoBehaviour
                     cardDetailList = m_exclusionDetailList;
                 }
                 break;
-            case OPTION_TYPE.SECURLTY:
-                if (m_securltyDetailList != null)
+            case OPTION_TYPE.DAMAGE:
+                if (m_damageDetailList != null)
                 {
-                    cardDetailList = m_securltyDetailList;
+                    cardDetailList = m_damageDetailList;
                 }
                 break;
-            case OPTION_TYPE.DIGITAMA:
-                if (m_digitamaDetailList != null)
+            case OPTION_TYPE.SUB:
+                if (m_subDetailList != null)
                 {
-                    cardDetailList = m_digitamaDetailList;
+                    cardDetailList = m_subDetailList;
                 }
                 break;
             case OPTION_TYPE.TOKEN:
@@ -510,23 +509,23 @@ public class FieldCardManager : MonoBehaviour
                 m_exclusionDetailList.RemoveRange(index, count);
                 m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
                 break;
-            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 if (!isUp)
                 {
-                    index = m_securltyDetailList.Count - count;
+                    index = m_damageDetailList.Count - count;
                 }
-                cardDetailList = m_securltyDetailList.GetRange(index, count);
-                m_securltyDetailList.RemoveRange(index, count);
-                m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+                cardDetailList = m_damageDetailList.GetRange(index, count);
+                m_damageDetailList.RemoveRange(index, count);
+                m_damageCardCountText.text = m_damageDetailList.Count.ToString();
                 break;
-            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 if (!isUp)
                 {
-                    index = m_digitamaDetailList.Count - count;
+                    index = m_subDetailList.Count - count;
                 }
-                cardDetailList = m_digitamaDetailList.GetRange(index, count);
-                m_digitamaDetailList.RemoveRange(index, count);
-                m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+                cardDetailList = m_subDetailList.GetRange(index, count);
+                m_subDetailList.RemoveRange(index, count);
+                m_subCardCountText.text = m_subDetailList.Count.ToString();
                 break;
         }
         AddCardDetailList(optionDst, cardDetailList);
@@ -570,19 +569,19 @@ public class FieldCardManager : MonoBehaviour
                 }
                 cardDetailList = m_exclusionDetailList.GetRange(index, count);
                 break;
-            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 if (!isUp)
                 {
-                    index = m_securltyDetailList.Count - count;
+                    index = m_damageDetailList.Count - count;
                 }
-                cardDetailList = m_securltyDetailList.GetRange(index, count);
+                cardDetailList = m_damageDetailList.GetRange(index, count);
                 break;
-            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 if (!isUp)
                 {
-                    index = m_digitamaDetailList.Count - count;
+                    index = m_subDetailList.Count - count;
                 }
-                cardDetailList = m_digitamaDetailList.GetRange(index, count);
+                cardDetailList = m_subDetailList.GetRange(index, count);
                 break;
         }
         return cardDetailList;
@@ -617,21 +616,21 @@ public class FieldCardManager : MonoBehaviour
                 m_exclusionDetailList.Insert(index, cardDetail);
                 m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
                 break;
-            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 if (!isUp)
                 {
-                    index = m_securltyDetailList.Count;
+                    index = m_damageDetailList.Count;
                 }
-                m_securltyDetailList.Insert(index, cardDetail);
-                m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+                m_damageDetailList.Insert(index, cardDetail);
+                m_damageCardCountText.text = m_damageDetailList.Count.ToString();
                 break;
-            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 if (!isUp)
                 {
-                    index = m_digitamaDetailList.Count;
+                    index = m_subDetailList.Count;
                 }
-                m_digitamaDetailList.Insert(index, cardDetail);
-                m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+                m_subDetailList.Insert(index, cardDetail);
+                m_subCardCountText.text = m_subDetailList.Count.ToString();
                 break;
         }
     }
@@ -644,7 +643,7 @@ public class FieldCardManager : MonoBehaviour
                 foreach (var cardDetail in cardDetailList)
                 {
                     Image card = CreateCard(cardDetail, true, m_handCard, m_handContent,
-                        (Image target, string tag, string cardId) => {
+                        (Image target, string tag, string cardId, bool isDoubleClick) => {
                             CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.HAND);
                         });
                     card.name = m_handCard.name;
@@ -659,7 +658,7 @@ public class FieldCardManager : MonoBehaviour
                 foreach (var cardDetail in cardDetailList)
                 {
                     Image card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
-                        (Image target, string tag, string cardId) => {
+                        (Image target, string tag, string cardId, bool isDoubleClick) => {
                             CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);
                         });
                     card.name = m_atHandCard.name;
@@ -686,18 +685,18 @@ public class FieldCardManager : MonoBehaviour
                     m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
                 }
                 break;
-            case CardOptionWindow.OPTION_TYPE.SECURLTY:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 foreach (var cardDetail in cardDetailList)
                 {
-                    m_securltyDetailList.Add(cardDetail);
-                    m_securltyCardCountText.text = m_securltyDetailList.Count.ToString();
+                    m_damageDetailList.Add(cardDetail);
+                    m_damageCardCountText.text = m_damageDetailList.Count.ToString();
                 }
                 break;
-            case CardOptionWindow.OPTION_TYPE.DIGITAMA:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 foreach (var cardDetail in cardDetailList)
                 {
-                    m_digitamaDetailList.Add(cardDetail);
-                    m_digitamaCardCountText.text = m_digitamaDetailList.Count.ToString();
+                    m_subDetailList.Add(cardDetail);
+                    m_subCardCountText.text = m_subDetailList.Count.ToString();
                 }
                 break;
         }
@@ -756,34 +755,34 @@ public class FieldCardManager : MonoBehaviour
                 m_exclusionCardCountText.text = count.ToString();
                 if (count <= 0) { }
                 break;
-            case OPTION_TYPE.SECURLTY:
-                foreach (var cardDetail in m_securltyDetailList)
+            case OPTION_TYPE.DAMAGE:
+                foreach (var cardDetail in m_damageDetailList)
                 {
                     if (cardDetail.tag != tag || cardDetail.cardId != cardId)
                     {
                         continue;
                     }
                     cardDetailList.Add(cardDetail);
-                    m_securltyDetailList.Remove(cardDetail);
+                    m_damageDetailList.Remove(cardDetail);
                     break;
                 }
-                count = m_securltyDetailList.Count;
-                m_securltyCardCountText.text = count.ToString();
+                count = m_damageDetailList.Count;
+                m_damageCardCountText.text = count.ToString();
                 if (count <= 0) { }
                 break;
-            case OPTION_TYPE.DIGITAMA:
-                foreach (var cardDetail in m_digitamaDetailList)
+            case OPTION_TYPE.SUB:
+                foreach (var cardDetail in m_subDetailList)
                 {
                     if (cardDetail.tag != tag || cardDetail.cardId != cardId)
                     {
                         continue;
                     }
                     cardDetailList.Add(cardDetail);
-                    m_digitamaDetailList.Remove(cardDetail);
+                    m_subDetailList.Remove(cardDetail);
                     break;
                 }
-                count = m_digitamaDetailList.Count;
-                m_digitamaCardCountText.text = count.ToString();
+                count = m_subDetailList.Count;
+                m_subCardCountText.text = count.ToString();
                 if (count <= 0) { }
                 break;
         }
@@ -825,9 +824,9 @@ public class FieldCardManager : MonoBehaviour
 
     public Image CreateCard(DeckManager.CardDetail cardDetail, bool isInstantiate, Image targetImage,
         Transform parent = null,
-        Action<Image, string, string> leftClickAction = null,
-        Action<Image, string, string> rightClickAction = null,
-        Action<Image, string, string> middleClickAction = null)
+        Action<Image, string, string, bool> leftClickAction = null,
+        Action<Image, string, string, bool> rightClickAction = null,
+        Action<Image, string, string, bool> middleClickAction = null)
     {
         string tag = cardDetail.tag;
         string fileName = cardDetail.cardId;
@@ -870,30 +869,33 @@ public class FieldCardManager : MonoBehaviour
                 return;
             }
 
-            switch ((pointerEventData as PointerEventData).pointerId)
+            MouseManager.Instance().OnClick((pointerEventData as PointerEventData).pointerId, (int pointerId, bool isDoubleClick) =>
             {
-                case -1:
-                    Debug.Log("Left Click");
-                    if (leftClickAction != null)
-                    {
-                        leftClickAction(copied, tag, fileName);
-                    }
-                    break;
-                case -2:
-                    Debug.Log("Right Click");
-                    if (rightClickAction != null)
-                    {
-                        rightClickAction(copied, tag, fileName);
-                    }
-                    break;
-                case -3:
-                    Debug.Log("Middle Click");
-                    if (middleClickAction != null)
-                    {
-                        middleClickAction(copied, tag, fileName);
-                    }
-                    break;
-            }
+                switch (pointerId)
+                {
+                    case -1:
+                        Debug.Log("Left Click");
+                        if (leftClickAction != null)
+                        {
+                            leftClickAction(copied, tag, fileName, isDoubleClick);
+                        }
+                        break;
+                    case -2:
+                        Debug.Log("Right Click");
+                        if (rightClickAction != null)
+                        {
+                            rightClickAction(copied, tag, fileName, isDoubleClick);
+                        }
+                        break;
+                    case -3:
+                        Debug.Log("Middle Click");
+                        if (middleClickAction != null)
+                        {
+                            middleClickAction(copied, tag, fileName, isDoubleClick);
+                        }
+                        break;
+                }
+            });
         });
         cardEventTrigger.triggers.Add(entry);
         copied.gameObject.SetActive(true);
@@ -1026,8 +1028,8 @@ public class FieldCardManager : MonoBehaviour
         SetDeckDetail(OPTION_TYPE.TRASH, fieldCardData.trashDetailList);
         SetDeckDetail(OPTION_TYPE.EXCLUSION, fieldCardData.exclusionDetailList);
 
-        SetDeckDetail(OPTION_TYPE.SECURLTY, fieldCardData.securltyDetailList);
-        SetDeckDetail(OPTION_TYPE.DIGITAMA, fieldCardData.digitamaDetailList);
+        SetDeckDetail(OPTION_TYPE.DAMAGE, fieldCardData.damageDetailList);
+        SetDeckDetail(OPTION_TYPE.SUB, fieldCardData.subDetailList);
     }
 
     public string GetFieldCardManagerDataJson()
@@ -1059,8 +1061,8 @@ public class FieldCardManager : MonoBehaviour
         fieldCardData.trashDetailList = m_trashDetailList;
         fieldCardData.exclusionDetailList = m_exclusionDetailList;
 
-        fieldCardData.securltyDetailList = m_securltyDetailList;
-        fieldCardData.digitamaDetailList = m_digitamaDetailList;
+        fieldCardData.damageDetailList = m_damageDetailList;
+        fieldCardData.subDetailList = m_subDetailList;
 
         return JsonUtility.ToJson(fieldCardData);
     }

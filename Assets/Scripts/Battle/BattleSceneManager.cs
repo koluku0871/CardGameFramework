@@ -124,7 +124,16 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             Debug.LogError("m_playerName1 = " + m_playerName1);
             m_fieldPanel.localRotation = Quaternion.Euler(0, 0, 0);
 
-            GameObject obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField_" + m_type, Vector3.zero, Quaternion.identity);
+            GameObject obj = null;
+            try
+            {
+                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField_" + m_type, Vector3.zero, Quaternion.identity);
+            }
+            catch
+            {
+                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField", Vector3.zero, Quaternion.identity);
+            }
+            
             PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
             obj.SetActive(true);
             obj.transform.localPosition = Vector3.zero;
@@ -164,7 +173,16 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             Debug.LogError("m_playerName2 = " + m_playerName2);
             m_fieldPanel.localRotation = Quaternion.Euler(0, 0, 180);
 
-            GameObject obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField_" + m_type, Vector3.zero, Quaternion.Euler(0, 0, 180));
+            GameObject obj = null;
+            try
+            {
+                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField_" + m_type, Vector3.zero, Quaternion.Euler(0, 0, 180));
+            }
+            catch
+            {
+                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField", Vector3.zero, Quaternion.Euler(0, 0, 180));
+            }
+
             PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
             obj.SetActive(true);
             obj.transform.localPosition = Vector3.zero;

@@ -17,7 +17,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     public ConstManager.PhotonObjectType m_photonObjectType = ConstManager.PhotonObjectType.NONE;
 
     private PhotonView m_photonView = null;
-    private BoxCollider2D m_boxCollider = null;
+    private List<BoxCollider2D> m_boxColliderList = new List<BoxCollider2D>();
     private Image m_image = null;
     private EventTrigger m_eventTrigger = null;
 
@@ -56,6 +56,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         {
             m_isOverlap = value;
             m_isOverlapImage.gameObject.SetActive(value);
+            if (!value)
+            {
+                m_overlapObjectList.Clear();
+            }
         }
         get
         {
@@ -238,8 +242,16 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             }
         }
 
-        m_boxCollider = gameObject.GetComponent<BoxCollider2D>();
-        if (m_boxCollider == null) m_boxCollider = gameObject.AddComponent<BoxCollider2D>();
+        BoxCollider2D[] boxColliderList = gameObject.GetComponents<BoxCollider2D>();
+        if (boxColliderList.Length < 1)
+        {
+            BoxCollider2D boxCollider = gameObject.AddComponent<BoxCollider2D>();
+            m_boxColliderList.Add(boxCollider);
+        }
+        else
+        {
+            m_boxColliderList.AddRange(boxColliderList);
+        }
 
         m_image = gameObject.GetComponent<Image>();
         if (m_image == null) m_image = gameObject.AddComponent<Image>();
@@ -256,7 +268,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         });
         m_eventTrigger.triggers.Add(entry);
 
-        m_boxCollider.enabled = m_photonView.IsMine;
+        foreach (var boxCollider in m_boxColliderList)
+        {
+            boxCollider.enabled = m_photonView.IsMine;
+        }
         if (!m_photonView.IsMine) return;
 
         // マウスクリック
@@ -419,31 +434,31 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     }
 
     /// <summary>
-    /// オブジェクトが離れた時
+    /// オブジェクトが離れた
     /// </summary>
     /// <param name="coll"></param>
-    private void OnTriggerEnter2D(Collider2D coll)
+    private void OnTriggerExit2D(Collider2D coll)
     {
-        if (!m_photonView.IsMine) return;
+        //if (!m_photonView.IsMine) return;
 
-        if (gameObject.tag != coll.gameObject.tag) return;
+        if (coll.gameObject.tag != "Card") return;
 
-        Debug.Log("OnTriggerEnter2D : " + coll.gameObject.name);
+        Debug.Log("OnTriggerExit2D : " + coll.gameObject.name);
 
         RemoveOoverlapObjectList(coll.gameObject);
     }
 
     /// <summary>
-    /// オブジェクトが重なっている間
+    /// オブジェクトが重なった
     /// </summary>
     /// <param name="coll"></param>
-    private void OnTriggerExit2D(Collider2D coll)
+    private void OnTriggerEnter2D(Collider2D coll)
     {
-        if (!m_photonView.IsMine) return;
+        //if (!m_photonView.IsMine) return;
 
-        if (gameObject.tag != coll.gameObject.tag) return;
+        if (coll.gameObject.tag != "Card") return;
 
-        Debug.Log("OnTriggerExit2D : " + coll.gameObject.name);
+        Debug.Log("OnTriggerEnter2D : " + coll.gameObject.name);
 
         AddOoverlapObjectList(coll.gameObject);
     }

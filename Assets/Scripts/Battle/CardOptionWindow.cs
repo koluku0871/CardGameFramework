@@ -75,11 +75,12 @@ public class CardOptionWindow : MonoBehaviour
         switch (BattleSceneManager.m_type)
         {
             case "bs":
-                SetButtonToCore();
+                SetButtonToBs();
                 break;
             case "digimon":
                 damageStr = "セキュリティ";
                 subStr = "デジタマ";
+                SetButtonToDigimon();
                 break;
         }
 
@@ -97,7 +98,7 @@ public class CardOptionWindow : MonoBehaviour
         Close();
     }
 
-    private void SetButtonToCore()
+    private void SetButtonToBs()
     {
 
         Dictionary<string, UnityAction> actionList = new Dictionary<string, UnityAction>();
@@ -112,16 +113,6 @@ public class CardOptionWindow : MonoBehaviour
         actionList.Add("コアをリザーブからトラッシュにX個移動する", () => {
             PlayerFieldManager.Instance().SetCorePos(ConstManager.CorePosType.RESERVE, ConstManager.CorePosType.TRASH, numButtonTextNum);
             Close();
-        });
-        actionList.Add("自分の手札からランダムにX枚捨てる", () => {
-            for (int index = 0; index > numButtonTextNum; index++)
-            {
-                List<GameObject> handObjectList = FieldCardManager.Instance().GetHandGameObject();
-                GameObject handObject = handObjectList[UnityEngine.Random.Range(0, handObjectList.Count)];
-                string[] list = handObject.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.TRASH, handObject.GetComponent<Image>(), list[0], list[1]);
-                CloseOnSound();
-            }
         });
         actionList.Add("コアをフィールドからリザーブにすべて移動する", () => {
             PlayerFieldManager.Instance().SetCorePos(ConstManager.CorePosType.FIELD, ConstManager.CorePosType.RESERVE);
@@ -153,6 +144,29 @@ public class CardOptionWindow : MonoBehaviour
         }
     }
 
+    private void SetButtonToDigimon()
+    {
+        Dictionary<string, UnityAction> actionList = new Dictionary<string, UnityAction>();
+        actionList.Add(damageStr + "と手札をデッキに戻して引き直す", () => {
+            List<GameObject> handObjectList = FieldCardManager.Instance().GetHandGameObject();
+            foreach (GameObject handObject in handObjectList)
+            {
+                string[] list = handObject.name.Split('^');
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
+            }
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.DECK, true, 5);
+
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
+            CloseOnSound();
+        });
+
+        foreach (var action in actionList)
+        {
+            CreateOptionButton(action.Key, OPTION_TYPE.STEP, OPTION_TYPE.NONE, action.Value);
+        }
+    }
+
     private void SetButtonToOption()
     {
         Dictionary<OPTION_TYPE, Dictionary<string, UnityAction>> subOptionList = new Dictionary<OPTION_TYPE, Dictionary<string, UnityAction>>();
@@ -169,6 +183,30 @@ public class CardOptionWindow : MonoBehaviour
 
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.TOKEN, openCardList);
             Close();
+        });
+
+
+        actionList.Add("自分の手札からランダムにX枚捨てる", () => {
+            for (int index = 0; index < numButtonTextNum; index++)
+            {
+                List<GameObject> handObjectList = FieldCardManager.Instance().GetHandGameObject();
+                GameObject handObject = handObjectList[UnityEngine.Random.Range(0, handObjectList.Count)];
+                string[] list = handObject.name.Split('^');
+                Debug.Log(handObject.name);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.TRASH, handObject.GetComponent<Image>(), list[0], list[1]);
+            }
+            CloseOnSound();
+        });
+
+        actionList.Add("手札をデッキに戻してX枚引き直す", () => {
+            List<GameObject> handObjectList = FieldCardManager.Instance().GetHandGameObject();
+            foreach (GameObject handObject in handObjectList)
+            {
+                string[] list = handObject.name.Split('^');
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
+            }
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, numButtonTextNum);
+            CloseOnSound();
         });
 
         subOptionList.Add(OPTION_TYPE.NONE, actionList);
@@ -401,6 +439,19 @@ public class CardOptionWindow : MonoBehaviour
         {
             actionList.Add("デッキの上からX枚を手元に置く", () => {
                 FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
+                CloseOnSound();
+            });
+        }
+
+        if (BattleSceneManager.m_type == "digimon")
+        {
+            actionList.Add("デッキの上から" + damageStr + "に送る", () => {
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, numButtonTextNum);
+                CloseOnSound();
+            });
+
+            actionList.Add("デッキの上から" + subStr + "に送る", () => {
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, true, numButtonTextNum);
                 CloseOnSound();
             });
         }

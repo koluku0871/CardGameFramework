@@ -101,6 +101,8 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         // マルチプレイに参加していない場合は参加する
         if (!PhotonNetwork.IsConnected)
         {
+            PhotonNetwork.AutomaticallySyncScene = true;
+
             PhotonNetwork.ConnectUsingSettings();
         }
     }
@@ -492,7 +494,10 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        m_photonView.RPC(nameof(MoveBattleScene), RpcTarget.AllBuffered);
+        //m_photonView.RPC(nameof(MoveBattleScene), RpcTarget.AllBuffered);
+
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.LoadLevel("BattleScene");
     }
 
     public void SetCustomRoomProperties()
@@ -560,7 +565,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
+    /*[PunRPC]
     public void MoveBattleScene()
     {
         PhotonNetwork.IsMessageQueueRunning = false;
@@ -568,7 +573,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         m_battlePlayerManager.SetRoomHash();
 
         FadeManager.Instance().OnStart("BattleScene", false);
-    }
+    }*/
 
     public void OnClickToCloseButton()
     {

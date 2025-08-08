@@ -53,6 +53,10 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         AudioSourceManager.Instance().PlayOneShot((int)AudioSourceManager.BGM_NUM.BATTLE_1, true);
 
         PhotonNetwork.IsMessageQueueRunning = true;
+    }
+
+    public void Start()
+    {
         m_playerName = GetPlayerName(PhotonNetwork.LocalPlayer);
 
         foreach (var prop in PhotonNetwork.CurrentRoom.CustomProperties)

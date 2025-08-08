@@ -156,11 +156,11 @@ public class CardListWindow : MonoBehaviour, IPunObservable
                 switch (m_optionType)
                 {
                     case CardOptionWindow.OPTION_TYPE.DECK:
-                    case CardOptionWindow.OPTION_TYPE.SUB:
-                    case CardOptionWindow.OPTION_TYPE.DAMAGE:
                     case CardOptionWindow.OPTION_TYPE.CARD_LIST:
                         stream.SendNext(transform.localScale);
                         break;
+                    case CardOptionWindow.OPTION_TYPE.SUB:
+                    case CardOptionWindow.OPTION_TYPE.DAMAGE:
                     case CardOptionWindow.OPTION_TYPE.TRASH:
                     case CardOptionWindow.OPTION_TYPE.EXCLUSION:
                         if (m_isEnemyOpen)

@@ -494,6 +494,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         //m_photonView.RPC(nameof(MoveBattleScene), RpcTarget.AllBuffered);
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
+        m_battlePlayerManager.SetRoomHash();
         PhotonNetwork.LoadLevel("BattleScene");
     }
 

@@ -259,15 +259,15 @@ public class CardOptionWindow : MonoBehaviour
             AudioSourceManager.Instance().PlayOneShot(1);
         });
 
-        actionList.Add(damageStr + "の上からX枚を公開する", () => {
-            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DAMAGE, true, numButtonTextNum);
-            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DAMAGE, cardList);
-            CloseOnSound();
-        });
-
         actionList.Add("相手に見せつつ" + damageStr + "の上からX枚を公開する", () => {
             var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DAMAGE, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DAMAGE, cardList, true, true);
+            CloseOnSound();
+        });
+
+        actionList.Add(damageStr + "の上からX枚を公開する", () => {
+            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DAMAGE, true, numButtonTextNum);
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DAMAGE, cardList);
             CloseOnSound();
         });
 
@@ -355,15 +355,15 @@ public class CardOptionWindow : MonoBehaviour
             AudioSourceManager.Instance().PlayOneShot(1);
         });
 
-        actionList.Add(subStr + "の上からX枚を公開する", () => {
-            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.SUB, true, numButtonTextNum);
-            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.SUB, cardList);
-            CloseOnSound();
-        });
-
         actionList.Add("相手に見せつつ" + subStr + "の上からX枚を公開する", () => {
             var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.SUB, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.SUB, cardList, true, true);
+            CloseOnSound();
+        });
+
+        actionList.Add(subStr + "の上からX枚を公開する", () => {
+            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.SUB, true, numButtonTextNum);
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.SUB, cardList);
             CloseOnSound();
         });
 
@@ -464,15 +464,15 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         });
 
-        actionList.Add("デッキの上からX枚を公開する", () => {
-            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DECK, true, numButtonTextNum);
-            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DECK, cardList);
-            CloseOnSound();
-        });
-
         actionList.Add("相手に見せつつデッキの上からX枚を公開する", () => {
             var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DECK, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DECK, cardList, true, true);
+            CloseOnSound();
+        });
+
+        actionList.Add("デッキの上からX枚を公開する", () => {
+            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DECK, true, numButtonTextNum);
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.DECK, cardList);
             CloseOnSound();
         });
 

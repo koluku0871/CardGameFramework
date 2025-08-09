@@ -12,26 +12,23 @@ public class DeckCardImageList : MonoBehaviour
     {
         for (int i = 0; i < 4; i++)
         {
+            CardData cardData = null;
             if (isSearchCard)
             {
-                CardData cardData = DeckSceneManager.Instance().GetCardDatas(count * 4 + i);
-                if (cardData != null)
-                {
-                    deckCardImages[i].SetData(cardData.PackNo, cardData.fileName, cardData.Sprite);
-                    continue;
-                }
-                deckCardImages[i].gameObject.SetActive(false);
+                cardData = DeckSceneManager.Instance().GetCardDatas(count * 4 + i);
             }
             else
             {
-                CardData cardData = DeckSceneManager.Instance().GetFavoriteCardDatas(count * 4 + i);
-                if (cardData != null)
-                {
-                    deckCardImages[i].SetData(cardData.PackNo, cardData.fileName, cardData.Sprite);
-                    continue;
-                }
-                deckCardImages[i].gameObject.SetActive(false);
+                cardData = DeckSceneManager.Instance().GetFavoriteCardDatas(count * 4 + i);
             }
+
+            if (cardData != null)
+            {
+                deckCardImages[i].SetData(cardData.PackNo, cardData.fileName, cardData.Sprite);
+                continue;
+            }
+
+            deckCardImages[i].gameObject.SetActive(false);
         }
     }
 }

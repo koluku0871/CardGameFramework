@@ -111,8 +111,6 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (SetActive(m_optionButton, IsMine))
         {
-            CardOptionWindow.Instance().Init();
-
             m_optionButton.onClick.AddListener(() => {
                 CardOptionWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.STEP);
             });

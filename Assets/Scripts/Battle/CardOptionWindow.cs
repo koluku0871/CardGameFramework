@@ -71,10 +71,7 @@ public class CardOptionWindow : MonoBehaviour
     private void Awake()
     {
         instance = this;
-    }
 
-    public void Init()
-    {
         switch (BattleSceneManager.m_type)
         {
             case "bs":

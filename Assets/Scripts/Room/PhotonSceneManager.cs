@@ -14,9 +14,6 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     private RoomAnimManager roomAnimManager = null;
 
     [SerializeField]
-    private PhotonView m_photonView = null;
-
-    [SerializeField]
     private Button m_closeButton = null;
 
     [SerializeField]

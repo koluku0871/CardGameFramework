@@ -48,13 +48,13 @@ public class AudioSourceManager : MonoBehaviour
             switch (index)
             {
                 case 0:
-                    m_audioSourceSe.volume = optionData.battleBgmVolume;
+                    m_audioSourceBgm.volume = optionData.battleBgmVolume;
                     break;
                 case 1:
-                    m_audioSourceSe.volume = optionData.homeBgmVolume;
+                    m_audioSourceBgm.volume = optionData.homeBgmVolume;
                     break;
                 case 2:
-                    m_audioSourceSe.volume = optionData.deckBgmVolume;
+                    m_audioSourceBgm.volume = optionData.deckBgmVolume;
                     break;
             }
             m_audioSourceBgm.Play();

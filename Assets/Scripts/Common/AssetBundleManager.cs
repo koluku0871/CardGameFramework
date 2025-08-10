@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
@@ -120,7 +122,29 @@ public class AssetBundleManager : MonoBehaviour
             yield return null;
         }
 
-        sequence = new CoroutineSequence(this);
+        fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
+        var count = fs.Length;
+        List<Task> actionList = new List<Task>();
+        foreach (string file in fs)
+        {
+            //actionList.Add(ReadFileTaskToSpriteAtlas(file, logAction, () => { count--; }));
+            actionList.Add(Task.Run(() =>
+            {
+                // ˆ—1
+                //Debug.Log(Thread.CurrentThread.ManagedThreadId);
+                ReadFileTaskToSpriteAtlas(file, logAction, () => { count--; });
+                count--;
+            }));
+        }
+        Task.WhenAll(actionList.ToArray());
+
+        while (count > 0)
+        {
+            yield return null;
+        }
+        action();
+
+        /*sequence = new CoroutineSequence(this);
         fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
         foreach (string file in fs)
         {
@@ -130,7 +154,7 @@ public class AssetBundleManager : MonoBehaviour
         sequence.OnCompleted(() => {
             action();
         });
-        sequence.Play();
+        sequence.Play();*/
     }
 
     public IEnumerator ReadFileToTxt(string file, Action<string> logAction)
@@ -211,7 +235,35 @@ public class AssetBundleManager : MonoBehaviour
         logAction("ReadFilePath : " + file + "\n");
     }
 
-    public IEnumerator ReadFileToSpriteAtlas(string file, Action<string> logAction)
+    public async Task ReadFileTaskToSpriteAtlas(string file, Action<string> logAction, Action action)
+    {
+        string key = Path.GetFileNameWithoutExtension(file);
+        string type = key.Split('_')[0];
+        if (!m_assetBundleCardDataList[type].assetBundleSpriteList.ContainsKey(key))
+        {
+            AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
+            m_assetBundleCardDataList[type].assetBundleSpriteList.Add(key, new AssetBundleBaseSprite() { assetBundle = assetBundle });
+            var request = assetBundle.LoadAllAssetsAsync();
+
+            while (!request.isDone)
+            {
+                await Task.Delay(10);
+            }
+
+            logAction(Thread.CurrentThread.ManagedThreadId + "\n");
+            logAction("ReadFilePath : " + file + "\n");
+
+            if (request.asset.GetType() == typeof(UnityEngine.U2D.SpriteAtlas))
+            {
+                var atlas = (UnityEngine.U2D.SpriteAtlas)request.asset;
+                Debug.Log("Asset : " + atlas.name + " spriteCount : " + atlas.spriteCount);
+                m_assetBundleCardDataList[type].assetBundleSpriteList[key].spriteAtlas = atlas;
+            }
+        }
+        if (action != null) action();
+    }
+
+    public IEnumerator ReadFileToSpriteAtlas(string file, Action<string> logAction, Action action)
     {
         string key = Path.GetFileNameWithoutExtension(file);
         string type = key.Split('_')[0];
@@ -235,6 +287,8 @@ public class AssetBundleManager : MonoBehaviour
                 m_assetBundleCardDataList[type].assetBundleSpriteList[key].spriteAtlas = atlas;
             }
         }
+
+        if (action != null) action();
     }
 
     public Sprite GetCardSprite(string key, string name)

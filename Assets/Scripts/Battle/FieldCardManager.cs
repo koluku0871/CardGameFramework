@@ -127,6 +127,13 @@ public class FieldCardManager : MonoBehaviour
             AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
             AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
         }
+
+        if (BattleSceneManager.m_type == "hololive")
+        {
+            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 7);
+            // TODO 後々
+            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
+        }
     }
 
     public EventTrigger GetOrAddComponentToEventTrigger(GameObject obj, EventTrigger.Entry entry)

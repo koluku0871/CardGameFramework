@@ -496,6 +496,11 @@ public class DeckManager : MonoBehaviour
     }
 
     private bool IsDuplicateLimit(string tag, string cardId, RectTransform parent) {
+        if (AssetBundleManager.Instance().CardType == "hololive")
+        {
+            return false;
+        }
+
         if (ConstManager.DECK_CARD_DUPLICATE_OK_LIST.Contains(cardId)) {
             return false;
         }

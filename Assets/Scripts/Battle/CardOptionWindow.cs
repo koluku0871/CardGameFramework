@@ -71,7 +71,10 @@ public class CardOptionWindow : MonoBehaviour
     private void Awake()
     {
         instance = this;
+    }
 
+    private void Start()
+    {
         switch (BattleSceneManager.m_type)
         {
             case "bs":
@@ -81,6 +84,8 @@ public class CardOptionWindow : MonoBehaviour
                 damageStr = "セキュリティ";
                 subStr = "デジタマ";
                 SetButtonToDigimon();
+                break;
+            case "hololive":
                 break;
         }
 
@@ -473,7 +478,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         });
 
-        if (BattleSceneManager.m_type == "bs")
+        if (BattleSceneManager.m_type != "digimon")
         {
             actionList.Add("デッキの上からX枚を手元に置く", () => {
                 FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
@@ -481,7 +486,7 @@ public class CardOptionWindow : MonoBehaviour
             });
         }
 
-        if (BattleSceneManager.m_type == "digimon")
+        if (BattleSceneManager.m_type != "bs")
         {
             actionList.Add("デッキの上から" + damageStr + "の上に送る", () => {
                 FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, numButtonTextNum);
@@ -542,7 +547,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         });
 
-        if (BattleSceneManager.m_type == "bs")
+        if (BattleSceneManager.m_type != "digimon")
         {
             actionList.Add("デッキから手元に置く", () => {
                 string[] list = target.name.Split('^');
@@ -551,7 +556,7 @@ public class CardOptionWindow : MonoBehaviour
             });
         }
 
-        if (BattleSceneManager.m_type == "digimon")
+        if (BattleSceneManager.m_type != "bs")
         {
             actionList.Add("デッキから" + damageStr + "の上に加える", () => {
                 string[] list = target.name.Split('^');
@@ -630,7 +635,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         });
 
-        if (BattleSceneManager.m_type == "bs")
+        if (BattleSceneManager.m_type != "digimon")
         {
             actionList.Add("手札から手元に置く", () => {
                 string[] list = target.name.Split('^');
@@ -639,7 +644,7 @@ public class CardOptionWindow : MonoBehaviour
             });
         }
 
-        if (BattleSceneManager.m_type == "digimon")
+        if (BattleSceneManager.m_type != "bs")
         {
             actionList.Add("手札から" + damageStr + "の上に加える", () => {
                 string[] list = target.name.Split('^');
@@ -768,7 +773,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         });
 
-        if (BattleSceneManager.m_type == "bs")
+        if (BattleSceneManager.m_type != "digimon")
         {
             actionList.Add("フィールドから手元に置く", () => {
                 string[] list = target.name.Split('^');
@@ -777,7 +782,7 @@ public class CardOptionWindow : MonoBehaviour
             });
         }
 
-        if (BattleSceneManager.m_type == "digimon")
+        if (BattleSceneManager.m_type != "bs")
         {
             actionList.Add("フィールドから" + damageStr + "の上に加える", () => {
                 string[] list = target.name.Split('^');
@@ -975,7 +980,7 @@ public class CardOptionWindow : MonoBehaviour
             OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
         });
 
-        if (BattleSceneManager.m_type == "bs")
+        if (BattleSceneManager.m_type != "digimon")
         {
             actionList.Add("除外一覧から手元に置く", () => {
                 string[] list = target.name.Split('^');
@@ -984,7 +989,7 @@ public class CardOptionWindow : MonoBehaviour
             });
         }
 
-        if (BattleSceneManager.m_type == "digimon")
+        if (BattleSceneManager.m_type != "bs")
         {
             actionList.Add("除外一覧から" + damageStr + "の上に加える", () => {
                 string[] list = target.name.Split('^');
@@ -1114,7 +1119,7 @@ public class CardOptionWindow : MonoBehaviour
             OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         });
 
-        if (BattleSceneManager.m_type == "bs")
+        if (BattleSceneManager.m_type != "digimon")
         {
             actionList.Add("トラッシュから手元に置く", () => {
                 string[] list = target.name.Split('^');
@@ -1123,7 +1128,7 @@ public class CardOptionWindow : MonoBehaviour
             });
         }
 
-        if (BattleSceneManager.m_type == "digimon")
+        if (BattleSceneManager.m_type != "bs")
         {
             actionList.Add("トラッシュから" + damageStr + "の上に加える", () => {
                 string[] list = target.name.Split('^');

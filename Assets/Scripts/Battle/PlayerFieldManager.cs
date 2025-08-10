@@ -461,7 +461,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             m_fieldCardManager.SetDeckDetail(OPTION_TYPE.DECK, jsonDeckDetail.cardDetailList);
             m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.DECK);
 
-            if (BattleSceneManager.m_type == "digimon")
+            if (BattleSceneManager.m_type != "bs")
             {
                 m_fieldCardManager.SetDeckDetail(OPTION_TYPE.SUB, jsonDeckDetail.subCardDetailList);
                 m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.SUB);

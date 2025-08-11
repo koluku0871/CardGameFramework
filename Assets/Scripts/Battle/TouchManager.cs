@@ -441,7 +441,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     {
         //if (!m_photonView.IsMine) return;
 
-        if (coll.gameObject.tag != "Card") return;
+        if (coll.gameObject.tag != "Card" && coll.gameObject.tag != "Core") return;
 
         Debug.Log("OnTriggerExit2D : " + coll.gameObject.name);
 
@@ -456,7 +456,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     {
         //if (!m_photonView.IsMine) return;
 
-        if (coll.gameObject.tag != "Card") return;
+        if (coll.gameObject.tag != "Card" && coll.gameObject.tag != "Core") return;
 
         Debug.Log("OnTriggerEnter2D : " + coll.gameObject.name);
 

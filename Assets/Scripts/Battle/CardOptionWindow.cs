@@ -86,6 +86,8 @@ public class CardOptionWindow : MonoBehaviour
                 SetButtonToDigimon();
                 break;
             case "hololive":
+                damageStr = "ライフ";
+                subStr = "エールデッキ";
                 break;
         }
 

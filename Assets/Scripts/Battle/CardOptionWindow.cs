@@ -285,6 +285,12 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         });
 
+        actionList.Add(damageStr + "の上からX枚を" + subStr + "に送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.SUB, true, numButtonTextNum);
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
+            CloseOnSound();
+        });
+
         actionList.Add(damageStr + "の上からX枚をトラッシュに送る", () => {
             var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
@@ -368,6 +374,12 @@ public class CardOptionWindow : MonoBehaviour
         actionList.Add(subStr + "の上からX枚を公開する", () => {
             var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.SUB, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.SUB, cardList);
+            CloseOnSound();
+        });
+
+        actionList.Add(subStr + "の上からX枚を" + damageStr + "に送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.TRASH, true, numButtonTextNum);
+            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         });
 

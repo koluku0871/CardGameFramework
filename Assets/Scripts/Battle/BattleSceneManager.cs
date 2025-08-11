@@ -119,7 +119,10 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             System.Random random = new System.Random();
             coinObj.GetComponent<CoinManager>().SetIsOpen(Convert.ToBoolean(random.Next(0, 2)));
 
-            GameObject costManagerObj = PhotonNetwork.InstantiateRoomObject("Prefab/Battle/CostManager", Vector3.zero, Quaternion.identity);
+            if (m_type == "digimon")
+            {
+                GameObject costManagerObj = PhotonNetwork.InstantiateRoomObject("Prefab/Battle/CostManager", Vector3.zero, Quaternion.identity);
+            }
         }
 
         if (m_playerName == m_playerName1)

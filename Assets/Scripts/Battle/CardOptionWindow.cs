@@ -302,6 +302,15 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         });
 
+        actionList.Add("見ないで" + damageStr + "の上からX枚をトラッシュに送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.TRASH, true, numButtonTextNum);
+            CloseOnSound();
+        });
+        actionList.Add("見ないで" + damageStr + "の上からX枚を除外一覧に送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
+            CloseOnSound();
+        });
+
         subOptionList.Add(OPTION_TYPE.NONE, actionList);
         actionList = new Dictionary<string, UnityAction>();
 
@@ -391,6 +400,15 @@ public class CardOptionWindow : MonoBehaviour
         actionList.Add(subStr + "の上からX枚を除外一覧に送る", () => {
             var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
+            CloseOnSound();
+        });
+
+        actionList.Add("見ないで" + subStr + "の上からX枚をトラッシュに送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.TRASH, true, numButtonTextNum);
+            CloseOnSound();
+        });
+        actionList.Add("見ないで" + subStr + "の上からX枚を除外一覧に送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CloseOnSound();
         });
 
@@ -931,6 +949,11 @@ public class CardOptionWindow : MonoBehaviour
 
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.EXCLUSION, openCardList);
             Close();
+        });
+
+        actionList.Add("見ないで自分の除外一覧の上からX枚をトラッシュに送る", () => {
+            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.TRASH, true, numButtonTextNum);
+            CloseOnSound();
         });
 
         actionList.Add("相手に見せつつ自分の除外一覧を確認する", () => {

@@ -495,20 +495,21 @@ public class DeckManager : MonoBehaviour
         UpdateDeckCardCount();
     }
 
-    private bool IsDuplicateLimit(string tag, string cardId, RectTransform parent) {
-        if (AssetBundleManager.Instance().CardType == "hololive")
+    private bool IsDuplicateLimit(string tag, string cardId, RectTransform parent)
+    {
+        int maxDuplicateCount = ConstManager.DECK_CARD_DUPLICATE_COUNT;
+        switch (AssetBundleManager.Instance().CardType)
         {
-            return false;
+            case "hololive":
+            case "pokemon":
+                return false;
+            case "digimon":
+                maxDuplicateCount = ConstManager.DECK_CARD_DUPLICATE_COUNT + 1;
+                break;
         }
 
         if (ConstManager.DECK_CARD_DUPLICATE_OK_LIST.Contains(cardId)) {
             return false;
-        }
-
-        int maxDuplicateCount = ConstManager.DECK_CARD_DUPLICATE_COUNT;
-        if (AssetBundleManager.Instance().CardType == "digimon")
-        {
-            maxDuplicateCount = ConstManager.DECK_CARD_DUPLICATE_COUNT + 1;
         }
 
         if (ConstManager.DECK_CARD_DUPLICATE_5_NG_LIST.Contains(cardId))

@@ -25,6 +25,7 @@ public class ConstManager
         SOULCORE,
         CORE,
         MARK,
+        DAMAGE,
     }
 
     public enum CorePosType

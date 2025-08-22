@@ -14,18 +14,10 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     private Button m_optionButton = null;
     [SerializeField]
     private Button m_markButton = null;
-
-
     [SerializeField]
-    private Button m_countPlusButton = null;
-    [SerializeField]
-    private Button m_countMinusButton = null;
-
 
     [SerializeField]
-    private Button m_lifePlusButton = null;
-    [SerializeField]
-    private Button m_lifeMinusButton = null;
+    private Button m_damageButton = null;
 
     [SerializeField]
     private Button m_soulPlusButton = null;
@@ -40,13 +32,9 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private Image m_count = null;
     [SerializeField]
-    private Image m_life = null;
+    private Image m_life = null; 
     [SerializeField]
     private Image m_reserve = null;
-    [SerializeField]
-    private Image m_field = null;
-    [SerializeField]
-    private Image m_trash = null;
 
     [SerializeField]
     private RectTransform m_markField = null;
@@ -59,6 +47,24 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 
     [SerializeField]
     private FieldCardManager m_fieldCardManager = null;
+
+    [Header("BS")]
+
+    [SerializeField]
+    private Button m_countPlusButton = null;
+    [SerializeField]
+    private Button m_countMinusButton = null;
+
+    [SerializeField]
+    private Button m_lifePlusButton = null;
+    [SerializeField]
+    private Button m_lifeMinusButton = null;
+
+    [SerializeField]
+    private Image m_field = null;
+    [SerializeField]
+    private Image m_trash = null;
+
 
     private List<GameObject> m_countCoreList = new List<GameObject>();
     private List<GameObject> m_soulCoreList = new List<GameObject>();
@@ -130,6 +136,22 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             });
         }
 
+
+        if (SetActive(m_damageButton, IsMine))
+        {
+            m_damageButton.onClick.AddListener(() => {
+                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
+                core.transform.SetParent(m_coinField);
+                core.transform.localPosition = Vector3.zero;
+                core.transform.localScale = Vector3.one;
+                core.transform.localRotation = Quaternion.identity;
+                core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
+                    core.SetActive(false);
+                });
+                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.DAMAGE;
+            });
+        }
+
         if (SetActive(m_countPlusButton, IsMine) && m_count != null && m_countCoreList != null)
         {
             m_countPlusButton.onClick.AddListener(() => {
@@ -149,6 +171,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
+                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
                 m_countCoreList.Add(core);
             });
         }
@@ -185,6 +208,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
+                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
                 m_coreList.Add(core);
             });
         }
@@ -194,7 +218,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         if (SetActive(m_soulPlusButton, IsMine))
         {
             m_soulPlusButton.onClick.AddListener(() => {
-                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/SoulCore", Vector3.zero, Quaternion.identity);
+                GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
                 core.transform.SetParent(m_coreField);
                 float offset = 10;
                 float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
@@ -211,6 +235,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
+                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.SOULCORE;
                 m_soulCoreList.Add(core);
             });
         }
@@ -247,6 +272,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
+                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
                 m_coreList.Add(core);
             });
         }
@@ -299,13 +325,14 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
+                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
                 m_coreList.Add(core);
             }
         }
 
         for (int index = 0; index < soulCoreNum; index++)
         {
-            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/SoulCore", Vector3.zero, Quaternion.identity);
+            GameObject core = PhotonNetwork.Instantiate("Prefab/Battle/Core", Vector3.zero, Quaternion.identity);
             core.transform.SetParent(m_coreField);
             float offset = 10;
             float sizeX = m_reserve.rectTransform.sizeDelta.x * m_reserve.rectTransform.localScale.x - offset;
@@ -322,6 +349,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     core.SetActive(false);
                 }
             });
+            core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.SOULCORE;
             m_soulCoreList.Add(core);
         }
 
@@ -344,6 +372,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     core.SetActive(false);
                 }
             });
+            core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
             m_coreList.Add(core);
         }
     }

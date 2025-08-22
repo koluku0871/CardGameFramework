@@ -1,11 +1,15 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using static CardOptionWindow;
+using static ConstManager;
 
 public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 {
+    [Header("共通")]
 
     [SerializeField]
     private PhotonView m_photonView = null;
@@ -15,6 +19,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private Button m_markButton = null;
     [SerializeField]
+    private Button m_coinButton = null;
 
     [SerializeField]
     private Button m_damageButton = null;
@@ -44,6 +49,9 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 
     [SerializeField]
     private RectTransform m_coreField = null;
+
+    [SerializeField]
+    private RectTransform m_coinField = null;
 
     [SerializeField]
     private FieldCardManager m_fieldCardManager = null;
@@ -136,6 +144,12 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             });
         }
 
+        if (SetActive(m_coinButton, IsMine))
+        {
+            m_coinButton.onClick.AddListener(() => {
+                BattleSceneManager.Instance().m_coinManager.SetIsOpen(Convert.ToBoolean(new System.Random().Next(0, 2)));
+            });
+        }
 
         if (SetActive(m_damageButton, IsMine))
         {

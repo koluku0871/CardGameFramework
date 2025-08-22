@@ -34,6 +34,19 @@ public class AssetBundleBaseCardData
     public BaseData baseData = new BaseData();
 }
 
+[System.Serializable]
+public class ApiResponseDataToFileList
+{
+    public FileData[] res;
+}
+
+[System.Serializable]
+public class FileData
+{
+    public string url;
+    public string list;
+}
+
 public class AssetBundleManager : MonoBehaviour
 {
     private string m_cardType = "";
@@ -70,6 +83,8 @@ public class AssetBundleManager : MonoBehaviour
             return m_assetBundleCardDataList.Keys.ToList();
         }
     }
+
+    public ApiResponseDataToFileList apiResponseData = null;
 
     private static AssetBundleManager instance = null;
     public static AssetBundleManager Instance()
@@ -122,7 +137,7 @@ public class AssetBundleManager : MonoBehaviour
             yield return null;
         }
 
-        fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
+        /*fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
         var count = fs.Length;
         List<Task> actionList = new List<Task>();
         foreach (string file in fs)
@@ -142,19 +157,19 @@ public class AssetBundleManager : MonoBehaviour
         {
             yield return null;
         }
-        action();
+        action();*/
 
-        /*sequence = new CoroutineSequence(this);
+        sequence = new CoroutineSequence(this);
         fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
         foreach (string file in fs)
         {
-            sequence.Insert(0f, ReadFileToSpriteAtlas(file, logAction));
+            sequence.Insert(0f, ReadFileToSpriteAtlas(file, logAction, () => { }));
         }
 
         sequence.OnCompleted(() => {
             action();
         });
-        sequence.Play();*/
+        sequence.Play();
     }
 
     public IEnumerator ReadFileToTxt(string file, Action<string> logAction)

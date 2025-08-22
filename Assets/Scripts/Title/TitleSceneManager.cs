@@ -215,6 +215,7 @@ public class TitleSceneManager : MonoBehaviour
         }
 
         yield return new WaitUntil(() => apiResponseData != null);
+        AssetBundleManager.Instance().apiResponseData = apiResponseData;
 
         List<string> pathList = new List<string>();
         foreach (var fileData in apiResponseData.res)
@@ -285,15 +286,4 @@ public class TitleSceneManager : MonoBehaviour
     }
 }
 
-[System.Serializable]
-public class ApiResponseDataToFileList
-{
-    public FileData[] res;
-}
 
-[System.Serializable]
-public class FileData
-{
-    public string url;
-    public string list;
-}

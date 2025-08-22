@@ -1,7 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class HomeSceneManager : MonoBehaviour
 {
@@ -34,6 +36,17 @@ public class HomeSceneManager : MonoBehaviour
 
     [SerializeField]
     private UnityEngine.UI.Button m_updateButton = null;
+
+    [Header("リソース再ダウンロード")]
+
+    [SerializeField]
+    private UnityEngine.UI.Toggle m_copyToggle = null;
+
+    [SerializeField]
+    private GameObject m_reDlWindowContent = null;
+
+    [SerializeField]
+    private Dictionary<string, UnityEngine.UI.Toggle> m_reDlWindowToggleList = new Dictionary<string, UnityEngine.UI.Toggle>();
 
     private void Start()
     {
@@ -85,7 +98,7 @@ public class HomeSceneManager : MonoBehaviour
                 text = update
             });
 
-            if (update == Application.version)
+            if (update == UnityEngine.Application.version)
             {
                 selectIndex = index;
             }
@@ -108,12 +121,25 @@ public class HomeSceneManager : MonoBehaviour
             process.StartInfo.FileName = fileName;
             process.Start();
 
-            Application.Quit();
+            UnityEngine.Application.Quit();
         });
 
         m_nameText.text = m_nameInputField.text;
 
-        m_versionText.text = "v " + Application.version;
+        m_versionText.text = "v " + UnityEngine.Application.version;
+
+        foreach (var fileData in AssetBundleManager.Instance().apiResponseData.res)
+        {
+            foreach (var data in fileData.list.Split(","))
+            {
+                UnityEngine.UI.Toggle toggle = Instantiate<UnityEngine.UI.Toggle>(m_copyToggle, m_copyToggle.transform.position, Quaternion.identity);
+                toggle.transform.parent = m_reDlWindowContent.transform;
+                toggle.GetComponent<RectTransform>().localScale = Vector3.one;
+                toggle.transform.Find("Text (TMP)").GetComponent<TMPro.TextMeshProUGUI>().text = data;
+                toggle.gameObject.SetActive(true);
+                m_reDlWindowToggleList.Add(fileData.url + data, toggle);
+            }
+        }
     }
 
     public void OnClickToRoomButton() {
@@ -125,12 +151,58 @@ public class HomeSceneManager : MonoBehaviour
         FadeManager.Instance().OnStart("DeckScene");
     }
 
+    public void OnClickToRestartButton()
+    {
+#if UNITY_EDITOR
+#elif UNITY_STANDALONE_WIN
+        System.Diagnostics.Process.Start(Application.dataPath.Replace("_Data", ".exe"));
+        UnityEngine.Application.Quit();
+#endif
+    }
+
     public void OnClickToCloseButton() {
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #elif UNITY_STANDALONE
-            UnityEngine.Application.Quit();
-        #endif
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_STANDALONE_WIN
+        UnityEngine.Application.Quit();
+#endif
+    }
+
+    private Coroutine reDlCoroutine = null;
+    public void OnClickToReDlButton()
+    {
+        if (reDlCoroutine != null) return; 
+
+        reDlCoroutine = StartCoroutine(ReDlCoroutine());
+    }
+
+    public IEnumerator ReDlCoroutine()
+    {
+        foreach (var reDlWindowToggle in m_reDlWindowToggleList)
+        {
+            if (!reDlWindowToggle.Value.isOn)
+            {
+                continue;
+            }
+
+            var data = reDlWindowToggle.Value.transform.Find("Text (TMP)").GetComponent<TMPro.TextMeshProUGUI>().text;
+            var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
+            if (Path.GetExtension(data) == ".exe")
+            {
+                directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
+            }
+
+            using var fileStream = File.OpenWrite(directoryPath + data);
+            UnityWebRequest req = UnityWebRequest.Get(reDlWindowToggle.Key);
+            yield return req.WriteToStreamAsync(fileStream);
+
+            while (!req.isDone)
+            {
+                yield return new WaitForSeconds(1f);
+            }
+        }
+
+        OnClickToRestartButton();
     }
 
     public void OnClickToOptionCloseButton()

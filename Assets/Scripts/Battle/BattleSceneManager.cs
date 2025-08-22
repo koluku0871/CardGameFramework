@@ -20,6 +20,8 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private CardOptionWindow m_cardOptionWindow = null;
 
+    public CoinManager m_coinManager = null;
+
     private static BattleSceneManager instance = null;
     public static BattleSceneManager Instance()
     {
@@ -116,8 +118,8 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
-            System.Random random = new System.Random();
-            coinObj.GetComponent<CoinManager>().SetIsOpen(Convert.ToBoolean(random.Next(0, 2)));
+            m_coinManager = coinObj.GetComponent<CoinManager>();
+            m_coinManager.SetIsOpen(Convert.ToBoolean(new System.Random().Next(0, 2)));
 
             if (m_type == "digimon")
             {

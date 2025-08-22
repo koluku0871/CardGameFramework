@@ -42,7 +42,9 @@ public class CoinManager : MonoBehaviour, IPunObservable
 
     public void SetIsOpen(bool isOpen)
     {
+        this.gameObject.GetComponent<PhotonView>().RequestOwnership();
         IsOpen = isOpen;
+        this.gameObject.SetActive(true);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

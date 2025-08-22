@@ -1,30 +1,48 @@
 ﻿using Photon.Pun;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static CardOptionWindow;
+using static ConstManager;
 
 public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragHandler, IEndDragHandler, IPunObservable
 {
+    [Header("共通")]
+    
+    [SerializeField]
+    private List<Sprite> m_sprites = new List<Sprite>();
+
+    public ConstManager.PhotonObjectType m_photonObjectType = ConstManager.PhotonObjectType.NONE;
+
+    public ConstManager.PhotonObjectType PhotonObjectType
+    {
+        set
+        {
+            m_photonObjectType = value;
+            if (m_image == null) m_image = gameObject.GetComponent<Image>();
+            if (m_image == null) m_image = gameObject.AddComponent<Image>();
+            var sprite = m_sprites[(int)m_photonObjectType];
+            if (sprite != null) m_image.sprite = sprite;
+
+            m_inputFields.gameObject.SetActive(m_photonObjectType == ConstManager.PhotonObjectType.DAMAGE);
+            if (m_photonView == null) m_photonView = gameObject.GetComponent<PhotonView>();
+            if (m_photonView == null) m_photonView = gameObject.AddComponent<PhotonView>();
+            m_TextMeshPro.gameObject.SetActive(m_photonObjectType == ConstManager.PhotonObjectType.DAMAGE && !m_photonView.IsMine);
+        }
+        get
+        {
+            return m_photonObjectType;
+        }
+    }
+
+    [Header("カード")]
+
     [SerializeField]
     private Text m_openText = null;
 
     [SerializeField]
     private Image m_soulImage = null;
-
-    public ConstManager.PhotonObjectType m_photonObjectType = ConstManager.PhotonObjectType.NONE;
-
-    private PhotonView m_photonView = null;
-    private List<BoxCollider2D> m_boxColliderList = new List<BoxCollider2D>();
-    private Image m_image = null;
-    private EventTrigger m_eventTrigger = null;
-
-    private System.Action pointerEnterAction = null;
-    private System.Action leftClickAction = null;
-    private System.Action rightClickAction = null;
-    private System.Action middleClickAction = null;
 
     [SerializeField]
     public string m_endTagStr = "";
@@ -66,6 +84,25 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             return m_isOverlap;
         }
     }
+
+    [Header("ダメージ")]
+
+    [SerializeField]
+    private TMPro.TMP_InputField m_inputFields = null;
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_TextMeshPro = null;
+
+    private PhotonView m_photonView = null;
+    private List<BoxCollider2D> m_boxColliderList = new List<BoxCollider2D>();
+    private Image m_image = null;
+    private EventTrigger m_eventTrigger = null;
+
+    private System.Action pointerEnterAction = null;
+    private System.Action leftClickAction = null;
+    private System.Action rightClickAction = null;
+    private System.Action middleClickAction = null;
+    
+
     public void AddOoverlapObjectList(GameObject overlapObject)
     {
         if (IsOverlap)
@@ -234,6 +271,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                     break;
                 case ConstManager.PhotonObjectType.CORE:
                 case ConstManager.PhotonObjectType.SOULCORE:
+                case ConstManager.PhotonObjectType.DAMAGE:
                     transform.SetParent(playerFieldManager.GetCoreField());
                     break;
                 case ConstManager.PhotonObjectType.MARK:
@@ -501,26 +539,45 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
         if (m_photonView.Synchronization == ViewSynchronization.Unreliable) m_photonView.Synchronization = ViewSynchronization.UnreliableOnChange;
 
         if (stream.IsWriting)
         {
             //データの送信
-            stream.SendNext(transform.name);
+            stream.SendNext((int)PhotonObjectType);
             stream.SendNext(transform.GetSiblingIndex());
-            stream.SendNext(IsOpen);
-            stream.SendNext(IsSoul);
-            stream.SendNext(IsAwake);
+
+            if (PhotonObjectType == ConstManager.PhotonObjectType.CARD)
+            {
+                stream.SendNext(transform.name);
+                stream.SendNext(IsOpen);
+                stream.SendNext(IsSoul);
+                stream.SendNext(IsAwake);
+            }
+
+            if (PhotonObjectType == ConstManager.PhotonObjectType.DAMAGE)
+            {
+                stream.SendNext(m_inputFields.text);
+            }
         }
         else
         {
             //データの受信
-            transform.name = (string)stream.ReceiveNext();
+            PhotonObjectType = (ConstManager.PhotonObjectType)(int)stream.ReceiveNext();
             transform.SetSiblingIndex((int)stream.ReceiveNext());
-            IsOpen = (bool)stream.ReceiveNext();
-            IsSoul = (bool)stream.ReceiveNext();
-            IsAwake = (bool)stream.ReceiveNext();
+
+            if (PhotonObjectType == ConstManager.PhotonObjectType.CARD)
+            {
+                transform.name = (string)stream.ReceiveNext();
+                IsOpen = (bool)stream.ReceiveNext();
+                IsSoul = (bool)stream.ReceiveNext();
+                IsAwake = (bool)stream.ReceiveNext();
+            }
+
+            if (PhotonObjectType == ConstManager.PhotonObjectType.DAMAGE)
+            {
+                m_TextMeshPro.text = (string)stream.ReceiveNext();
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using WebSocketSharp;
 
 [Serializable]
 public class AssetBundleBase
@@ -102,13 +103,44 @@ public class AssetBundleManager : MonoBehaviour
     {
         bool isCompleted = false;
 
-        var sequence = new CoroutineSequence(this);
-        string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_text_.a*.assetbundle", SearchOption.TopDirectoryOnly);
+        List<string> textAAssetbundleList = new List<string>();
+        List<string> textBAssetbundleList = new List<string>();
+        List<string> spriteatlasAssetbundleList = new List<string>();
+        List<string> audioClipAssetbundleList = new List<string>();
+
+        string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*.assetbundle", SearchOption.TopDirectoryOnly);
         foreach (string file in fs)
+        {
+            if (file.Contains("_text_.a"))
+            {
+                textAAssetbundleList.Add(file);
+                continue;
+            }
+
+            if (file.Contains("_text_.b"))
+            {
+                textBAssetbundleList.Add(file);
+                continue;
+            }
+
+            if (file.Contains("_spriteatlas_"))
+            {
+                spriteatlasAssetbundleList.Add(file);
+                continue;
+            }
+
+            if (file.Contains(".bgm") || file.Contains(".se"))
+            {
+                audioClipAssetbundleList.Add(file);
+                continue;
+            }
+        }
+
+        var sequence = new CoroutineSequence(this);
+        foreach (string file in textAAssetbundleList)
         {
             sequence.Insert(0f, ReadFileToTxt(file, logAction));
         }
-
         sequence.OnCompleted(() => {
             isCompleted = true;
         });
@@ -120,13 +152,11 @@ public class AssetBundleManager : MonoBehaviour
         }
 
         isCompleted = false;
-
-        fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_text_.b*.assetbundle", SearchOption.TopDirectoryOnly);
-        foreach (string file in fs)
+        sequence = new CoroutineSequence(this);
+        foreach (string file in textBAssetbundleList)
         {
             sequence.Insert(0f, ReadFileAddTxt(file, logAction));
         }
-
         sequence.OnCompleted(() => {
             isCompleted = true;
         });
@@ -159,17 +189,39 @@ public class AssetBundleManager : MonoBehaviour
         }
         action();*/
 
+        isCompleted = false;
         sequence = new CoroutineSequence(this);
-        fs = System.IO.Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*_spriteatlas_.*.assetbundle", System.IO.SearchOption.TopDirectoryOnly);
-        foreach (string file in fs)
+        foreach (string file in audioClipAssetbundleList)
+        {
+            sequence.Insert(0f, ReadFileToAudio(file, logAction, () => { }));
+        }
+        sequence.OnCompleted(() => {
+            isCompleted = true;
+        });
+        sequence.Play();
+
+        while (!isCompleted)
+        {
+            yield return null;
+        }
+
+        isCompleted = false;
+        sequence = new CoroutineSequence(this);
+        foreach (string file in spriteatlasAssetbundleList)
         {
             sequence.Insert(0f, ReadFileToSpriteAtlas(file, logAction, () => { }));
         }
-
         sequence.OnCompleted(() => {
-            action();
+            isCompleted = true;
         });
         sequence.Play();
+
+        while (!isCompleted)
+        {
+            yield return null;
+        }
+
+        action();
     }
 
     public IEnumerator ReadFileToTxt(string file, Action<string> logAction)
@@ -304,6 +356,65 @@ public class AssetBundleManager : MonoBehaviour
         }
 
         if (action != null) action();
+    }
+
+    public IEnumerator ReadFileToAudio(string file, Action<string> logAction, Action action)
+    {
+        AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
+        var request = assetBundle.LoadAllAssetsAsync();
+
+        while (!request.isDone)
+        {
+            yield return null;
+        }
+
+        logAction("ReadFilePath : " + file + "\n");
+
+        SortedDictionary<int, AudioClip> audioClipList = new SortedDictionary<int, AudioClip>();
+        foreach (var asset in request.allAssets)
+        {
+            if (asset.GetType() != typeof(AudioClip))
+            {
+                continue;
+            }
+            var audioClip = (AudioClip)asset;
+            Debug.Log("Asset : " + audioClip.name + " length : " + audioClip.length);
+
+            int index = -1;
+            if (audioClip.name.Contains("battle"))
+            {
+                index = 0;
+            }
+            else if (audioClip.name.Contains("home"))
+            {
+                index = 1;
+            }
+            else if (audioClip.name.Contains("deck"))
+            {
+                index = 2;
+            }
+            if (audioClip.name.Contains("draw"))
+            {
+                index = 0;
+            }
+            else if (audioClip.name.Contains("shuffle"))
+            {
+                index = 1;
+            }
+
+            audioClipList.Add(index, audioClip);
+        }
+
+        if (file.Contains(".bgm"))
+        {
+            AudioSourceManager.Instance().m_soundBgmList.Clear();
+            AudioSourceManager.Instance().m_soundBgmList.AddRange(audioClipList.Values);
+        }
+        else if (file.Contains(".se"))
+        {
+            AudioSourceManager.Instance().m_soundSeList.Clear();
+            AudioSourceManager.Instance().m_soundSeList.AddRange(audioClipList.Values);
+        }
     }
 
     public Sprite GetCardSprite(string key, string name)

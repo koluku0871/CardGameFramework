@@ -62,15 +62,16 @@ public class TitleSceneManager : MonoBehaviour
             Instantiate(m_audioManager);
         }
 
+        if (MouseManager.Instance() == null)
+        {
+            Instantiate(m_mouseManager);
+        }
+
         if (AssetBundleManager.Instance() == null)
         {
             Instantiate(m_assetBundleManager);
         }
 
-        if (MouseManager.Instance() == null)
-        {
-            Instantiate(m_mouseManager);
-        }
         string path = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
         if (!Directory.Exists(path))
         {

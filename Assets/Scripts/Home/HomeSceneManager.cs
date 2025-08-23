@@ -133,7 +133,7 @@ public class HomeSceneManager : MonoBehaviour
             foreach (var data in fileData.list.Split(","))
             {
                 UnityEngine.UI.Toggle toggle = Instantiate<UnityEngine.UI.Toggle>(m_copyToggle, m_copyToggle.transform.position, Quaternion.identity);
-                toggle.transform.parent = m_reDlWindowContent.transform;
+                toggle.transform.SetParent(m_reDlWindowContent.transform);
                 toggle.GetComponent<RectTransform>().localScale = Vector3.one;
                 toggle.transform.Find("Text (TMP)").GetComponent<TMPro.TextMeshProUGUI>().text = data;
                 toggle.gameObject.SetActive(true);

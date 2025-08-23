@@ -11,10 +11,10 @@ public class AudioSourceManager : MonoBehaviour
     private AudioSource m_audioSourceSe = null;
 
     [SerializeField]
-    private List<AudioClip> m_soundBgmList = new List<AudioClip>();
+    public List<AudioClip> m_soundBgmList = new List<AudioClip>();
 
     [SerializeField]
-    private List<AudioClip> m_soundSeList = new List<AudioClip>();
+    public List<AudioClip> m_soundSeList = new List<AudioClip>();
 
     public enum BGM_NUM : int
     {

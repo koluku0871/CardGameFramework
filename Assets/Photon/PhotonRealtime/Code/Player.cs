@@ -10,6 +10,7 @@
 // <author>developer@photonengine.com</author>
 // ----------------------------------------------------------------------------
 
+
 #if UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
@@ -117,7 +118,7 @@ namespace Photon.Realtime
             }
         }
 
-        /// <summary>If this player is active in the room (and getting events which are currently being sent).</summary>
+        /// <summary>If this player in the room is currently inactive (not being connected and not getting "live" events).</summary>
         /// <remarks>
         /// Inactive players keep their spot in a room but otherwise behave as if offline (no matter what their actual connection status is).
         /// The room needs a PlayerTTL != 0. If a player is inactive for longer than PlayerTTL, the server will remove this player from the room.
@@ -250,35 +251,21 @@ namespace Photon.Realtime
             {
                 return;
             }
-
-            if (properties.ContainsKey(ActorProperties.PlayerName))
+            
+            // only remote player instances update their NickName from the properties
+            if (!this.IsLocal && properties.ContainsKey(ActorProperties.PlayerName))
             {
                 string nameInServersProperties = (string)properties[ActorProperties.PlayerName];
-                if (nameInServersProperties != null)
-                {
-                    if (this.IsLocal)
-                    {
-                        // the local playername is different than in the properties coming from the server
-                        // so the local nickName was changed and the server is outdated -> update server
-                        // update property instead of using the outdated nickName coming from server
-                        if (!nameInServersProperties.Equals(this.nickName))
-                        {
-                            this.SetPlayerNameProperty();
-                        }
-                    }
-                    else
-                    {
-                        this.NickName = nameInServersProperties;
-                    }
-                }
+                this.NickName = nameInServersProperties;
             }
+
             if (properties.ContainsKey(ActorProperties.UserId))
             {
                 this.UserId = (string)properties[ActorProperties.UserId];
             }
             if (properties.ContainsKey(ActorProperties.IsInactive))
             {
-                this.IsInactive = (bool)properties[ActorProperties.IsInactive]; //TURNBASED new well-known propery for players
+                this.IsInactive = (bool)properties[ActorProperties.IsInactive]; //TURNBASED new well-known property for players
             }
 
             this.CustomProperties.MergeStringKeys(properties);
@@ -435,6 +422,25 @@ namespace Photon.Realtime
             return false;
         }
 
+
+        /// <summary>If there is a nickname in the room props, but it's not the current (local) one, update the room when joining/joined.</summary>
+        internal bool UpdateNickNameOnJoined()
+        {
+            if (this.RoomReference == null || this.RoomReference.CustomProperties == null || !this.IsLocal)
+            {
+                return false;
+            }
+
+            bool found = this.RoomReference.CustomProperties.ContainsKey(ActorProperties.PlayerName);
+            string nickFromProps = found ? this.RoomReference.CustomProperties[ActorProperties.PlayerName] as string : string.Empty;
+
+            if (!string.Equals(this.NickName, nickFromProps))
+            {
+                return this.SetPlayerNameProperty();
+            }
+
+            return true;
+        }
 
         /// <summary>Uses OpSetPropertiesOfActor to sync this player's NickName (server is being updated with this.NickName).</summary>
         private bool SetPlayerNameProperty()

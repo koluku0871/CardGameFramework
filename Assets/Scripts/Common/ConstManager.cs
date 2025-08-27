@@ -476,7 +476,7 @@ public class ConstManager
     };
 
     // 一つのデッキに入れられる同カード枚数
-    public const int DECK_CARD_DUPLICATE_COUNT = 3;
+    public const int DECK_CARD_DUPLICATE_COUNT = 4;
 
     public const int DECK_CARD_MIN_COUNT = 40;
 }

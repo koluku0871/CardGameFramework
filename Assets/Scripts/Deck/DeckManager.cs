@@ -504,7 +504,6 @@ public class DeckManager : MonoBehaviour
             case "pokemon":
                 return false;
             case "digimon":
-                maxDuplicateCount = ConstManager.DECK_CARD_DUPLICATE_COUNT + 1;
                 break;
         }
 

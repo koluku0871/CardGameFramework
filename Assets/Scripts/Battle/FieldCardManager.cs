@@ -180,56 +180,62 @@ public class FieldCardManager : MonoBehaviour
             GetOrAddComponentToEventTrigger(m_deckCard.gameObject, entry);
 
             // マウスクリック
-            entry = new EventTrigger.Entry();
-            entry.eventID = EventTriggerType.PointerClick;
-            entry.callback.AddListener((pointerEventData) => {
-                bool isPointerEvent = pointerEventData is PointerEventData;
-                if (!isPointerEvent)
-                {
-                    return;
-                }
+            if (m_damageCard != null)
+            {
+                entry = new EventTrigger.Entry();
+                entry.eventID = EventTriggerType.PointerClick;
+                entry.callback.AddListener((pointerEventData) => {
+                    bool isPointerEvent = pointerEventData is PointerEventData;
+                    if (!isPointerEvent)
+                    {
+                        return;
+                    }
 
-                switch ((pointerEventData as PointerEventData).pointerId)
-                {
-                    case -1:
-                        Debug.Log("Left Click");
-                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DAMAGE);
-                        break;
-                    case -2:
-                        Debug.Log("Right Click");
-                        break;
-                    case -3:
-                        Debug.Log("Middle Click");
-                        break;
-                }
-            });
-            GetOrAddComponentToEventTrigger(m_damageCard.gameObject, entry);
+                    switch ((pointerEventData as PointerEventData).pointerId)
+                    {
+                        case -1:
+                            Debug.Log("Left Click");
+                            CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DAMAGE);
+                            break;
+                        case -2:
+                            Debug.Log("Right Click");
+                            break;
+                        case -3:
+                            Debug.Log("Middle Click");
+                            break;
+                    }
+                });
+                GetOrAddComponentToEventTrigger(m_damageCard.gameObject, entry);
+            }
 
             // マウスクリック
-            entry = new EventTrigger.Entry();
-            entry.eventID = EventTriggerType.PointerClick;
-            entry.callback.AddListener((pointerEventData) => {
-                bool isPointerEvent = pointerEventData is PointerEventData;
-                if (!isPointerEvent)
-                {
-                    return;
-                }
+            if (m_subCard != null)
+            {
+                entry = new EventTrigger.Entry();
+                entry.eventID = EventTriggerType.PointerClick;
+                entry.callback.AddListener((pointerEventData) => {
+                    bool isPointerEvent = pointerEventData is PointerEventData;
+                    if (!isPointerEvent)
+                    {
+                        return;
+                    }
 
-                switch ((pointerEventData as PointerEventData).pointerId)
-                {
-                    case -1:
-                        Debug.Log("Left Click");
-                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.SUB);
-                        break;
-                    case -2:
-                        Debug.Log("Right Click");
-                        break;
-                    case -3:
-                        Debug.Log("Middle Click");
-                        break;
-                }
-            });
-            GetOrAddComponentToEventTrigger(m_subCard.gameObject, entry);
+                    switch ((pointerEventData as PointerEventData).pointerId)
+                    {
+                        case -1:
+                            Debug.Log("Left Click");
+                            CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.SUB);
+                            break;
+                        case -2:
+                            Debug.Log("Right Click");
+                            break;
+                        case -3:
+                            Debug.Log("Middle Click");
+                            break;
+                    }
+                });
+                GetOrAddComponentToEventTrigger(m_subCard.gameObject, entry);
+            }
         }
 
         if (isActive)
@@ -407,11 +413,17 @@ public class FieldCardManager : MonoBehaviour
                 break;
             case OPTION_TYPE.DAMAGE:
                 m_damageDetailList = deckDetailList;
-                m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                if (m_damageCardCountText != null)
+                {
+                    m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                }
                 break;
             case OPTION_TYPE.SUB:
                 m_subDetailList = deckDetailList;
-                m_subCardCountText.text = m_subDetailList.Count.ToString();
+                if (m_subCardCountText != null)
+                {
+                    m_subCardCountText.text = m_subDetailList.Count.ToString();
+                }
                 break;
             case OPTION_TYPE.TOKEN:
                 m_aceDetailList = deckDetailList;
@@ -523,7 +535,10 @@ public class FieldCardManager : MonoBehaviour
                 }
                 cardDetailList = m_damageDetailList.GetRange(index, count);
                 m_damageDetailList.RemoveRange(index, count);
-                m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                if (m_damageCardCountText != null)
+                {
+                    m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                }
                 break;
             case CardOptionWindow.OPTION_TYPE.SUB:
                 if (!isUp)
@@ -532,7 +547,10 @@ public class FieldCardManager : MonoBehaviour
                 }
                 cardDetailList = m_subDetailList.GetRange(index, count);
                 m_subDetailList.RemoveRange(index, count);
-                m_subCardCountText.text = m_subDetailList.Count.ToString();
+                if (m_subCardCountText != null)
+                {
+                    m_subCardCountText.text = m_subDetailList.Count.ToString();
+                }
                 break;
         }
         AddCardDetailList(optionDst, cardDetailList);
@@ -629,7 +647,10 @@ public class FieldCardManager : MonoBehaviour
                     index = m_damageDetailList.Count;
                 }
                 m_damageDetailList.Insert(index, cardDetail);
-                m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                if (m_damageCardCountText != null)
+                {
+                    m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                }
                 break;
             case CardOptionWindow.OPTION_TYPE.SUB:
                 if (!isUp)
@@ -637,7 +658,10 @@ public class FieldCardManager : MonoBehaviour
                     index = m_subDetailList.Count;
                 }
                 m_subDetailList.Insert(index, cardDetail);
-                m_subCardCountText.text = m_subDetailList.Count.ToString();
+                if (m_subCardCountText != null)
+                {
+                    m_subCardCountText.text = m_subDetailList.Count.ToString();
+                }
                 break;
         }
     }
@@ -696,14 +720,20 @@ public class FieldCardManager : MonoBehaviour
                 foreach (var cardDetail in cardDetailList)
                 {
                     m_damageDetailList.Add(cardDetail);
-                    m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                    if (m_damageCardCountText != null)
+                    {
+                        m_damageCardCountText.text = m_damageDetailList.Count.ToString();
+                    }
                 }
                 break;
             case CardOptionWindow.OPTION_TYPE.SUB:
                 foreach (var cardDetail in cardDetailList)
                 {
                     m_subDetailList.Add(cardDetail);
-                    m_subCardCountText.text = m_subDetailList.Count.ToString();
+                    if (m_subCardCountText != null)
+                    {
+                        m_subCardCountText.text = m_subDetailList.Count.ToString();
+                    }
                 }
                 break;
         }
@@ -774,7 +804,10 @@ public class FieldCardManager : MonoBehaviour
                     break;
                 }
                 count = m_damageDetailList.Count;
-                m_damageCardCountText.text = count.ToString();
+                if (m_damageCardCountText != null)
+                {
+                    m_damageCardCountText.text = count.ToString();
+                }
                 if (count <= 0) { }
                 break;
             case OPTION_TYPE.SUB:
@@ -789,7 +822,10 @@ public class FieldCardManager : MonoBehaviour
                     break;
                 }
                 count = m_subDetailList.Count;
-                m_subCardCountText.text = count.ToString();
+                if (m_subCardCountText != null)
+                {
+                    m_subCardCountText.text = count.ToString();
+                }
                 if (count <= 0) { }
                 break;
         }

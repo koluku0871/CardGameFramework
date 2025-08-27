@@ -22,13 +22,22 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             m_photonObjectType = value;
             if (m_image == null) m_image = gameObject.GetComponent<Image>();
             if (m_image == null) m_image = gameObject.AddComponent<Image>();
-            var sprite = m_sprites[(int)m_photonObjectType];
-            if (sprite != null) m_image.sprite = sprite;
+            if (m_photonObjectType != PhotonObjectType.CARD)
+            {
+                var sprite = m_sprites[(int)m_photonObjectType];
+                if (sprite != null) m_image.sprite = sprite;
+            }
 
-            m_inputFields.gameObject.SetActive(m_photonObjectType == ConstManager.PhotonObjectType.DAMAGE);
+            if (m_inputFields != null)
+            {
+                m_inputFields.gameObject.SetActive(m_photonObjectType == ConstManager.PhotonObjectType.DAMAGE);
+            }
             if (m_photonView == null) m_photonView = gameObject.GetComponent<PhotonView>();
             if (m_photonView == null) m_photonView = gameObject.AddComponent<PhotonView>();
-            m_TextMeshPro.gameObject.SetActive(m_photonObjectType == ConstManager.PhotonObjectType.DAMAGE && !m_photonView.IsMine);
+            if (m_TextMeshPro != null)
+            {
+                m_TextMeshPro.gameObject.SetActive(m_photonObjectType == ConstManager.PhotonObjectType.DAMAGE && !m_photonView.IsMine);
+            }
         }
         get
         {

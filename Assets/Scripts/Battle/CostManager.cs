@@ -15,11 +15,9 @@ public class CostManager : MonoBehaviour, IPunObservable
         transform.SetParent(panel.transform);
         transform.localPosition = Vector3.zero;
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-            this.transform.localRotation = Quaternion.identity;
-        }
-        else
+        this.transform.localRotation = Quaternion.identity;
+
+        if (!PhotonNetwork.IsMasterClient && BattleSceneManager.IsPlayer)
         {
             this.transform.localRotation = Quaternion.Euler(0, 0, 180);
         }

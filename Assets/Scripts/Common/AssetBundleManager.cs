@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using WebSocketSharp;
 
 [Serializable]
 public class AssetBundleBase

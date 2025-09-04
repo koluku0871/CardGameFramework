@@ -742,6 +742,7 @@ MonoBehaviour:
   m_lifeMinusButton: {fileID: 2645075361853671915}
   m_field: {fileID: 8183000997505196013}
   m_trash: {fileID: 7028142124934573757}
+  m_logList: []
 --- !u!114 &6186015901845612012
 MonoBehaviour:
   m_ObjectHideFlags: 0

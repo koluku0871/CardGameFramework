@@ -1,11 +1,14 @@
-﻿using Photon.Pun;
+﻿using NUnit.Framework;
+using Photon.Pun;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using static CardOptionWindow;
 using static ConstManager;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -597,6 +600,18 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         return cardImage;
     }
 
+    public void AddLogList(string log)
+    {
+        var logText = TimeUtil.GetUnixTime(DateTime.Now).ToString() + "," + BattleSceneManager.m_playerName + " --> " + log;
+        Debug.Log(logText);
+        m_logList.Add(logText);
+    }
+
+    public List<string> GetLogList()
+    {
+        return m_logList;
+    }
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -605,6 +620,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             if (m_fieldCardManager != null)
             {
                 stream.SendNext(m_fieldCardManager.GetFieldCardManagerDataJson());
+                stream.SendNext(string.Join("#", m_logList));
             }
         }
         else
@@ -613,6 +629,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             if (m_fieldCardManager != null)
             {
                 m_fieldCardManager.SetFieldCardManagerDataJson((string)stream.ReceiveNext());
+                m_logList.Clear();
+                m_logList.AddRange(((string)stream.ReceiveNext()).Split("#").ToList());
             }
         }
     }

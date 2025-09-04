@@ -1,6 +1,7 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -18,9 +19,17 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     private Text m_playerName2Text = null;
 
     [SerializeField]
+    private ScrollRect m_scrollRect = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_logText = null;
+
+    [SerializeField]
     private CardOptionWindow m_cardOptionWindow = null;
 
     public CoinManager m_coinManager = null;
+
+    public List<string> m_logList = new List<string>();
 
     private static BattleSceneManager instance = null;
     public static BattleSceneManager Instance()
@@ -51,6 +60,8 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     public void Awake()
     {
         instance = this;
+
+        m_logList = new List<string>();
 
         AudioSourceManager.Instance().PlayOneShot((int)AudioSourceManager.BGM_NUM.BATTLE_1, true);
 
@@ -86,6 +97,57 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         }
 
         SetUi();
+    }
+
+    public List<PlayerFieldManager> m_fieldManagerList = new List<PlayerFieldManager>();
+    SortedDictionary<long, string> m_sortLogList = new SortedDictionary<long, string>();
+
+    public void Update()
+    {
+        if (m_fieldManagerList.Count < 2)
+        {
+            GameObject[] playFieldList = GameObject.FindGameObjectsWithTag("PlayField");
+            foreach (var playFieldObj in playFieldList)
+            {
+                PlayerFieldManager fieldManager = playFieldObj.GetComponent<PlayerFieldManager>();
+                if (fieldManager == null || m_fieldManagerList.Contains(fieldManager))
+                {
+                    continue;
+                }
+                m_fieldManagerList.Add(fieldManager);
+                break;
+            }
+        }
+        else
+        {
+            bool isAdd = false;
+            foreach (var fieldManager in m_fieldManagerList)
+            {
+                foreach (var log in fieldManager.GetLogList())
+                {
+                    if (string.IsNullOrEmpty(log))
+                    {
+                        continue;
+                    }
+
+                    var item = log.Split(',');
+                    var key = long.Parse(item[0]);
+                    if (m_sortLogList.ContainsKey(key))
+                    {
+                        continue;
+                    }
+                    isAdd = true;
+                    m_sortLogList.Add(key, item[1]);
+                }
+            }
+
+            if (isAdd)
+            {
+                Debug.Log(string.Join("\n", m_sortLogList.Values));
+                m_logText.text = string.Join("\n", m_sortLogList.Values);
+                m_scrollRect.verticalNormalizedPosition = 0f;
+            }
+        }
     }
 
     public override void OnLeftRoom()
@@ -252,10 +314,5 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     public static bool IsPlayerName1(string playerName)
     {
         return playerName == m_playerName1;
-    }
-
-    [PunRPC]
-    public void MoveBattleScene()
-    {
     }
 }

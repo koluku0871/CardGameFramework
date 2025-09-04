@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,11 @@ public class HomeSceneManager : MonoBehaviour
 
     [SerializeField]
     private TMPro.TextMeshProUGUI m_versionText = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_fpsText = null;
+
+    [Header("オプションメニュー")]
 
     [SerializeField]
     private TMPro.TMP_InputField m_nameInputField = null;
@@ -47,6 +53,9 @@ public class HomeSceneManager : MonoBehaviour
 
     [SerializeField]
     private Dictionary<string, UnityEngine.UI.Toggle> m_reDlWindowToggleList = new Dictionary<string, UnityEngine.UI.Toggle>();
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_reDlTextContent = null;
 
     private void Start()
     {
@@ -127,7 +136,18 @@ public class HomeSceneManager : MonoBehaviour
         m_nameText.text = m_nameInputField.text;
 
         m_versionText.text = "v " + UnityEngine.Application.version;
+        m_reDlTextContent.text = "";
 
+        StartCoroutine(DrawAssetBundleText(() => { }));
+    }
+
+    public void Update()
+    {
+        m_fpsText.text = $"Update : {((float)(1.0f / Time.deltaTime)).ToString().PadLeft(8, '0')}fps, {((float)(Time.deltaTime * 1000.0f)).ToString().PadLeft(10, '0')}ms";
+    }
+
+    public IEnumerator DrawAssetBundleText(Action action)
+    {
         foreach (var fileData in AssetBundleManager.Instance().apiResponseData.res)
         {
             foreach (var data in fileData.list.Split(","))
@@ -138,8 +158,48 @@ public class HomeSceneManager : MonoBehaviour
                 toggle.transform.Find("Text (TMP)").GetComponent<TMPro.TextMeshProUGUI>().text = data;
                 toggle.gameObject.SetActive(true);
                 m_reDlWindowToggleList.Add(fileData.url + data, toggle);
+
+                string key = Path.GetFileNameWithoutExtension(data);
+                string type = key.Split('_')[0];
+                string subtype = "";
+                if (key.Split('_').Length > 1)
+                {
+                    subtype = key.Split('_')[1];
+                }
+
+                if (subtype == "spriteatlas")
+                {
+                    //m_reDlTextContent.text += " --(spriteAtlas)--> ";
+                    //m_reDlTextContent.text += AssetBundleManager.Instance().m_assetBundleCardDataList[type].assetBundleSpriteList[key].spriteAtlas.name + "\n";
+                }
+                else if (subtype == "text")
+                {
+                    m_reDlTextContent.text += "■ " + data + "\n";
+                    //m_reDlTextContent.text += " --(textAsset)--> ";
+                    List<string> packDatas = new List<string>();
+                    foreach (var item in AssetBundleManager.Instance().m_assetBundleCardDataList[type].assetBundleTextList[key].textAssetList)
+                    {
+                        CardData cardData = null;
+                        cardData = new CardData(JsonUtility.FromJson<CardDataFromJson>(item.text));
+                        if (packDatas.Contains(cardData.PackNo))
+                        {
+                            continue;
+                        }
+                        packDatas.Add(cardData.PackNo);
+                        m_reDlTextContent.text += cardData.PackNo + ",";
+                    }
+                    m_reDlTextContent.text += "\n" + AssetBundleManager.Instance().m_assetBundleCardDataList[type].assetBundleTextList[key].textAssetList.Count;
+                    m_reDlTextContent.text += "\n";
+
+                    yield return null;
+                }
+                else if (key.Contains(".bgm") || key.Contains(".se"))
+                {
+                }
             }
         }
+
+        action();
     }
 
     public void OnClickToRoomButton() {

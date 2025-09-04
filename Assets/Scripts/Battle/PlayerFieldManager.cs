@@ -81,6 +81,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     private List<GameObject> m_soulCoreList = new List<GameObject>();
     private List<GameObject> m_coreList = new List<GameObject>();
 
+    public List<string> m_logList = new List<string>();
+
     private ExitGames.Client.Photon.Hashtable m_customRoomProperties = new ExitGames.Client.Photon.Hashtable();
 
     private static PlayerFieldManager instance = null;
@@ -566,7 +568,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         m_plusButton.onClick.Invoke();
     }
 
-    public Image CreateCard(string name)
+    public Image CreateCard(string name, bool isOpen = true)
     {
         string[] list = name.Split('^');
         var cardId = list[1];
@@ -597,6 +599,11 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             });
         cardImage.name = name;
         cardImage.gameObject.SetActive(true);
+        TouchManager touchManager = card.GetComponent<TouchManager>();
+        if (touchManager != null)
+        {
+            touchManager.SetIsOpen(isOpen);
+        }
         return cardImage;
     }
 

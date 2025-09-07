@@ -40,7 +40,7 @@ public class MouseManager : MonoBehaviour
 
         clickCount++;
 
-        coroutine = StartCoroutine(DelayMethod(0.2f, action));
+        coroutine = StartCoroutine(DelayMethod(0.25f, action));
     }
 
     private IEnumerator DelayMethod(float waitTime, Action<int, bool> action)

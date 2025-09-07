@@ -869,7 +869,8 @@ public class FieldCardManager : MonoBehaviour
         Transform parent = null,
         Action<Image, string, string, bool> leftClickAction = null,
         Action<Image, string, string, bool> rightClickAction = null,
-        Action<Image, string, string, bool> middleClickAction = null)
+        Action<Image, string, string, bool> middleClickAction = null
+        )
     {
         string tag = cardDetail.tag;
         string fileName = cardDetail.cardId;

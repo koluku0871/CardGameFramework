@@ -1,14 +1,11 @@
-﻿using NUnit.Framework;
-using Photon.Pun;
+﻿using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using static CardOptionWindow;
 using static ConstManager;
-using static UnityEngine.GraphicsBuffer;
 
 public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -594,7 +591,14 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 TouchManager touchManager = target.GetComponent<TouchManager>();
                 if (touchManager != null)
                 {
-                    touchManager.IsOverlap = !touchManager.IsOverlap;
+                    if (isDoubleClick)
+                    {
+                        touchManager.IsInner = !touchManager.IsInner;
+                    }
+                    else
+                    {
+                        touchManager.IsOverlap = !touchManager.IsOverlap;
+                    }
                 }
             });
         cardImage.name = name;

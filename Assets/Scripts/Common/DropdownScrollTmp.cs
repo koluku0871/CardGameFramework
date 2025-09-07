@@ -12,8 +12,23 @@ public class DropdownScrollTmp : MonoBehaviour
 
     public void Start()
     {
-        var dropdown = GetComponentInParent<Dropdown>();
-        if (dropdown != null)
+        int index = -1;
+        TMPro.TMP_Dropdown tmpDropdown = GetComponentInParent<TMPro.TMP_Dropdown>();
+        if (tmpDropdown != null)
+        {
+            index = tmpDropdown.value;
+        }
+
+        if (index > 0)
+        {
+            Dropdown dropdown = GetComponentInParent<Dropdown>();
+            if (dropdown != null)
+            {
+                index = dropdown.value;
+            }
+        }
+
+        if (index > 0)
         {
             var viewport = this.transform.Find("Viewport").GetComponent<RectTransform>();
             var contentArea = this.transform.Find("Viewport/Content").GetComponent<RectTransform>();
@@ -22,7 +37,7 @@ public class DropdownScrollTmp : MonoBehaviour
             // Viewportに対するContentのスクロール位置を求める
             var areaHeight = contentArea.rect.height - viewport.rect.height;
             var cellHeight = contentItem.rect.height;
-            var scrollRatio = (cellHeight * dropdown.value) / areaHeight;
+            var scrollRatio = (cellHeight * index) / areaHeight;
             sr.verticalNormalizedPosition = 1.0f - Mathf.Clamp(scrollRatio, 0.0f, 1.0f);
         }
     }

@@ -29,6 +29,9 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
     public CoinManager m_coinManager = null;
 
+    [SerializeField]
+    private TMPro.TMP_Dropdown m_optionDropdown = null;
+
     public List<string> m_logList = new List<string>();
 
     private static BattleSceneManager instance = null;
@@ -286,6 +289,28 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
             m_cardOptionWindow.transform.SetAsLastSibling();
         }
+
+        m_optionDropdown.options.Clear();
+        foreach (var type in Enum.GetValues(typeof(CardOptionWindow.OPTION_TYPE)))
+        {
+            string name = Enum.GetName(typeof(CardOptionWindow.OPTION_TYPE), type);
+
+            m_optionDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+            {
+                text = name
+            });
+        }
+        m_optionDropdown.onValueChanged.AddListener((_) => {
+            string name = m_optionDropdown.options[m_optionDropdown.value].text;
+            foreach (CardOptionWindow.OPTION_TYPE type in Enum.GetValues(typeof(CardOptionWindow.OPTION_TYPE)))
+            {
+                if (name != Enum.GetName(typeof(CardOptionWindow.OPTION_TYPE), type))
+                {
+                    continue;
+                }
+                CardOptionWindow.Instance().innerListFromType = type;
+            }
+        });
     }
 
     public void OnClickToCloseButton()

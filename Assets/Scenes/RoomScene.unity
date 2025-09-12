@@ -6079,7 +6079,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomAnimManager: {fileID: 1256053911}
-  m_photonView: {fileID: 1256053908}
   m_closeButton: {fileID: 936910208}
   m_roomTitleText: {fileID: 1098052908}
   m_messageText: {fileID: 112859960}

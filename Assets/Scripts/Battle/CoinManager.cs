@@ -21,6 +21,7 @@ public class CoinManager : MonoBehaviour, IPunObservable
             {
                 m_openText.text = "2P";
             }
+            PlayerFieldManager.Instance().AddLogList("先行は" + m_openText.text);
         }
         get
         {

@@ -351,8 +351,12 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                         }
                         else
                         {
+                            string[] list = this.gameObject.name.Split('^');
                             m_innerCardDetailList.RemoveAt(index);
-                            m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = "", cardId = "" });
+                            m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
+                            this.gameObject.name = target.gameObject.name;
+                            list = this.gameObject.name.Split('^');
+                            this.gameObject.GetComponent<Image>().sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
                         }
                         
                         SetInnerCardDetailList(string.Join("#", m_innerCardDetailList.Select(x => x.ToString())));

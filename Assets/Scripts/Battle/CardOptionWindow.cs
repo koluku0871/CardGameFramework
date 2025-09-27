@@ -588,6 +588,56 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE optionType = OPTION_TYPE.FIELD;
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
+        detailOptionType = OPTION_TYPE.FIELD_ROT;
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを開く", () => {
+            TouchManager touchManager = target.GetComponent<TouchManager>();
+            if (touchManager != null)
+            {
+                touchManager.SetIsOpen(true);
+            }
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを閉じる", () => {
+            TouchManager touchManager = target.GetComponent<TouchManager>();
+            if (touchManager != null)
+            {
+                touchManager.SetIsOpen(false);
+            }
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードをスタンドさせる", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().SetCardToStand(target);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを疲労させる", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().SetCardToRest(target);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを重疲労させる", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().SetCardToDualRest(target);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを裏返す", () => {
+            TouchManager touchManager = target.GetComponent<TouchManager>();
+            if (touchManager != null)
+            {
+                touchManager.SetIsAwake(!touchManager.IsAwake);
+            }
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを魂状態を入れ替える", () => {
+            TouchManager touchManager = target.GetComponent<TouchManager>();
+            if (touchManager != null)
+            {
+                touchManager.SetIsSoul(!touchManager.IsSoul);
+            }
+            CloseOnSound();
+        }));
+
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "フィールドからデッキの上に戻す", () => {
             TouchManager touchManager = target.GetComponent<TouchManager>();
             if (touchManager != null)
@@ -725,56 +775,6 @@ public class CardOptionWindow : MonoBehaviour
             }
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.EXCLUSION, target, list[0], list[1]);
-            CloseOnSound();
-        }));
-
-        detailOptionType = OPTION_TYPE.FIELD_ROT;
-
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを開く", () => {
-            TouchManager touchManager = target.GetComponent<TouchManager>();
-            if (touchManager != null)
-            {
-                touchManager.SetIsOpen(true);
-            }
-            CloseOnSound();
-        }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを閉じる", () => {
-            TouchManager touchManager = target.GetComponent<TouchManager>();
-            if (touchManager != null)
-            {
-                touchManager.SetIsOpen(false);
-            }
-            CloseOnSound();
-        }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードをスタンドさせる", () => {
-            string[] list = target.name.Split('^');
-            FieldCardManager.Instance().SetCardToStand(target);
-            CloseOnSound();
-        }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを疲労させる", () => {
-            string[] list = target.name.Split('^');
-            FieldCardManager.Instance().SetCardToRest(target);
-            CloseOnSound();
-        }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを重疲労させる", () => {
-            string[] list = target.name.Split('^');
-            FieldCardManager.Instance().SetCardToDualRest(target);
-            CloseOnSound();
-        }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを裏返す", () => {
-            TouchManager touchManager = target.GetComponent<TouchManager>();
-            if (touchManager != null)
-            {
-                touchManager.SetIsAwake(!touchManager.IsAwake);
-            }
-            CloseOnSound();
-        }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを魂状態を入れ替える", () => {
-            TouchManager touchManager = target.GetComponent<TouchManager>();
-            if (touchManager != null)
-            {
-                touchManager.SetIsSoul(!touchManager.IsSoul);
-            }
             CloseOnSound();
         }));
     }

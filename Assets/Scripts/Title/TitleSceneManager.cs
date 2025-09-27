@@ -96,6 +96,7 @@ public class TitleSceneManager : MonoBehaviour
             optionData.LoadTxt();
             optionData.SaveTxt();
         }
+        AssetBundleManager.Instance().CardType = optionData.cardType;
 
         path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "favoriteCardData.json";
         if (!File.Exists(path))

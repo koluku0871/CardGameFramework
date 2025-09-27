@@ -40,6 +40,19 @@ public class CostManager : MonoBehaviour, IPunObservable
             this.gameObject.GetComponent<PhotonView>().RequestOwnership();
             Toggle activeToggle = this.gameObject.GetComponent<ToggleGroup>().GetFirstActiveToggle();
             m_toggleName = (activeToggle.name);
+
+            var textObj = activeToggle.transform.Find("Text (TMP)");
+            if (textObj != null)
+            {
+                TMPro.TextMeshProUGUI text = textObj.GetComponent<TMPro.TextMeshProUGUI>();
+                if (text != null)
+                {
+                    if (int.TryParse(text.text.Replace("toggle_", ""), out int index))
+                    {
+                        PlayerFieldManager.Instance().AddLogList("コストを" + index + "に変更");
+                    }
+                }
+            }
         }
     }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 using static CardOptionWindow;
@@ -575,11 +576,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             new DeckManager.CardDetail() { tag = list[0], cardId = cardId }, false, card.GetComponent<Image>(), m_cardField,
             null,
             (Image target, string targetTag, string targetCardId, bool isDoubleClick) => {
-                if (isDoubleClick)
-                {
-                    CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.FIELD);
-                }
-                else
+                if (!isDoubleClick)
                 {
                     CardOptionWindow.Instance().Open(
                         target,
@@ -593,11 +590,11 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     if (isDoubleClick)
                     {
-                        touchManager.IsInner = !touchManager.IsInner;
+                        touchManager.IsOverlap = !touchManager.IsOverlap;
                     }
                     else
                     {
-                        touchManager.IsOverlap = !touchManager.IsOverlap;
+                        touchManager.IsInner = !touchManager.IsInner;
                     }
                 }
             });
@@ -608,6 +605,9 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             touchManager.SetIsOpen(isOpen);
         }
+
+        PlayerFieldManager.Instance().AddLogList(name + "を生成");
+
         return cardImage;
     }
 

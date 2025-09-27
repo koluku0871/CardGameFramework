@@ -271,6 +271,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
     public List<DeckManager.CardDetail> m_innerCardDetailList = new List<DeckManager.CardDetail>();
     private string m_innerCardDetailListStr = "";
+    private List<Image> m_cardImageList = new List<Image>();
 
     private bool m_isInner = false;
     public bool IsInner
@@ -294,19 +295,21 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
     private void SetInnerCardDetailList(string innerCardDetailListStr)
     {
-        if (string.IsNullOrEmpty(innerCardDetailListStr)) return;
         if (m_innerCardDetailListStr == innerCardDetailListStr) return;
 
         m_innerCardDetailListStr = innerCardDetailListStr;
         m_innerCardDetailList.Clear();
-        foreach (string str in m_innerCardDetailListStr.Split("#"))
+        if (!string.IsNullOrEmpty(innerCardDetailListStr))
         {
-            var split = str.Split("^");
-            if (split.Count() != 2)
+            foreach (string str in m_innerCardDetailListStr.Split("#"))
             {
-                continue;
+                var split = str.Split("^");
+                if (split.Count() != 2)
+                {
+                    continue;
+                }
+                m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = split[0], cardId = split[1] });
             }
-            m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag=split[0], cardId=split[1] });
         }
 
         foreach (Transform c in m_content)
@@ -318,50 +321,57 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             Destroy(c.gameObject);
         }
 
+        m_cardImageList.Clear();
         foreach (var cardDetail in m_innerCardDetailList)
         {
             var card = FieldCardManager.Instance().CreateCard(cardDetail, true, m_contentInnerImage, m_content,
                 (Image target, string tag, string cardId, bool isDoubleClick) => {
-                    int siblingIndex = target.transform.GetSiblingIndex();
-                    if (siblingIndex > 2)
+                    if (!m_photonView.IsMine) return;
+                    int index = m_cardImageList.IndexOf(target);
+                    if (index != -1)
                     {
-                        target.transform.SetSiblingIndex(siblingIndex-1);
-                        m_innerCardDetailListStr = string.Join("#", m_innerCardDetailList.Select(x => x.ToString()));
+                        AudioSourceManager.Instance().PlayOneShot(0);
+                        var cardDetail = m_innerCardDetailList[index - 1];
+                        m_innerCardDetailList[index - 1] = m_innerCardDetailList[index];
+                        m_innerCardDetailList[index] = cardDetail;
+                        SetInnerCardDetailList(string.Join("#", m_innerCardDetailList.Select(x => x.ToString())));
                     }
                 },
                 (Image target, string tag, string cardId, bool isDoubleClick) => {
-                    int siblingIndex = target.transform.GetSiblingIndex();
-                    if (siblingIndex < m_innerCardDetailList.Count - 1)
+                    if (!m_photonView.IsMine) return;
+                    int index = m_cardImageList.IndexOf(target);
+                    if (index != -1)
                     {
-                        target.transform.SetSiblingIndex(siblingIndex+1);
-                        m_innerCardDetailListStr = string.Join("#", m_innerCardDetailList.Select(x => x.ToString()));
-                    }
-                },
-                (Image target, string tag, string cardId, bool isDoubleClick) => {
-                    PlayerFieldManager.Instance().CreateCard(target.name, false);
-                    AudioSourceManager.Instance().PlayOneShot(0);
-                    int siblingIndex = target.transform.GetSiblingIndex();
-                    Destroy(target);
-                    try
-                    {
-                        m_innerCardDetailList.RemoveAt(siblingIndex);
-                    }
-                    catch
-                    {
-                        foreach (var cardDetail in m_innerCardDetailList)
+                        AudioSourceManager.Instance().PlayOneShot(0);
+                        if (index + 1 < m_innerCardDetailList.Count)
                         {
-                            if (cardDetail.tag != tag || cardDetail.cardId != cardId)
-                            {
-                                continue;
-                            }
-                            m_innerCardDetailList.Remove(cardDetail);
-                            break;
+                            var cardDetail = m_innerCardDetailList[index + 1];
+                            m_innerCardDetailList[index + 1] = m_innerCardDetailList[index];
+                            m_innerCardDetailList[index] = cardDetail;
                         }
+                        else
+                        {
+                            m_innerCardDetailList.RemoveAt(index);
+                            m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = "", cardId = "" });
+                        }
+                        
+                        SetInnerCardDetailList(string.Join("#", m_innerCardDetailList.Select(x => x.ToString())));
                     }
-                    m_innerCardDetailListStr = string.Join("#", m_innerCardDetailList.Select(x => x.ToString()));
+                },
+                (Image target, string tag, string cardId, bool isDoubleClick) => {
+                    if (!m_photonView.IsMine) return;
+                    int index = m_cardImageList.IndexOf(target);
+                    if (index != -1)
+                    {
+                        PlayerFieldManager.Instance().CreateCard(target.name, true);
+                        AudioSourceManager.Instance().PlayOneShot(0);
+                        m_innerCardDetailList.RemoveAt(index);
+                        SetInnerCardDetailList(string.Join("#", m_innerCardDetailList.Select(x => x.ToString())));
+                    }
                 }
             );
             card.gameObject.name = cardDetail.ToString();
+            m_cardImageList.Add(card);
         }
     }
 

@@ -1196,7 +1196,7 @@ public class CardOptionWindow : MonoBehaviour
         {
             var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.SUB, true, 1)[0];
             var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.SUB, cardList.tag, cardList.cardId)[0];
-            PlayerFieldManager.Instance().CreateCard(target.name);
+            PlayerFieldManager.Instance().CreateCard(card.ToString());
             CloseOnSound();
         });
     }

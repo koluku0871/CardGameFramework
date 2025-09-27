@@ -180,18 +180,6 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         m_playerName1Text.text = m_playerName1;
         m_playerName2Text.text = m_playerName2;
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-            GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
-            m_coinManager = coinObj.GetComponent<CoinManager>();
-            m_coinManager.SetIsOpen(Convert.ToBoolean(new System.Random().Next(0, 2)));
-
-            if (m_type == "digimon")
-            {
-                GameObject costManagerObj = PhotonNetwork.InstantiateRoomObject("Prefab/Battle/CostManager", Vector3.zero, Quaternion.identity);
-            }
-        }
-
         if (m_playerName == m_playerName1)
         {
             m_playerName1Text.text += "- mine";
@@ -288,6 +276,18 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             PhotonNetwork.Instantiate("Prefab/Battle/CardListWindow", Vector3.zero, Quaternion.identity);
 
             m_cardOptionWindow.transform.SetAsLastSibling();
+        }
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
+            m_coinManager = coinObj.GetComponent<CoinManager>();
+            m_coinManager.SetIsOpen(Convert.ToBoolean(new System.Random().Next(0, 2)));
+
+            if (m_type == "digimon")
+            {
+                GameObject costManagerObj = PhotonNetwork.InstantiateRoomObject("Prefab/Battle/CostManager", Vector3.zero, Quaternion.identity);
+            }
         }
 
         m_optionDropdown.options.Clear();

@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class HomeSceneManager : MonoBehaviour
 {
@@ -24,6 +26,14 @@ public class HomeSceneManager : MonoBehaviour
 
     [SerializeField]
     private TMPro.TMP_Dropdown m_typeDropdown = null;
+
+    [SerializeField]
+    private Toggle m_contentToggle = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_contentToggleText = null;
+
+    private List<Toggle> m_contentToggleList = new List<Toggle>();
 
     [SerializeField]
     private UnityEngine.UI.Slider m_homeBgmSlider = null;
@@ -57,6 +67,15 @@ public class HomeSceneManager : MonoBehaviour
     [SerializeField]
     private TMPro.TextMeshProUGUI m_reDlTextContent = null;
 
+    [Header("ログ")]
+
+    [SerializeField]
+    private GameObject m_logPanel = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_logContentText = null;
+
+
     private void Start()
     {
         AudioSourceManager.Instance().PlayOneShot((int)AudioSourceManager.BGM_NUM.HOME_1, true);
@@ -82,7 +101,6 @@ public class HomeSceneManager : MonoBehaviour
             if (type == optionData.cardType)
             {
                 m_typeDropdown.value = typeIndex;
-                AssetBundleManager.Instance().CardType = type;
             }
             typeIndex++;
         }
@@ -228,6 +246,41 @@ public class HomeSceneManager : MonoBehaviour
 #endif
     }
 
+    public void OnClickToOptionCloseButton()
+    {
+        if (string.IsNullOrEmpty(m_nameInputField.text))
+        {
+            return;
+        }
+
+        OptionData optionData = new OptionData();
+        optionData.IsFileExists();
+        optionData.LoadTxt();
+
+        optionData.name = m_nameInputField.text;
+        m_nameText.text = m_nameInputField.text;
+
+        bool isUpdateCardType = optionData.cardType != m_typeDropdown.options[m_typeDropdown.value].text;
+        optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
+        AssetBundleManager.Instance().CardType = optionData.cardType;
+
+        optionData.homeBgmVolume = m_homeBgmSlider.value;
+        optionData.battleBgmVolume = m_battleBgmSlider.value;
+        optionData.deckBgmVolume = m_deckBgmSlider.value;
+        optionData.seVolume = m_seSlider.value;
+
+        optionData.SaveTxt();
+
+        if (isUpdateCardType)
+        {
+            SetActiveToLogWindow(true);
+
+            StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
+                SetActiveToLogWindow(false);
+            }, AddLogList));
+        }
+    }
+
     private Coroutine reDlCoroutine = null;
     public void OnClickToReDlButton()
     {
@@ -238,6 +291,8 @@ public class HomeSceneManager : MonoBehaviour
 
     public IEnumerator ReDlCoroutine()
     {
+        SetActiveToLogWindow(true);
+
         foreach (var reDlWindowToggle in m_reDlWindowToggleList)
         {
             if (!reDlWindowToggle.Value.isOn)
@@ -260,32 +315,27 @@ public class HomeSceneManager : MonoBehaviour
             {
                 yield return new WaitForSeconds(1f);
             }
+
+            AddLogList("UnityWebRequestPath : " + data);
         }
+
+        SetActiveToLogWindow(false);
 
         OnClickToRestartButton();
     }
 
-    public void OnClickToOptionCloseButton()
+    public void SetActiveToLogWindow(bool isActive)
     {
-        if (string.IsNullOrEmpty(m_nameInputField.text))
+        if (isActive)
         {
-            return;
+            m_logContentText.text = "";
         }
 
-        OptionData optionData = new OptionData();
-        optionData.IsFileExists();
-        optionData.LoadTxt();
+        m_logPanel.SetActive(isActive);
+    }
 
-        optionData.name = m_nameInputField.text;
-        m_nameText.text = m_nameInputField.text;
-        optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
-        AssetBundleManager.Instance().CardType = optionData.cardType;
-
-        optionData.homeBgmVolume = m_homeBgmSlider.value;
-        optionData.battleBgmVolume = m_battleBgmSlider.value;
-        optionData.deckBgmVolume = m_deckBgmSlider.value;
-        optionData.seVolume = m_seSlider.value;
-
-        optionData.SaveTxt();
+    public void AddLogList(string log)
+    {
+        m_logContentText.text += log + "\n";
     }
 }

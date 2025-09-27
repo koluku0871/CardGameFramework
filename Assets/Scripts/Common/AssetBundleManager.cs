@@ -22,7 +22,27 @@ public class AssetBundleBaseText : AssetBundleBase
 [Serializable]
 public class AssetBundleBaseSprite : AssetBundleBase
 {
-    public UnityEngine.U2D.SpriteAtlas spriteAtlas = null;
+    private UnityEngine.U2D.SpriteAtlas spriteAtlas = null;
+
+    public void SetSpriteAtlas(UnityEngine.U2D.SpriteAtlas spriteAtlas)
+    {
+        this.spriteAtlas = spriteAtlas;
+    }
+
+    public UnityEngine.U2D.SpriteAtlas GetSpriteAtlas()
+    {
+        if (spriteAtlas == null)
+        {
+            if (assetBundle == null)
+            {
+                return null;
+            }
+
+
+        }
+
+        return spriteAtlas;
+    }
 }
 
 [Serializable]
@@ -86,6 +106,8 @@ public class AssetBundleManager : MonoBehaviour
 
     public ApiResponseDataToFileList apiResponseData = null;
 
+    public List<string> m_assetBundleSeList = new List<string>();
+
     private static AssetBundleManager instance = null;
     public static AssetBundleManager Instance()
     {
@@ -110,17 +132,17 @@ public class AssetBundleManager : MonoBehaviour
         string[] fs = Directory.GetFiles(ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES, "*.assetbundle", SearchOption.TopDirectoryOnly);
         foreach (string file in fs)
         {
-            if (file.Contains("_text_.a"))
+            if (file.Contains("_text_"))
             {
                 textAAssetbundleList.Add(file);
                 continue;
             }
 
-            if (file.Contains("_text_.b"))
+            /*if (file.Contains("_text_.b"))
             {
                 textBAssetbundleList.Add(file);
                 continue;
-            }
+            }*/
 
             if (file.Contains("_spriteatlas_"))
             {
@@ -150,7 +172,7 @@ public class AssetBundleManager : MonoBehaviour
             yield return null;
         }
 
-        isCompleted = false;
+        /*isCompleted = false;
         sequence = new CoroutineSequence(this);
         foreach (string file in textBAssetbundleList)
         {
@@ -323,7 +345,7 @@ public class AssetBundleManager : MonoBehaviour
             {
                 var atlas = (UnityEngine.U2D.SpriteAtlas)request.asset;
                 Debug.Log("Asset : " + atlas.name + " spriteCount : " + atlas.spriteCount);
-                m_assetBundleCardDataList[type].assetBundleSpriteList[key].spriteAtlas = atlas;
+                m_assetBundleCardDataList[type].assetBundleSpriteList[key].SetSpriteAtlas(atlas);
             }
         }
         if (action != null) action();
@@ -333,10 +355,39 @@ public class AssetBundleManager : MonoBehaviour
     {
         string key = Path.GetFileNameWithoutExtension(file);
         string type = key.Split('_')[0];
-        if (!m_assetBundleCardDataList[type].assetBundleSpriteList.ContainsKey(key))
+        if (type == CardType)
+        {
+            if (!m_assetBundleCardDataList[type].assetBundleSpriteList.ContainsKey(key))
+            {
+                AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
+                m_assetBundleCardDataList[type].assetBundleSpriteList.Add(key, new AssetBundleBaseSprite() { assetBundle = assetBundle });
+                var request = assetBundle.LoadAllAssetsAsync();
+
+                while (!request.isDone)
+                {
+                    yield return null;
+                }
+
+                logAction("ReadFilePath : " + file + "\n");
+
+                if (request.asset.GetType() == typeof(UnityEngine.U2D.SpriteAtlas))
+                {
+                    var atlas = (UnityEngine.U2D.SpriteAtlas)request.asset;
+                    Debug.Log("Asset : " + atlas.name + " spriteCount : " + atlas.spriteCount);
+                    m_assetBundleCardDataList[type].assetBundleSpriteList[key].SetSpriteAtlas(atlas);
+                }
+            }
+        }
+
+        if (action != null) action();
+    }
+
+    public IEnumerator ReadFileToAudio(string file, Action<string> logAction, Action action)
+    {
+        if (!m_assetBundleSeList.Contains(file))
         {
             AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
-            m_assetBundleCardDataList[type].assetBundleSpriteList.Add(key, new AssetBundleBaseSprite() { assetBundle = assetBundle });
+            m_assetBundleSeList.Add(file);
             var request = assetBundle.LoadAllAssetsAsync();
 
             while (!request.isDone)
@@ -346,73 +397,51 @@ public class AssetBundleManager : MonoBehaviour
 
             logAction("ReadFilePath : " + file + "\n");
 
-            if (request.asset.GetType() == typeof(UnityEngine.U2D.SpriteAtlas))
+            SortedDictionary<int, AudioClip> audioClipList = new SortedDictionary<int, AudioClip>();
+            foreach (var asset in request.allAssets)
             {
-                var atlas = (UnityEngine.U2D.SpriteAtlas)request.asset;
-                Debug.Log("Asset : " + atlas.name + " spriteCount : " + atlas.spriteCount);
-                m_assetBundleCardDataList[type].assetBundleSpriteList[key].spriteAtlas = atlas;
-            }
-        }
+                if (asset.GetType() != typeof(AudioClip))
+                {
+                    continue;
+                }
+                var audioClip = (AudioClip)asset;
+                Debug.Log("Asset : " + audioClip.name + " length : " + audioClip.length);
 
-        if (action != null) action();
-    }
+                int index = -1;
+                if (audioClip.name.Contains("battle"))
+                {
+                    index = 0;
+                }
+                else if (audioClip.name.Contains("home"))
+                {
+                    index = 1;
+                }
+                else if (audioClip.name.Contains("deck"))
+                {
+                    index = 2;
+                }
+                if (audioClip.name.Contains("draw"))
+                {
+                    index = 0;
+                }
+                else if (audioClip.name.Contains("shuffle"))
+                {
+                    index = 1;
+                }
 
-    public IEnumerator ReadFileToAudio(string file, Action<string> logAction, Action action)
-    {
-        AssetBundle assetBundle = AssetBundle.LoadFromFile(file);
-        var request = assetBundle.LoadAllAssetsAsync();
-
-        while (!request.isDone)
-        {
-            yield return null;
-        }
-
-        logAction("ReadFilePath : " + file + "\n");
-
-        SortedDictionary<int, AudioClip> audioClipList = new SortedDictionary<int, AudioClip>();
-        foreach (var asset in request.allAssets)
-        {
-            if (asset.GetType() != typeof(AudioClip))
-            {
-                continue;
-            }
-            var audioClip = (AudioClip)asset;
-            Debug.Log("Asset : " + audioClip.name + " length : " + audioClip.length);
-
-            int index = -1;
-            if (audioClip.name.Contains("battle"))
-            {
-                index = 0;
-            }
-            else if (audioClip.name.Contains("home"))
-            {
-                index = 1;
-            }
-            else if (audioClip.name.Contains("deck"))
-            {
-                index = 2;
-            }
-            if (audioClip.name.Contains("draw"))
-            {
-                index = 0;
-            }
-            else if (audioClip.name.Contains("shuffle"))
-            {
-                index = 1;
+                audioClipList.Add(index, audioClip);
             }
 
-            audioClipList.Add(index, audioClip);
-        }
-
-        if (file.Contains(".bgm"))
-        {
-            AudioSourceManager.Instance().m_soundBgmList.Clear();
-            AudioSourceManager.Instance().m_soundBgmList.AddRange(audioClipList.Values);
-        }
-        else if (file.Contains(".se"))
-        {
-            AudioSourceManager.Instance().m_soundSeList.Clear();
-            AudioSourceManager.Instance().m_soundSeList.AddRange(audioClipList.Values);
+            if (file.Contains(".bgm"))
+            {
+                AudioSourceManager.Instance().m_soundBgmList.Clear();
+                AudioSourceManager.Instance().m_soundBgmList.AddRange(audioClipList.Values);
+            }
+            else if (file.Contains(".se"))
+            {
+                AudioSourceManager.Instance().m_soundSeList.Clear();
+                AudioSourceManager.Instance().m_soundSeList.AddRange(audioClipList.Values);
+            }
         }
     }
 
@@ -420,7 +449,7 @@ public class AssetBundleManager : MonoBehaviour
     {
         try
         {
-            return AssetBundleBaseCardData.assetBundleSpriteList[key].spriteAtlas.GetSprite(name);
+            return AssetBundleBaseCardData.assetBundleSpriteList[key].GetSpriteAtlas().GetSprite(name);
         }
         catch
         {

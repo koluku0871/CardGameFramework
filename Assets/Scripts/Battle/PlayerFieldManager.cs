@@ -557,7 +557,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     FieldCardManager.Instance().SetCardToStand(image);
                     break;
                 case 180:
-                    FieldCardManager.Instance().SetCardToRest(image);
+                    FieldCardManager.Instance().SetCardToRRest(image);
                     break;
             }
         }

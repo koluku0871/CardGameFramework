@@ -613,12 +613,17 @@ public class CardOptionWindow : MonoBehaviour
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを疲労させる", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().SetCardToRest(target);
+            FieldCardManager.Instance().SetCardToRRest(target);
             CloseOnSound();
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを重疲労させる", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().SetCardToDualRest(target);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを反疲労させる", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().SetCardToLRest(target);
             CloseOnSound();
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを裏返す", () => {

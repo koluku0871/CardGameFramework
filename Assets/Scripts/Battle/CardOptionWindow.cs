@@ -550,6 +550,12 @@ public class CardOptionWindow : MonoBehaviour
             }
             CloseOnSound();
         }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "からフィールドに出す", () => {
+            string[] list = target.name.Split('^');
+            var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.AT_HAND, list[0], list[1])[0];
+            PlayerFieldManager.Instance().CreateCard(target.name);
+            CloseOnSound();
+        }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "からデッキの上に戻す", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, true, target, list[0], list[1]);

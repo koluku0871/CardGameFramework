@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static CardOptionWindow;
 using static DeckManager;
+using static FieldCardManager;
+using static UnityEngine.GraphicsBuffer;
 
 public class FieldCardManager : MonoBehaviour
 {
@@ -459,6 +461,25 @@ public class FieldCardManager : MonoBehaviour
         List<CardDetail> cardDetailList = new List<CardDetail>();
         switch (option)
         {
+            case OPTION_TYPE.AT_HAND:
+                List<GameObject> atHandObjectList = new List<GameObject>();
+                if (m_atHandContent != null)
+                {
+                    foreach (Transform atHand in m_atHandContent)
+                    {
+                        if (atHand.gameObject.activeSelf)
+                        {
+                            atHandObjectList.Add(atHand.gameObject);
+                        }
+                    }
+                }
+                for (var index = 0; index < atHandObjectList.Count; index++)
+                {
+                    string[] list = atHandObjectList[index].name.Split('^');
+                    CardDetail cardDetail = new CardDetail() { tag = list[0], cardId = list[1] };
+                    cardDetailList.Add(cardDetail);
+                }
+                break;
             case OPTION_TYPE.DECK:
                 cardDetailList = m_deckDetailList;
                 break;
@@ -494,6 +515,46 @@ public class FieldCardManager : MonoBehaviour
                 break;
         }
         return cardDetailList;
+    }
+
+    public List<CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
+    {
+        List<CardDetail> cardDetailList = GetCardDetailList(option);
+        int index = 0;
+        if (!isUp)
+        {
+            index = cardDetailList.Count - count;
+        }
+        cardDetailList = cardDetailList.GetRange(index, count);
+        return cardDetailList;
+    }
+
+    public List<GameObject> GetCardHandObjList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
+    {
+        List<GameObject> objList = new List<GameObject>();
+        switch (option)
+        {
+            case OPTION_TYPE.AT_HAND:
+                if (m_atHandContent != null)
+                {
+                    foreach (Transform atHand in m_atHandContent)
+                    {
+                        if (atHand.gameObject.activeSelf)
+                        {
+                            objList.Add(atHand.gameObject);
+                        }
+                    }
+                }
+                break;
+        }
+
+        int index = 0;
+        if (!isUp)
+        {
+            index = objList.Count - count;
+        }
+        objList = objList.GetRange(index, count);
+        return objList;
     }
 
     public void AddDstFromSrc(OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, string tag, string cardId)
@@ -585,53 +646,6 @@ public class FieldCardManager : MonoBehaviour
     ){
         List<DeckManager.CardDetail> cardDetailList = RemoveCardDetail(optionSrc, tag, cardId);
         AddCardDetailList(optionDst, cardDetailList);
-        return cardDetailList;
-    }
-
-
-
-    public List<CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
-    {
-        List<CardDetail> cardDetailList = new List<CardDetail>();
-        int index = 0;
-        switch (option)
-        {
-            case CardOptionWindow.OPTION_TYPE.DECK:
-                if (!isUp)
-                {
-                    index = m_deckDetailList.Count - count;
-                }
-                cardDetailList = m_deckDetailList.GetRange(index, count);
-                break;
-            case CardOptionWindow.OPTION_TYPE.TRASH:
-                if (!isUp)
-                {
-                    index = m_trashDetailList.Count - count;
-                }
-                cardDetailList = m_trashDetailList.GetRange(index, count);
-                break;
-            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
-                if (!isUp)
-                {
-                    index = m_exclusionDetailList.Count - count;
-                }
-                cardDetailList = m_exclusionDetailList.GetRange(index, count);
-                break;
-            case CardOptionWindow.OPTION_TYPE.DAMAGE:
-                if (!isUp)
-                {
-                    index = m_damageDetailList.Count - count;
-                }
-                cardDetailList = m_damageDetailList.GetRange(index, count);
-                break;
-            case CardOptionWindow.OPTION_TYPE.SUB:
-                if (!isUp)
-                {
-                    index = m_subDetailList.Count - count;
-                }
-                cardDetailList = m_subDetailList.GetRange(index, count);
-                break;
-        }
         return cardDetailList;
     }
 

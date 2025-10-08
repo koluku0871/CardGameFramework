@@ -583,6 +583,24 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, new List<DeckManager.CardDetail>() { card });
             CloseOnSound();
         }));
+
+
+        if (BattleSceneManager.m_type == "digimon")
+        {
+            if (FieldCardManager.Instance().IsActiveAtHand())
+            {
+                AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.O, subStr + "の上から1枚を表にする", () =>
+                {
+                    var card = FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.AT_HAND, true, 1)[0];
+                    HandCard handCard = card.GetComponent<HandCard>();
+                    if (handCard != null)
+                    {
+                        handCard.SetIsOpen(true);
+                    }
+                    CloseOnSound();
+                });
+            }
+        }
     }
 
     public void SetButtonToField()

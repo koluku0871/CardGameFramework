@@ -97,6 +97,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     private void Start()
     {
         transform.localScale = Vector3.one;
+
+        SetInitCore();
     }
 
     public override void OnEnable()

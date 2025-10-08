@@ -202,8 +202,6 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             obj.transform.localRotation = Quaternion.identity;
             obj.transform.localScale = Vector3.one;
 
-            playerFieldManager.SetInitCore();
-
             var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
             string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
             for (int index = 0; index < deckFiles.Length; index++)
@@ -250,8 +248,6 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             obj.transform.localPosition = Vector3.zero;
             obj.transform.localRotation = Quaternion.Euler(0, 0, 180);
             obj.transform.localScale = Vector3.one;
-
-            playerFieldManager.SetInitCore();
 
             var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
             string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);

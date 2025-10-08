@@ -72,6 +72,7 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         if (pos.magnitude > 50)
         {
             PlayerFieldManager.Instance().CreateCard(gameObject.name, false);
+            PlayerFieldManager.Instance().AddLogList(gameObject.name + "をフィールドに出す");
             AudioSourceManager.Instance().PlayOneShot(0);
             Destroy(gameObject);
             return;

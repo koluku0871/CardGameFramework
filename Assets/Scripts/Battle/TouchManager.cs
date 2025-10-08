@@ -560,6 +560,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 }
                 FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.DECK, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
+
+                PlayerFieldManager.Instance().AddLogList(m_image.name + "をデッキに戻す");
                 break;
             case "Trash":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
@@ -569,6 +571,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 }
                 FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.TRASH, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
+
+                PlayerFieldManager.Instance().AddLogList(m_image.name + "をトラッシュに戻す");
                 break;
             case "Exclusion":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
@@ -578,6 +582,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 }
                 FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.EXCLUSION, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
+
+                PlayerFieldManager.Instance().AddLogList(m_image.name + "を除外一覧に戻す");
                 break;
             case "Hand":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
@@ -587,6 +593,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 }
                 FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.HAND, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
+
+                PlayerFieldManager.Instance().AddLogList(m_image.name + "を手札に戻す");
                 break;
             case "AtHand":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
@@ -596,6 +604,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 }
                 FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.AT_HAND, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
+
+                PlayerFieldManager.Instance().AddLogList(m_image.name + "を手元に戻す");
                 break;
             case "Damage":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
@@ -605,6 +615,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 }
                 FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.DAMAGE, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
+
+                PlayerFieldManager.Instance().AddLogList(m_image.name + "をダメージに戻す");
                 break;
             case "Sub":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
@@ -614,6 +626,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 }
                 FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.SUB, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
+
+                PlayerFieldManager.Instance().AddLogList(m_image.name + "をサブデッキに戻す");
                 break;
             case "Card":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
@@ -624,6 +638,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                     m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
                     FieldCardManager.Instance().RemoveCardImage(CardOptionWindow.OPTION_TYPE.FIELD, m_image);
                     AudioSourceManager.Instance().PlayOneShot(0);
+
+                    PlayerFieldManager.Instance().AddLogList(m_image.name + "を" + m_endObj.name + "に内包する");
                 }
                 break;
         }

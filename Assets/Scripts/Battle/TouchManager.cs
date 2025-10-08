@@ -666,7 +666,13 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             }
             return;
         }
-
+        if (coll.gameObject.tag == "Deck")
+        {
+            if (EndTag == "AtHand" || EndTag == "Damage")
+            {
+                return;
+            }
+        }
         EndTag = coll.gameObject.tag;
     }
 

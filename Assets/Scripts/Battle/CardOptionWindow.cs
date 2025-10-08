@@ -85,6 +85,7 @@ public class CardOptionWindow : MonoBehaviour
         return instance;
     }
 
+    string atHandStr = "手元";
     string damageStr = "ダメージ";
     string subStr = "サブデッキ";
 
@@ -101,6 +102,7 @@ public class CardOptionWindow : MonoBehaviour
                 SetButtonToBs();
                 break;
             case "digimon":
+                atHandStr = "セキュリティ一覧";
                 damageStr = "セキュリティ";
                 subStr = "デジタマ";
                 SetButtonToDigimon();
@@ -339,13 +341,11 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        if (BattleSceneManager.m_type != "digimon")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を手元に置く", () => {
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
-                CloseOnSound();
-            }));
-        }
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + atHandStr + "に置く", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
+            CloseOnSound();
+        }));
 
         if (BattleSceneManager.m_type != "bs")
         {
@@ -407,14 +407,12 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        if (BattleSceneManager.m_type != "digimon")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから手元に置く", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, list[0], list[1]);
-                CloseOnSound();
-            }));
-        }
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + atHandStr + "に置く", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, list[0], list[1]);
+            CloseOnSound();
+        }));
 
         if (BattleSceneManager.m_type != "bs")
         {
@@ -486,14 +484,12 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        if (BattleSceneManager.m_type != "digimon")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手札から手元に置く", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
-                CloseOnSound();
-            }));
-        }
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手札から" + atHandStr + "に置く", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
+            CloseOnSound();
+        }));
 
         if (BattleSceneManager.m_type != "bs")
         {
@@ -554,28 +550,28 @@ public class CardOptionWindow : MonoBehaviour
             }
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手元からデッキの上に戻す", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "からデッキの上に戻す", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, true, target, list[0], list[1]);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手元からデッキの下に戻す", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "からデッキの下に戻す", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, false, target, list[0], list[1]);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手元から手札に加える", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "から手札に加える", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.HAND, target, list[0], list[1]);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手元からトラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "からトラッシュに送る", () => {
             string[] list = target.name.Split('^');
             var card = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.TRASH, target, list[0], list[1]);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, new List<DeckManager.CardDetail>() { card });
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手元から除外一覧に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "から除外一覧に送る", () => {
             string[] list = target.name.Split('^');
             var card = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.EXCLUSION, target, list[0], list[1]);
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, new List<DeckManager.CardDetail>() { card });
@@ -683,22 +679,20 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        if (BattleSceneManager.m_type != "digimon")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "フィールドから手元に置く", () => {
-                TouchManager touchManager = target.GetComponent<TouchManager>();
-                if (touchManager != null)
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "フィールドから" + atHandStr + "に置く", () => {
+            TouchManager touchManager = target.GetComponent<TouchManager>();
+            if (touchManager != null)
+            {
+                foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    foreach (var cardDetail in touchManager.m_innerCardDetailList)
-                    {
-                        FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
-                    }
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
                 }
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
-                CloseOnSound();
-            }));
-        }
+            }
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
+            CloseOnSound();
+        }));
 
         if (BattleSceneManager.m_type != "bs")
         {
@@ -862,14 +856,12 @@ public class CardOptionWindow : MonoBehaviour
             OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
         }));
 
-        if (BattleSceneManager.m_type != "digimon")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "除外一覧から手元に置く", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.AT_HAND, list[0], list[1]);
-                OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
-            }));
-        }
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "除外一覧から" + atHandStr + "に置く", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.AT_HAND, list[0], list[1]);
+            OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
+        }));
 
         if (BattleSceneManager.m_type != "bs")
         {
@@ -981,14 +973,12 @@ public class CardOptionWindow : MonoBehaviour
             OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
 
-        if (BattleSceneManager.m_type != "digimon")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから手元に置く", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, list[0], list[1]);
-                OpenCardDetailListToMine(OPTION_TYPE.TRASH);
-            }));
-        }
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + atHandStr + "に置く", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, list[0], list[1]);
+            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
+        }));
 
         if (BattleSceneManager.m_type != "bs")
         {
@@ -1278,6 +1268,18 @@ public class CardOptionWindow : MonoBehaviour
     {
         foreach (OptionButton optionButton in m_optionButtonList)
         {
+            if (BattleSceneManager.m_type == "digimon")
+            {
+                if (optionType == OPTION_TYPE.AT_HAND && !FieldCardManager.Instance().IsActiveAtHand())
+                {
+                    return;
+                }
+                else if (optionType == OPTION_TYPE.DAMAGE && FieldCardManager.Instance().IsActiveAtHand())
+                {
+                    return;
+                }
+            }
+
             bool isActive = (optionButton.optionType == optionType && optionButton.detailOptionType == detailOptionType);
             optionButton.button.gameObject.SetActive(isActive);
         }

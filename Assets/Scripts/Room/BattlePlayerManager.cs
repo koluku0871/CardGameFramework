@@ -32,6 +32,7 @@ public class BattlePlayerManager : MonoBehaviourPunCallbacks
             customRoomProperties.Add("SoulCore", 1);
             customRoomProperties.Add("Life", 5);
             customRoomProperties.Add("Hand", 4);
+            customRoomProperties.Add("IsSecurityAtHand", true);
 
             customRoomProperties.Add("playerName1", "");
             customRoomProperties.Add("playerName2", "");

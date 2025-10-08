@@ -108,6 +108,19 @@ public class FieldCardManager : MonoBehaviour
         // m_trashCard.gameObject.SetActive(false);
     }
 
+    bool isInit = true;
+    public void Update()
+    {
+        if (m_photonView.IsMine || !isInit)
+        {
+            return;
+        }
+        isInit = false;
+
+        bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
+        SetSecurityAtHand(isSecurityAtHand);
+    }
+
     public void InitSetting()
     {
         if (BattleSceneManager.m_type == "bs")
@@ -124,8 +137,18 @@ public class FieldCardManager : MonoBehaviour
 
         if (BattleSceneManager.m_type == "digimon")
         {
+            bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
+            FieldCardManager.Instance().SetSecurityAtHand(isSecurityAtHand);
+
             AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
-            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
+            if (!FieldCardManager.Instance().IsActiveAtHand())
+            {
+                AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
+            }
+            else
+            {
+                AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, 5);
+            }
         }
 
         if (BattleSceneManager.m_type == "hololive")
@@ -888,6 +911,7 @@ public class FieldCardManager : MonoBehaviour
         copied.rectTransform.localPosition = Vector3.zero;
         copied.rectTransform.localRotation = Quaternion.Euler(0, 0, 0);
         copied.rectTransform.localScale = targetImage.rectTransform.localScale;
+
         copied.sprite = CardDetailManager.Instance().GetCardSprite(cardDetail);
 
         // マウスオーバー
@@ -944,6 +968,17 @@ public class FieldCardManager : MonoBehaviour
         cardEventTrigger.triggers.Add(entry);
         copied.gameObject.SetActive(true);
         return copied;
+    }
+
+    public void SetSecurityAtHand(bool isActive)
+    {
+        m_damageCard.transform.parent.gameObject.SetActive(!isActive);
+        m_atHandContent.transform.parent.parent.gameObject.SetActive(isActive);
+    }
+
+    public bool IsActiveAtHand()
+    {
+        return m_atHandContent != null && m_atHandContent.gameObject.activeInHierarchy;
     }
 
     // 差分確認用Json

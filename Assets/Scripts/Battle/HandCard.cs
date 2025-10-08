@@ -8,6 +8,11 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField]
     private Text m_openText = null;
 
+    [SerializeField]
+    private bool m_isMoveHand = true;
+
+    public bool m_isOpenHand = true;
+
     private Image m_image = null;
     private EventTrigger m_eventTrigger = null;
     public Vector2 m_startPos = new Vector2();
@@ -18,13 +23,17 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         private set
         {
             m_isOpen = value;
+
             if (m_isOpen)
             {
                 m_openText.text = "表";
+                string[] namelist = this.gameObject.name.Split('^');
+                m_image.sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = namelist[0], cardId = namelist[1] });
             }
             else
             {
                 m_openText.text = "裏";
+                m_image.sprite = CardDetailManager.Instance().GetSleeveSprite();
             }
         }
         get
@@ -53,6 +62,11 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnEndDrag(PointerEventData data)
     {
+        if (!m_isMoveHand)
+        {
+            return;
+        }
+
         Vector2 pos = m_startPos - data.position;
         Debug.Log(pos.magnitude);
         if (pos.magnitude > 50)

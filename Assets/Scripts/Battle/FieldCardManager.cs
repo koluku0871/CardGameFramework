@@ -713,9 +713,28 @@ public class FieldCardManager : MonoBehaviour
                 {
                     Image card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
+                            AudioSourceManager.Instance().PlayOneShot(0);
+                            int siblingIndex = target.transform.GetSiblingIndex();
+                            target.transform.SetSiblingIndex(siblingIndex-1);
+                        },
+                        (Image target, string tag, string cardId, bool isDoubleClick) => {
+                            AudioSourceManager.Instance().PlayOneShot(0);
+                            int siblingIndex = target.transform.GetSiblingIndex();
+                            target.transform.SetSiblingIndex(siblingIndex+1);
+                        },
+                        (Image target, string tag, string cardId, bool isDoubleClick) => {
                             CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);
-                        });
+                        },
+                        (Image target, string tag, string cardId) => {
+                            if (target.GetComponent<HandCard>().IsOpen)
+                            {
+                                CardDetailManager.Instance().SetSprite(target.sprite);
+                                CardDetailManager.Instance().SetCardDetail(tag, cardId);
+                            }
+                        }
+                    );
                     card.name = m_atHandCard.name;
+                    card.sprite = CardDetailManager.Instance().GetSleeveSprite();
                 }
                 break;
             case CardOptionWindow.OPTION_TYPE.DECK:
@@ -878,7 +897,12 @@ public class FieldCardManager : MonoBehaviour
         card.rectTransform.localRotation = Quaternion.Euler(0, 0, 0);
     }
 
-    public void SetCardToRest(Image card)
+    public void SetCardToLRest(Image card)
+    {
+        card.rectTransform.localRotation = Quaternion.Euler(0, 0, 90);
+    }
+
+    public void SetCardToRRest(Image card)
     {
         card.rectTransform.localRotation = Quaternion.Euler(0, 0, -90);
     }
@@ -888,11 +912,11 @@ public class FieldCardManager : MonoBehaviour
         card.rectTransform.localRotation = Quaternion.Euler(0, 0, -180);
     }
 
-    public Image CreateCard(DeckManager.CardDetail cardDetail, bool isInstantiate, Image targetImage,
-        Transform parent = null,
+    public Image CreateCard(DeckManager.CardDetail cardDetail, bool isInstantiate, Image targetImage, Transform parent = null,
         Action<Image, string, string, bool> leftClickAction = null,
         Action<Image, string, string, bool> rightClickAction = null,
-        Action<Image, string, string, bool> middleClickAction = null
+        Action<Image, string, string, bool> middleClickAction = null,
+        Action<Image, string, string> pointerEnterAction = null
         )
     {
         string tag = cardDetail.tag;
@@ -917,14 +941,22 @@ public class FieldCardManager : MonoBehaviour
         // マウスオーバー
         EventTrigger.Entry entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerEnter;
-        entry.callback.AddListener((_) => {
-            if (CardDetailManager.Instance().isLock)
-            {
-                return;
-            }
-            CardDetailManager.Instance().SetSprite(copied.sprite);
-            CardDetailManager.Instance().SetCardDetail(tag, fileName);
-        });
+        if (pointerEnterAction == null)
+        {
+            entry.callback.AddListener((_) => {
+                if (CardDetailManager.Instance().isLock)
+                {
+                    return;
+                }
+
+                CardDetailManager.Instance().SetSprite(copied.sprite);
+                CardDetailManager.Instance().SetCardDetail(tag, fileName);
+            });
+        }
+        else
+        {
+            entry.callback.AddListener((_) => { pointerEnterAction(copied, tag, fileName); });
+        }
         EventTrigger cardEventTrigger = GetOrAddComponentToEventTrigger(copied.gameObject, entry);
 
         // マウスクリック

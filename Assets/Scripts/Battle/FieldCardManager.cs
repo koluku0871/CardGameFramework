@@ -407,19 +407,6 @@ public class FieldCardManager : MonoBehaviour
         AddCardDetailList(OPTION_TYPE.HAND, cardDetailList);
     }
 
-    public List<GameObject> GetHandGameObject()
-    {
-        List<GameObject> handObjectList = new List<GameObject>();
-        foreach (Transform hand in m_handContent)
-        {
-            if (hand.gameObject.activeSelf)
-            {
-                handObjectList.Add(hand.gameObject);
-            }
-        }
-        return handObjectList;
-    }
-
     public void SetDeckDetail(CardOptionWindow.OPTION_TYPE option, List<CardDetail> deckDetailList)
     {
         switch (option)
@@ -458,24 +445,39 @@ public class FieldCardManager : MonoBehaviour
 
     public List<CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option)
     {
+        List<GameObject> objList = new List<GameObject>();
         List<CardDetail> cardDetailList = new List<CardDetail>();
         switch (option)
         {
+            case OPTION_TYPE.HAND:
+                foreach (Transform hand in m_handContent)
+                {
+                    if (hand.gameObject.activeSelf)
+                    {
+                        objList.Add(hand.gameObject);
+                    }
+                }
+                for (var index = 0; index < objList.Count; index++)
+                {
+                    string[] list = objList[index].name.Split('^');
+                    CardDetail cardDetail = new CardDetail() { tag = list[0], cardId = list[1] };
+                    cardDetailList.Add(cardDetail);
+                }
+                break;
             case OPTION_TYPE.AT_HAND:
-                List<GameObject> atHandObjectList = new List<GameObject>();
                 if (m_atHandContent != null)
                 {
                     foreach (Transform atHand in m_atHandContent)
                     {
                         if (atHand.gameObject.activeSelf)
                         {
-                            atHandObjectList.Add(atHand.gameObject);
+                            objList.Add(atHand.gameObject);
                         }
                     }
                 }
-                for (var index = 0; index < atHandObjectList.Count; index++)
+                for (var index = 0; index < objList.Count; index++)
                 {
-                    string[] list = atHandObjectList[index].name.Split('^');
+                    string[] list = objList[index].name.Split('^');
                     CardDetail cardDetail = new CardDetail() { tag = list[0], cardId = list[1] };
                     cardDetailList.Add(cardDetail);
                 }
@@ -529,11 +531,20 @@ public class FieldCardManager : MonoBehaviour
         return cardDetailList;
     }
 
-    public List<GameObject> GetCardHandObjList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
+    public List<GameObject> GetCardHandObjList(CardOptionWindow.OPTION_TYPE option)
     {
         List<GameObject> objList = new List<GameObject>();
         switch (option)
         {
+            case OPTION_TYPE.HAND:
+                foreach (Transform hand in m_handContent)
+                {
+                    if (hand.gameObject.activeSelf)
+                    {
+                        objList.Add(hand.gameObject);
+                    }
+                }
+                break;
             case OPTION_TYPE.AT_HAND:
                 if (m_atHandContent != null)
                 {
@@ -547,7 +558,12 @@ public class FieldCardManager : MonoBehaviour
                 }
                 break;
         }
+        return objList;
+    }
 
+    public List<GameObject> GetCardHandObjList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
+    {
+        List<GameObject> objList = GetCardHandObjList(option);
         int index = 0;
         if (!isUp)
         {

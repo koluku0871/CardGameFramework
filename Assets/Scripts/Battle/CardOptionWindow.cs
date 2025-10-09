@@ -240,7 +240,7 @@ public class CardOptionWindow : MonoBehaviour
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分の手札からランダムにX枚捨てる", () => {
             for (int index = 0; index < numButtonTextNum; index++)
             {
-                List<GameObject> handObjectList = FieldCardManager.Instance().GetHandGameObject();
+                List<GameObject> handObjectList = FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.HAND);
                 GameObject handObject = handObjectList[UnityEngine.Random.Range(0, handObjectList.Count)];
                 string[] list = handObject.name.Split('^');
                 Debug.Log(handObject.name);
@@ -249,7 +249,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F9, false, "手札をデッキに戻してX枚引き直す", () => {
-            List<GameObject> handObjectList = FieldCardManager.Instance().GetHandGameObject();
+            List<GameObject> handObjectList = FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.HAND);
             foreach (GameObject handObject in handObjectList)
             {
                 string[] list = handObject.name.Split('^');

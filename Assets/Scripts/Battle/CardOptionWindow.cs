@@ -342,7 +342,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + atHandStr + "に置く", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + atHandStr + "の上に置く", () => {
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
             CloseOnSound();
         }));
@@ -408,7 +408,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + atHandStr + "に置く", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + atHandStr + "の上に置く", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, list[0], list[1]);
             CloseOnSound();
@@ -485,7 +485,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手札から" + atHandStr + "に置く", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手札から" + atHandStr + "の上に置く", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
             CloseOnSound();
@@ -704,7 +704,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "フィールドから" + atHandStr + "に置く", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "フィールドから" + atHandStr + "の上に置く", () => {
             TouchManager touchManager = target.GetComponent<TouchManager>();
             if (touchManager != null)
             {
@@ -881,7 +881,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "除外一覧から" + atHandStr + "に置く", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "除外一覧から" + atHandStr + "の上に置く", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.AT_HAND, list[0], list[1]);
             OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
@@ -998,7 +998,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + atHandStr + "に置く", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + atHandStr + "の上に置く", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, list[0], list[1]);
             OpenCardDetailListToMine(OPTION_TYPE.TRASH);

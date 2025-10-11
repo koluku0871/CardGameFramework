@@ -334,25 +334,23 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        if (BattleSceneManager.m_type != "bs")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + damageStr + "の上に送る", () => {
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, numButtonTextNum);
-                CloseOnSound();
-            }));
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + subStr + "の上に送る", () => {
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, true, numButtonTextNum);
-                CloseOnSound();
-            }));
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + damageStr + "の下に送る", () => {
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, false, numButtonTextNum);
-                CloseOnSound();
-            }));
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + subStr + "の下に送る", () => {
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, false, numButtonTextNum);
-                CloseOnSound();
-            }));
-        }
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + damageStr + "の上に送る", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, numButtonTextNum);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + subStr + "の上に送る", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, true, numButtonTextNum);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + damageStr + "の下に送る", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, false, numButtonTextNum);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + subStr + "の下に送る", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, false, numButtonTextNum);
+            CloseOnSound();
+        }));
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚をトラッシュに送る", () => {
             var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.TRASH, true, numButtonTextNum);
@@ -397,33 +395,36 @@ public class CardOptionWindow : MonoBehaviour
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + atHandStr + "の上に送る", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, list[0], list[1]);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + atHandStr + "の上に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, false, list[0], list[1]);
             CloseOnSound();
         }));
 
-        if (BattleSceneManager.m_type != "bs")
-        {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + damageStr + "の上に送る", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, list[0], list[1]);
-                CloseOnSound();
-            }));
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + subStr + "の上に送る", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, true, list[0], list[1]);
-                CloseOnSound();
-            }));
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + damageStr + "の下に送る", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, false, list[0], list[1]);
-                CloseOnSound();
-            }));
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + subStr + "の下に送る", () => {
-                string[] list = target.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, false, list[0], list[1]);
-                CloseOnSound();
-            }));
-        }
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + damageStr + "の上に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, list[0], list[1]);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + subStr + "の上に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, true, list[0], list[1]);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + damageStr + "の下に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, false, list[0], list[1]);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから" + subStr + "の下に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, false, list[0], list[1]);
+            CloseOnSound();
+        }));
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキからトラッシュに送る", () => {
             string[] list = target.name.Split('^');
@@ -474,7 +475,12 @@ public class CardOptionWindow : MonoBehaviour
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手札から" + atHandStr + "の上に送る", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.AT_HAND, true, target, list[0], list[1]);
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手札から" + atHandStr + "の下に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.AT_HAND, false, target, list[0], list[1]);
             CloseOnSound();
         }));
 
@@ -702,7 +708,19 @@ public class CardOptionWindow : MonoBehaviour
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
             CloseOnSound();
         }));
-
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "フィールドから" + atHandStr + "の下に送る", () => {
+            TouchManager touchManager = target.GetComponent<TouchManager>();
+            if (touchManager != null)
+            {
+                foreach (var cardDetail in touchManager.m_innerCardDetailList)
+                {
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, false, cardDetail.tag, cardDetail.cardId);
+                }
+            }
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.FIELD, OPTION_TYPE.AT_HAND, target, list[0], list[1]);
+            CloseOnSound();
+        }));
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "フィールドから" + damageStr + "の上に送る", () => {
             TouchManager touchManager = target.GetComponent<TouchManager>();
@@ -866,7 +884,12 @@ public class CardOptionWindow : MonoBehaviour
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "除外一覧から" + atHandStr + "の上に送る", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.AT_HAND, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.AT_HAND, true, list[0], list[1]);
+            OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "除外一覧から" + atHandStr + "の下に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.AT_HAND, false, list[0], list[1]);
             OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
         }));
 
@@ -979,29 +1002,34 @@ public class CardOptionWindow : MonoBehaviour
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + atHandStr + "の上に送る", () => {
             string[] list = target.name.Split('^');
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, list[0], list[1]);
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, true, list[0], list[1]);
+            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + atHandStr + "の下に送る", () => {
+            string[] list = target.name.Split('^');
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, false, list[0], list[1]);
             OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + damageStr + "の上に送る", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.DAMAGE, true, list[0], list[1]);
-            OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
+            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + subStr + "の上に送る", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.SUB, true, list[0], list[1]);
-            OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
+            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + damageStr + "の下に送る", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.DAMAGE, false, list[0], list[1]);
-            OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
+            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + subStr + "の下に送る", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.SUB, false, list[0], list[1]);
-            OpenCardDetailListToMine(OPTION_TYPE.EXCLUSION);
+            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから除外一覧に送る", () => {

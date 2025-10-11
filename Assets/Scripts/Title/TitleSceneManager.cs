@@ -84,6 +84,18 @@ public class TitleSceneManager : MonoBehaviour
             Directory.CreateDirectory(path);
         }
 
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_LOG;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_HELP;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
         OptionData optionData = new OptionData();
         optionData.IsFileExists();
         if (!optionData.IsFileExists())
@@ -231,8 +243,12 @@ public class TitleSceneManager : MonoBehaviour
                 {
                     directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_EXE;
                 }
+                else if(Path.GetExtension(data) == ".help")
+                {
+                    directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_HELP;
+                }
 
-                string key = Path.GetFileNameWithoutExtension(directoryPath + data);
+                    string key = Path.GetFileNameWithoutExtension(directoryPath + data);
                 pathList.Add(key);
 
                 if (File.Exists(directoryPath + data))

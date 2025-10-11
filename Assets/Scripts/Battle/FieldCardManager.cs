@@ -739,6 +739,10 @@ public class FieldCardManager : MonoBehaviour
                 {
                     Image card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
+                            if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                            {
+                                return;
+                            }
                             AudioSourceManager.Instance().PlayOneShot(0);
                             int siblingIndex = target.transform.GetSiblingIndex();
                             if (siblingIndex - 1 > 0)
@@ -747,6 +751,10 @@ public class FieldCardManager : MonoBehaviour
                             }
                         },
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
+                            if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                            {
+                                return;
+                            }
                             AudioSourceManager.Instance().PlayOneShot(0);
                             int siblingIndex = target.transform.GetSiblingIndex();
                             if (siblingIndex + 1 < target.transform.parent.childCount)

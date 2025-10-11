@@ -71,6 +71,23 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private Image m_trash = null;
 
+    [Header("digimon")]
+    [SerializeField]
+    private Toggle m_moveSecurityToggle = null;
+
+    public bool IsMoveSecurity
+    {
+        get
+        {
+            if (m_moveSecurityToggle == null)
+            {
+                return false;
+            }
+
+            return !m_moveSecurityToggle.isOn;
+        }
+    }
+
 
     private List<GameObject> m_countCoreList = new List<GameObject>();
     private List<GameObject> m_soulCoreList = new List<GameObject>();

@@ -2,11 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
-using static CardOptionWindow;
-using static ConstManager;
 
 public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -167,7 +164,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 core.GetComponent<TouchManager>().SetAction(null, null, null, () => {
                     core.SetActive(false);
                 });
-                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.DAMAGE;
+                core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.DAMAGE;
             });
         }
 
@@ -190,7 +187,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
-                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
                 m_countCoreList.Add(core);
             });
         }
@@ -227,7 +224,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
-                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
                 m_coreList.Add(core);
             });
         }
@@ -254,7 +251,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
-                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.SOULCORE;
+                core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.SOULCORE;
                 m_soulCoreList.Add(core);
             });
         }
@@ -291,7 +288,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
-                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
                 m_coreList.Add(core);
             });
         }
@@ -344,7 +341,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         core.SetActive(false);
                     }
                 });
-                core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
                 m_coreList.Add(core);
             }
         }
@@ -368,7 +365,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     core.SetActive(false);
                 }
             });
-            core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.SOULCORE;
+            core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.SOULCORE;
             m_soulCoreList.Add(core);
         }
 
@@ -391,7 +388,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     core.SetActive(false);
                 }
             });
-            core.GetComponent<TouchManager>().PhotonObjectType = PhotonObjectType.CORE;
+            core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
             m_coreList.Add(core);
         }
     }
@@ -506,16 +503,16 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             DeckManager.DeckDetail jsonDeckDetail = JsonUtility.FromJson<DeckManager.DeckDetail>(deckDetailJson);
 
-            m_fieldCardManager.SetDeckDetail(OPTION_TYPE.DECK, jsonDeckDetail.cardDetailList);
-            m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.DECK);
+            m_fieldCardManager.SetDeckDetail(CardOptionWindow.OPTION_TYPE.DECK, jsonDeckDetail.cardDetailList);
+            m_fieldCardManager.ShuffleCardDetailList(CardOptionWindow.OPTION_TYPE.DECK);
 
             if (BattleSceneManager.m_type != "bs")
             {
-                m_fieldCardManager.SetDeckDetail(OPTION_TYPE.SUB, jsonDeckDetail.subCardDetailList);
-                m_fieldCardManager.ShuffleCardDetailList(OPTION_TYPE.SUB);
+                m_fieldCardManager.SetDeckDetail(CardOptionWindow.OPTION_TYPE.SUB, jsonDeckDetail.subCardDetailList);
+                m_fieldCardManager.ShuffleCardDetailList(CardOptionWindow.OPTION_TYPE.SUB);
             }
 
-            m_fieldCardManager.SetDeckDetail(OPTION_TYPE.TOKEN, jsonDeckDetail.tokenCardDetailList);
+            m_fieldCardManager.SetDeckDetail(CardOptionWindow.OPTION_TYPE.TOKEN, jsonDeckDetail.tokenCardDetailList);
 
 
             m_fieldCardManager.InitSetting();

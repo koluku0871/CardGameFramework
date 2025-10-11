@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Image = UnityEngine.UI.Image;
-using Text = UnityEngine.UI.Text;
 public class CardOptionWindow : MonoBehaviour
 {
     public enum OPTION_TYPE

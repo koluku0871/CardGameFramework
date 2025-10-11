@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
-using static DeckManager;
 
 public class OptionData : JsonFileData
 {
@@ -47,7 +46,7 @@ public class OptionData : JsonFileData
 
 public class FavoriteData
 {
-    public List<CardDetail> cardDetails = new List<CardDetail>();
+    public List<DeckManager.CardDetail> cardDetails = new List<DeckManager.CardDetail>();
 }
 
 public class JsonFileData

@@ -6,7 +6,6 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using static DeckManager;
 
 public class PhotonSceneManager : MonoBehaviourPunCallbacks
 {
@@ -304,7 +303,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
                 var deckStr = sr.ReadToEnd();
                 try
                 {
-                    DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(deckStr);
+                    DeckManager.DeckDetail deckCardList = JsonUtility.FromJson<DeckManager.DeckDetail>(deckStr);
                     if (deckCardList.GetDeckType() == AssetBundleManager.Instance().CardType)
                     {
                         m_deckList.Add(deckStr);

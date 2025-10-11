@@ -2,8 +2,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Image = UnityEngine.UI.Image;
-using Text = UnityEngine.UI.Text;
 
 public class CardDetailManager : MonoBehaviour
 {

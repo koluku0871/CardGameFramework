@@ -4,17 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static CardOptionWindow;
-using static DeckManager;
-using static FieldCardManager;
-using static UnityEngine.GraphicsBuffer;
 
 public class FieldCardManager : MonoBehaviour
 {
     [Serializable]
     public class FieldCardData
     {
-        public List<CardDetail> deckDetailList = new List<CardDetail>();
+        public List<DeckManager.CardDetail> deckDetailList = new List<DeckManager.CardDetail>();
 
         public List<string> atHandList = new List<string>();
 
@@ -24,13 +20,13 @@ public class FieldCardManager : MonoBehaviour
 
         public string flash = "";
 
-        public List<CardDetail> trashDetailList = new List<CardDetail>();
+        public List<DeckManager.CardDetail> trashDetailList = new List<DeckManager.CardDetail>();
 
-        public List<CardDetail> exclusionDetailList = new List<CardDetail>();
+        public List<DeckManager.CardDetail> exclusionDetailList = new List<DeckManager.CardDetail>();
 
-        public List<CardDetail> damageDetailList = new List<CardDetail>();
+        public List<DeckManager.CardDetail> damageDetailList = new List<DeckManager.CardDetail>();
 
-        public List<CardDetail> subDetailList = new List<CardDetail>();
+        public List<DeckManager.CardDetail> subDetailList = new List<DeckManager.CardDetail>();
     }
 
     [SerializeField]
@@ -78,17 +74,17 @@ public class FieldCardManager : MonoBehaviour
     [SerializeField]
     private Image m_handCard = null;
 
-    private List<CardDetail> m_deckDetailList = new List<CardDetail>();
+    private List<DeckManager.CardDetail> m_deckDetailList = new List<DeckManager.CardDetail>();
 
-    private List<CardDetail> m_aceDetailList = new List<CardDetail>();
+    private List<DeckManager.CardDetail> m_aceDetailList = new List<DeckManager.CardDetail>();
 
-    private List<CardDetail> m_trashDetailList = new List<CardDetail>();
+    private List<DeckManager.CardDetail> m_trashDetailList = new List<DeckManager.CardDetail>();
 
-    private List<CardDetail> m_exclusionDetailList = new List<CardDetail>();
+    private List<DeckManager.CardDetail> m_exclusionDetailList = new List<DeckManager.CardDetail>();
 
-    private List<CardDetail> m_damageDetailList = new List<CardDetail>();
+    private List<DeckManager.CardDetail> m_damageDetailList = new List<DeckManager.CardDetail>();
 
-    private List<CardDetail> m_subDetailList = new List<CardDetail>();
+    private List<DeckManager.CardDetail> m_subDetailList = new List<DeckManager.CardDetail>();
 
     private static FieldCardManager instance = null;
     public static FieldCardManager Instance()
@@ -133,7 +129,7 @@ public class FieldCardManager : MonoBehaviour
             }
             else
             {
-                AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 4);
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, 4);
             }
         }
 
@@ -142,22 +138,22 @@ public class FieldCardManager : MonoBehaviour
             bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
             FieldCardManager.Instance().SetSecurityAtHand(isSecurityAtHand);
 
-            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
+            AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, 5);
             if (!FieldCardManager.Instance().IsActiveAtHand())
             {
-                AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.DAMAGE, true, 5);
             }
             else
             {
-                AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, 5);
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.AT_HAND, true, 5);
             }
         }
 
         if (BattleSceneManager.m_type == "hololive")
         {
-            AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 7);
+            AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, 7);
             // TODO 後々
-            AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.DAMAGE, true, 5);
+            AddDstFromSrc(CardOptionWindow.OPTION_TYPE.SUB, CardOptionWindow.OPTION_TYPE.DAMAGE, true, 5);
         }
     }
 
@@ -341,25 +337,25 @@ public class FieldCardManager : MonoBehaviour
 
     public void ShuffleCardDetailList(CardOptionWindow.OPTION_TYPE option)
     {
-        List<CardDetail> deckDetailList = new List<CardDetail>();
+        List<DeckManager.CardDetail> deckDetailList = new List<DeckManager.CardDetail>();
         switch (option)
         {
-            case OPTION_TYPE.DECK:
+            case CardOptionWindow.OPTION_TYPE.DECK:
                 deckDetailList = m_deckDetailList;
                 break;
-            case OPTION_TYPE.TRASH:
+            case CardOptionWindow.OPTION_TYPE.TRASH:
                 deckDetailList = m_trashDetailList;
                 break;
-            case OPTION_TYPE.EXCLUSION:
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
                 deckDetailList = m_exclusionDetailList;
                 break;
-            case OPTION_TYPE.DAMAGE:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 deckDetailList = m_damageDetailList;
                 break;
-            case OPTION_TYPE.SUB:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 deckDetailList = m_subDetailList;
                 break;
-            case OPTION_TYPE.TOKEN:
+            case CardOptionWindow.OPTION_TYPE.TOKEN:
                 deckDetailList = m_aceDetailList;
                 break;
         }
@@ -374,22 +370,22 @@ public class FieldCardManager : MonoBehaviour
 
         switch (option)
         {
-            case OPTION_TYPE.DECK:
+            case CardOptionWindow.OPTION_TYPE.DECK:
                 m_deckDetailList = deckDetailList;
                 break;
-            case OPTION_TYPE.TRASH:
+            case CardOptionWindow.OPTION_TYPE.TRASH:
                 m_trashDetailList = deckDetailList;
                 break;
-            case OPTION_TYPE.EXCLUSION:
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
                 m_exclusionDetailList = deckDetailList;
                 break;
-            case OPTION_TYPE.DAMAGE:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 m_damageDetailList = deckDetailList;
                 break;
-            case OPTION_TYPE.SUB:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 m_subDetailList = deckDetailList;
                 break;
-            case OPTION_TYPE.TOKEN:
+            case CardOptionWindow.OPTION_TYPE.TOKEN:
                 m_aceDetailList = deckDetailList;
                 break;
         }
@@ -404,52 +400,52 @@ public class FieldCardManager : MonoBehaviour
             Debug.LogWarning("契約スピリットがデッキに入っていません");
         }
 
-        AddCardDetailList(OPTION_TYPE.HAND, cardDetailList);
+        AddCardDetailList(CardOptionWindow.OPTION_TYPE.HAND, cardDetailList);
     }
 
-    public void SetDeckDetail(CardOptionWindow.OPTION_TYPE option, List<CardDetail> deckDetailList)
+    public void SetDeckDetail(CardOptionWindow.OPTION_TYPE option, List<DeckManager.CardDetail> deckDetailList)
     {
         switch (option)
         {
-            case OPTION_TYPE.DECK:
+            case CardOptionWindow.OPTION_TYPE.DECK:
                 m_deckDetailList = deckDetailList;
                 m_deckCardCountText.text = m_deckDetailList.Count.ToString();
                 break;
-            case OPTION_TYPE.TRASH:
+            case CardOptionWindow.OPTION_TYPE.TRASH:
                 m_trashDetailList = deckDetailList;
                 m_trashCardCountText.text = m_trashDetailList.Count.ToString();
                 break;
-            case OPTION_TYPE.EXCLUSION:
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
                 m_exclusionDetailList = deckDetailList;
                 m_exclusionCardCountText.text = m_exclusionDetailList.Count.ToString();
                 break;
-            case OPTION_TYPE.DAMAGE:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 m_damageDetailList = deckDetailList;
                 if (m_damageCardCountText != null)
                 {
                     m_damageCardCountText.text = m_damageDetailList.Count.ToString();
                 }
                 break;
-            case OPTION_TYPE.SUB:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 m_subDetailList = deckDetailList;
                 if (m_subCardCountText != null)
                 {
                     m_subCardCountText.text = m_subDetailList.Count.ToString();
                 }
                 break;
-            case OPTION_TYPE.TOKEN:
+            case CardOptionWindow.OPTION_TYPE.TOKEN:
                 m_aceDetailList = deckDetailList;
                 break;
         }
     }
 
-    public List<CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option)
+    public List<DeckManager.CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option)
     {
         List<GameObject> objList = new List<GameObject>();
-        List<CardDetail> cardDetailList = new List<CardDetail>();
+        List<DeckManager.CardDetail> cardDetailList = new List<DeckManager.CardDetail>();
         switch (option)
         {
-            case OPTION_TYPE.HAND:
+            case CardOptionWindow.OPTION_TYPE.HAND:
                 foreach (Transform hand in m_handContent)
                 {
                     if (hand.gameObject.activeSelf)
@@ -460,11 +456,11 @@ public class FieldCardManager : MonoBehaviour
                 for (var index = 0; index < objList.Count; index++)
                 {
                     string[] list = objList[index].name.Split('^');
-                    CardDetail cardDetail = new CardDetail() { tag = list[0], cardId = list[1] };
+                    DeckManager.CardDetail cardDetail = new DeckManager.CardDetail() { tag = list[0], cardId = list[1] };
                     cardDetailList.Add(cardDetail);
                 }
                 break;
-            case OPTION_TYPE.AT_HAND:
+            case CardOptionWindow.OPTION_TYPE.AT_HAND:
                 if (m_atHandContent != null)
                 {
                     foreach (Transform atHand in m_atHandContent)
@@ -478,38 +474,38 @@ public class FieldCardManager : MonoBehaviour
                 for (var index = 0; index < objList.Count; index++)
                 {
                     string[] list = objList[index].name.Split('^');
-                    CardDetail cardDetail = new CardDetail() { tag = list[0], cardId = list[1] };
+                    DeckManager.CardDetail cardDetail = new DeckManager.CardDetail() { tag = list[0], cardId = list[1] };
                     cardDetailList.Add(cardDetail);
                 }
                 break;
-            case OPTION_TYPE.DECK:
+            case CardOptionWindow.OPTION_TYPE.DECK:
                 cardDetailList = m_deckDetailList;
                 break;
-            case OPTION_TYPE.TRASH:
+            case CardOptionWindow.OPTION_TYPE.TRASH:
                 if (m_trashDetailList != null)
                 {
                     cardDetailList = m_trashDetailList;
                 }
                 break;
-            case OPTION_TYPE.EXCLUSION:
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
                 if (m_exclusionDetailList != null)
                 {
                     cardDetailList = m_exclusionDetailList;
                 }
                 break;
-            case OPTION_TYPE.DAMAGE:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 if (m_damageDetailList != null)
                 {
                     cardDetailList = m_damageDetailList;
                 }
                 break;
-            case OPTION_TYPE.SUB:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 if (m_subDetailList != null)
                 {
                     cardDetailList = m_subDetailList;
                 }
                 break;
-            case OPTION_TYPE.TOKEN:
+            case CardOptionWindow.OPTION_TYPE.TOKEN:
                 if (m_aceDetailList != null)
                 {
                     cardDetailList = m_aceDetailList;
@@ -519,9 +515,9 @@ public class FieldCardManager : MonoBehaviour
         return cardDetailList;
     }
 
-    public List<CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
+    public List<DeckManager.CardDetail> GetCardDetailList(CardOptionWindow.OPTION_TYPE option, bool isUp, int count)
     {
-        List<CardDetail> cardDetailList = GetCardDetailList(option);
+        List<DeckManager.CardDetail> cardDetailList = GetCardDetailList(option);
         int index = 0;
         if (!isUp)
         {
@@ -536,7 +532,7 @@ public class FieldCardManager : MonoBehaviour
         List<GameObject> objList = new List<GameObject>();
         switch (option)
         {
-            case OPTION_TYPE.HAND:
+            case CardOptionWindow.OPTION_TYPE.HAND:
                 foreach (Transform hand in m_handContent)
                 {
                     if (hand.gameObject.activeSelf)
@@ -545,7 +541,7 @@ public class FieldCardManager : MonoBehaviour
                     }
                 }
                 break;
-            case OPTION_TYPE.AT_HAND:
+            case CardOptionWindow.OPTION_TYPE.AT_HAND:
                 if (m_atHandContent != null)
                 {
                     foreach (Transform atHand in m_atHandContent)
@@ -573,7 +569,7 @@ public class FieldCardManager : MonoBehaviour
         return objList;
     }
 
-    public void AddDstFromSrc(OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, string tag, string cardId)
+    public void AddDstFromSrc(CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, string tag, string cardId)
     {
         DeckManager.CardDetail cardDetailList = RemoveCardDetail(optionSrc, tag, cardId)[0];
         AddCardDetailList(optionDst, isUp, cardDetailList);
@@ -594,10 +590,10 @@ public class FieldCardManager : MonoBehaviour
         return cardDetail;
     }
 
-    public List<CardDetail> AddDstFromSrc(
+    public List<DeckManager.CardDetail> AddDstFromSrc(
         CardOptionWindow.OPTION_TYPE optionSrc, CardOptionWindow.OPTION_TYPE optionDst, bool isUp, int count
     ){
-        List<CardDetail> cardDetailList = new List<CardDetail>();
+        List<DeckManager.CardDetail> cardDetailList = new List<DeckManager.CardDetail>();
         int index = 0;
         switch (optionSrc)
         {
@@ -723,7 +719,7 @@ public class FieldCardManager : MonoBehaviour
     {
         switch (option)
         {
-            case OPTION_TYPE.HAND:
+            case CardOptionWindow.OPTION_TYPE.HAND:
                 foreach (var cardDetail in cardDetailList)
                 {
                     Image card = CreateCard(cardDetail, true, m_handCard, m_handContent,
@@ -733,7 +729,7 @@ public class FieldCardManager : MonoBehaviour
                     card.name = m_handCard.name;
                 }
                 break;
-            case OPTION_TYPE.AT_HAND:
+            case CardOptionWindow.OPTION_TYPE.AT_HAND:
                 if (m_atHandCard == null || m_atHandContent == null)
                 {
                     return;
@@ -817,7 +813,7 @@ public class FieldCardManager : MonoBehaviour
         int count = 0;
         switch (option)
         {
-            case OPTION_TYPE.DECK:
+            case CardOptionWindow.OPTION_TYPE.DECK:
                 foreach (DeckManager.CardDetail cardDetail in m_deckDetailList)
                 {
                     if (cardDetail.tag != tag || cardDetail.cardId != cardId)
@@ -831,7 +827,7 @@ public class FieldCardManager : MonoBehaviour
                 }
                 m_deckCardCountText.text = m_deckDetailList.Count.ToString();
                 break;
-            case OPTION_TYPE.TRASH:
+            case CardOptionWindow.OPTION_TYPE.TRASH:
                 foreach (var cardDetail in m_trashDetailList)
                 {
                     if (cardDetail.tag != tag || cardDetail.cardId != cardId)
@@ -849,7 +845,7 @@ public class FieldCardManager : MonoBehaviour
                     // m_trashCard.gameObject.SetActive(false);
                 }
                 break;
-            case OPTION_TYPE.EXCLUSION:
+            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
                 foreach (var cardDetail in m_exclusionDetailList)
                 {
                     if (cardDetail.tag != tag || cardDetail.cardId != cardId)
@@ -864,7 +860,7 @@ public class FieldCardManager : MonoBehaviour
                 m_exclusionCardCountText.text = count.ToString();
                 if (count <= 0) { }
                 break;
-            case OPTION_TYPE.DAMAGE:
+            case CardOptionWindow.OPTION_TYPE.DAMAGE:
                 foreach (var cardDetail in m_damageDetailList)
                 {
                     if (cardDetail.tag != tag || cardDetail.cardId != cardId)
@@ -882,7 +878,7 @@ public class FieldCardManager : MonoBehaviour
                 }
                 if (count <= 0) { }
                 break;
-            case OPTION_TYPE.SUB:
+            case CardOptionWindow.OPTION_TYPE.SUB:
                 foreach (var cardDetail in m_subDetailList)
                 {
                     if (cardDetail.tag != tag || cardDetail.cardId != cardId)
@@ -908,13 +904,13 @@ public class FieldCardManager : MonoBehaviour
     {
         switch(option)
         {
-            case OPTION_TYPE.HAND:
-            case OPTION_TYPE.AT_HAND:
+            case CardOptionWindow.OPTION_TYPE.HAND:
+            case CardOptionWindow.OPTION_TYPE.AT_HAND:
                 Destroy(card.gameObject);
                 break;
-            case OPTION_TYPE.FIELD:
-            case OPTION_TYPE.BURST:
-            case OPTION_TYPE.FLASH:
+            case CardOptionWindow.OPTION_TYPE.FIELD:
+            case CardOptionWindow.OPTION_TYPE.BURST:
+            case CardOptionWindow.OPTION_TYPE.FLASH:
                 card.sprite = CardDetailManager.Instance().GetSleeveSprite();
                 card.name = "";
                 card.gameObject.SetActive(false);
@@ -1053,7 +1049,7 @@ public class FieldCardManager : MonoBehaviour
 
         FieldCardData fieldCardData = JsonUtility.FromJson<FieldCardData>(fieldCardManagerDataJson);
 
-        SetDeckDetail(OPTION_TYPE.DECK, fieldCardData.deckDetailList);
+        SetDeckDetail(CardOptionWindow.OPTION_TYPE.DECK, fieldCardData.deckDetailList);
 
         List<GameObject> handObjectList = new List<GameObject>();
         foreach (Transform hand in m_handContent)
@@ -1166,11 +1162,11 @@ public class FieldCardManager : MonoBehaviour
             copied.gameObject.SetActive(true);
         }
 
-        SetDeckDetail(OPTION_TYPE.TRASH, fieldCardData.trashDetailList);
-        SetDeckDetail(OPTION_TYPE.EXCLUSION, fieldCardData.exclusionDetailList);
+        SetDeckDetail(CardOptionWindow.OPTION_TYPE.TRASH, fieldCardData.trashDetailList);
+        SetDeckDetail(CardOptionWindow.OPTION_TYPE.EXCLUSION, fieldCardData.exclusionDetailList);
 
-        SetDeckDetail(OPTION_TYPE.DAMAGE, fieldCardData.damageDetailList);
-        SetDeckDetail(OPTION_TYPE.SUB, fieldCardData.subDetailList);
+        SetDeckDetail(CardOptionWindow.OPTION_TYPE.DAMAGE, fieldCardData.damageDetailList);
+        SetDeckDetail(CardOptionWindow.OPTION_TYPE.SUB, fieldCardData.subDetailList);
     }
 
     public string GetFieldCardManagerDataJson()

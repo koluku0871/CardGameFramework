@@ -1017,7 +1017,6 @@ public class CardOptionWindow : MonoBehaviour
             OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
 
-
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + atHandStr + "の上に置く", () => {
             string[] list = target.name.Split('^');
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, list[0], list[1]);
@@ -1310,17 +1309,33 @@ public class CardOptionWindow : MonoBehaviour
 
     public void Open(OPTION_TYPE optionType, OPTION_TYPE detailOptionType = OPTION_TYPE.NONE, Action<bool> callback = null)
     {
+        bool isActiveAtHand = FieldCardManager.Instance().IsActiveAtHand();
+
         foreach (OptionButton optionButton in m_optionButtonList)
         {
             if (BattleSceneManager.m_type == "digimon")
             {
-                if (optionType == OPTION_TYPE.AT_HAND && !FieldCardManager.Instance().IsActiveAtHand())
+                if (isActiveAtHand)
                 {
-                    return;
+                    if (optionButton.optionType == OPTION_TYPE.DAMAGE)
+                    {
+                        continue;
+                    }
+                    if (optionButton.title.Contains("から"+ damageStr))
+                    {
+                        continue;
+                    }
                 }
-                else if (optionType == OPTION_TYPE.DAMAGE && FieldCardManager.Instance().IsActiveAtHand())
+                else
                 {
-                    return;
+                    if (optionType == OPTION_TYPE.AT_HAND)
+                    {
+                        continue;
+                    }
+                    if (optionButton.title.Contains("から" + atHandStr))
+                    {
+                        continue;
+                    }
                 }
             }
 

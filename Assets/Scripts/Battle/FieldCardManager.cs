@@ -741,12 +741,18 @@ public class FieldCardManager : MonoBehaviour
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
                             AudioSourceManager.Instance().PlayOneShot(0);
                             int siblingIndex = target.transform.GetSiblingIndex();
-                            target.transform.SetSiblingIndex(siblingIndex-1);
+                            if (siblingIndex - 1 > 0)
+                            {
+                                target.transform.SetSiblingIndex(siblingIndex - 1);
+                            }
                         },
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
                             AudioSourceManager.Instance().PlayOneShot(0);
                             int siblingIndex = target.transform.GetSiblingIndex();
-                            target.transform.SetSiblingIndex(siblingIndex+1);
+                            if (siblingIndex + 1 < target.transform.parent.childCount)
+                            {
+                                target.transform.SetSiblingIndex(siblingIndex + 1);
+                            }
                         },
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
                             CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);

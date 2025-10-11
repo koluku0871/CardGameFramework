@@ -276,46 +276,13 @@ public class CardOptionWindow : MonoBehaviour
             }
         });
 
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha1, "Xの設定値を1に変更する。", () =>
+        for (int i = 1; i < 11; i++)
         {
-            OnClickToNumSelectButton(1);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha2, "Xの設定値を2に変更する。", () =>
-        {
-            OnClickToNumSelectButton(2);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha3, "Xの設定値を3に変更する。", () =>
-        {
-            OnClickToNumSelectButton(3);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha4, "Xの設定値を4に変更する。", () =>
-        {
-            OnClickToNumSelectButton(4);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha5, "Xの設定値を5に変更する。", () =>
-        {
-            OnClickToNumSelectButton(5);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha6, "Xの設定値を6に変更する。", () =>
-        {
-            OnClickToNumSelectButton(6);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha7, "Xの設定値を7に変更する。", () =>
-        {
-            OnClickToNumSelectButton(7);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha8, "Xの設定値を8に変更する。", () =>
-        {
-            OnClickToNumSelectButton(8);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha9, "Xの設定値を9に変更する。", () =>
-        {
-            OnClickToNumSelectButton(9);
-        });
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha0, "Xの設定値を10に変更する。", () =>
-        {
-            OnClickToNumSelectButton(10);
-        });
+            AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha1, "Xの設定値を" + i + "に変更する。", () =>
+            {
+                OnClickToNumSelectButton(1);
+            });
+        }
     }
 
     

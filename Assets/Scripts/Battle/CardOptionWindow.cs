@@ -1313,30 +1313,50 @@ public class CardOptionWindow : MonoBehaviour
 
         foreach (OptionButton optionButton in m_optionButtonList)
         {
-            if (BattleSceneManager.m_type == "digimon")
+            switch (BattleSceneManager.m_type)
             {
-                if (isActiveAtHand)
-                {
+                case "digimon":
+                    if (isActiveAtHand)
+                    {
+                        if (optionButton.optionType == OPTION_TYPE.DAMAGE)
+                        {
+                            continue;
+                        }
+                        if (optionButton.title.Contains("から" + damageStr))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (optionType == OPTION_TYPE.AT_HAND)
+                        {
+                            continue;
+                        }
+                        if (optionButton.title.Contains("から" + atHandStr))
+                        {
+                            continue;
+                        }
+                    }
+                    break;
+                case "bs":
                     if (optionButton.optionType == OPTION_TYPE.DAMAGE)
                     {
                         continue;
                     }
-                    if (optionButton.title.Contains("から"+ damageStr))
+                    if (optionButton.optionType == OPTION_TYPE.SUB)
                     {
                         continue;
                     }
-                }
-                else
-                {
-                    if (optionType == OPTION_TYPE.AT_HAND)
+                    if (optionButton.title.Contains("から" + damageStr))
                     {
                         continue;
                     }
-                    if (optionButton.title.Contains("から" + atHandStr))
+                    if (optionButton.title.Contains("から" + subStr))
                     {
                         continue;
                     }
-                }
+                    break;
             }
 
             bool isActive = (optionButton.optionType == optionType && optionButton.detailOptionType == detailOptionType);

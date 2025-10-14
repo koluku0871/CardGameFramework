@@ -186,19 +186,30 @@ public class CardOptionWindow : MonoBehaviour
 
         if (FieldCardManager.Instance().IsActiveAtHand())
         {
-            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F12, false, damageStr + "と手札をデッキに戻して引き直す", () => {
+            m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F12, false, atHandStr + "と手札をデッキに戻して引き直す", () => {
                 List<GameObject> handObjectList = FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.AT_HAND);
                 foreach (GameObject handObject in handObjectList)
                 {
                     string[] list = handObject.name.Split('^');
                     FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.DECK, true, 5);
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, true, 5);
 
                 FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, 5);
                 FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
                 CloseOnSound();
             }));
+
+            AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.O, atHandStr + "の上から1枚を表にする", () =>
+            {
+                var card = FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.AT_HAND, false, 1)[0];
+                HandCard handCard = card.GetComponent<HandCard>();
+                if (handCard != null)
+                {
+                    handCard.SetIsOpen(true);
+                }
+                CloseOnSound();
+            });
         }
         else
         {
@@ -541,7 +552,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "からフィールドに送る", () => {
             string[] list = target.name.Split('^');
-            var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.AT_HAND, list[0], list[1])[0];
+            FieldCardManager.Instance().RemoveCardImage(OPTION_TYPE.AT_HAND, target);
             PlayerFieldManager.Instance().CreateCard(target.name);
             CloseOnSound();
         }));
@@ -572,24 +583,6 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, new List<DeckManager.CardDetail>() { card });
             CloseOnSound();
         }));
-
-
-        if (BattleSceneManager.m_type == "digimon")
-        {
-            if (FieldCardManager.Instance().IsActiveAtHand())
-            {
-                AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.O, subStr + "の上から1枚を表にする", () =>
-                {
-                    var card = FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.AT_HAND, true, 1)[0];
-                    HandCard handCard = card.GetComponent<HandCard>();
-                    if (handCard != null)
-                    {
-                        handCard.SetIsOpen(true);
-                    }
-                    CloseOnSound();
-                });
-            }
-        }
     }
 
     public void SetButtonToField()

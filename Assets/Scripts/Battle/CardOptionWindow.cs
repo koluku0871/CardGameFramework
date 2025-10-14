@@ -100,8 +100,8 @@ public class CardOptionWindow : MonoBehaviour
                 SetButtonToBs();
                 break;
             case "digimon":
-                atHandStr = "セキュリティ一覧";
-                damageStr = "セキュリティ";
+                atHandStr = "セキュリティリスト";
+                damageStr = "セキュリティ一覧";
                 subStr = "デジタマ";
                 SetButtonToDigimon();
                 break;

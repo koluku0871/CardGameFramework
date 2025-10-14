@@ -84,7 +84,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 return false;
             }
 
-            return !m_moveSecurityToggle.isOn;
+            return m_moveSecurityToggle.isOn;
         }
     }
 

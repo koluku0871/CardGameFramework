@@ -1148,15 +1148,15 @@ public class FieldCardManager : MonoBehaviour
             copied.name = list[0];
             if (list[1] == "False" && copied.sprite != sleeveSprite)
             {
-                handCard.SetIsOpen(false);
                 copied.sprite = sleeveSprite;
+                handCard.SetIsOpen(false);
                 cardEventTrigger.triggers = new List<EventTrigger.Entry>();
             }
-            else if (list[1] == "True" && copied.sprite == sleeveSprite)
+            else if (list[1] == "True")
             {
-                handCard.SetIsOpen(true);
                 string[] namelist = copied.name.Split('^');
                 copied.sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = namelist[0], cardId = namelist[1] });
+                handCard.SetIsOpen(true);
                 cardEventTrigger.triggers = new List<EventTrigger.Entry>();
                 // マウスオーバー
                 EventTrigger.Entry entry = new EventTrigger.Entry();

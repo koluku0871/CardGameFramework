@@ -664,8 +664,61 @@ public class FieldCardManager : MonoBehaviour
     public void AddCardDetailList(CardOptionWindow.OPTION_TYPE option, bool isUp, DeckManager.CardDetail cardDetail)
     {
         int index = 0;
+        Image card = null;
         switch (option)
         {
+            case CardOptionWindow.OPTION_TYPE.HAND:
+                card = CreateCard(cardDetail, true, m_handCard, m_handContent,
+                    (Image target, string tag, string cardId, bool isDoubleClick) => {
+                        CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.HAND);
+                    });
+                card.name = m_handCard.name;
+                break;
+            case CardOptionWindow.OPTION_TYPE.AT_HAND:
+                if (m_atHandCard == null || m_atHandContent == null)
+                {
+                    return;
+                }
+
+                card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
+                    (Image target, string tag, string cardId, bool isDoubleClick) => {
+                        if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                        {
+                            return;
+                        }
+                        AudioSourceManager.Instance().PlayOneShot(0);
+                        int siblingIndex = target.transform.GetSiblingIndex();
+                        if (siblingIndex - 1 > 0)
+                        {
+                            target.transform.SetSiblingIndex(siblingIndex - 1);
+                        }
+                    },
+                    (Image target, string tag, string cardId, bool isDoubleClick) => {
+                        if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                        {
+                            return;
+                        }
+                        AudioSourceManager.Instance().PlayOneShot(0);
+                        int siblingIndex = target.transform.GetSiblingIndex();
+                        if (siblingIndex + 1 < target.transform.parent.childCount)
+                        {
+                            target.transform.SetSiblingIndex(siblingIndex + 1);
+                        }
+                    },
+                    (Image target, string tag, string cardId, bool isDoubleClick) => {
+                        CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);
+                    },
+                    (Image target, string tag, string cardId) => {
+                        if (target.GetComponent<HandCard>().IsOpen)
+                        {
+                            CardDetailManager.Instance().SetSprite(target.sprite);
+                            CardDetailManager.Instance().SetCardDetail(tag, cardId);
+                        }
+                    }
+                );
+                card.name = m_atHandCard.name;
+                card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                break;
             case CardOptionWindow.OPTION_TYPE.DECK:
                 if (!isUp)
                 {

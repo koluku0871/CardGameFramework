@@ -187,16 +187,20 @@ public class CardOptionWindow : MonoBehaviour
         if (FieldCardManager.Instance().IsActiveAtHand())
         {
             m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F12, false, atHandStr + "と手札をデッキに戻して引き直す", () => {
-                List<GameObject> handObjectList = FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.AT_HAND);
-                foreach (GameObject handObject in handObjectList)
+                foreach (GameObject handObject in FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.HAND))
+                {
+                    string[] list = handObject.name.Split('^');
+                    FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
+                }
+
+                foreach (GameObject handObject in FieldCardManager.Instance().GetCardHandObjList(OPTION_TYPE.AT_HAND))
                 {
                     string[] list = handObject.name.Split('^');
                     FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, true, 5);
 
+                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
                 FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, 5);
-                FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
                 CloseOnSound();
             }));
 

@@ -15,8 +15,6 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private Button m_optionButton = null;
     [SerializeField]
-    private Button m_markButton = null;
-    [SerializeField]
     private Button m_coinButton = null;
 
     [SerializeField]
@@ -38,9 +36,6 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     private Image m_life = null; 
     [SerializeField]
     private Image m_reserve = null;
-
-    [SerializeField]
-    private RectTransform m_markField = null;
 
     [SerializeField]
     private RectTransform m_cardField = null;
@@ -146,20 +141,6 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             m_optionButton.onClick.AddListener(() => {
                 CardOptionWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.STEP);
-            });
-        }
-
-        if (SetActive(m_markButton, false))
-        {
-            m_markButton.onClick.AddListener(() => {
-                GameObject mark = PhotonNetwork.Instantiate("Prefab/Battle/Mark", Vector3.zero, Quaternion.identity);
-                mark.transform.SetParent(m_markField);
-                mark.transform.localPosition = Vector3.zero;
-                mark.transform.localScale = Vector3.one;
-                mark.transform.localRotation = Quaternion.identity;
-                mark.GetComponent<TouchManager>().SetAction(null, null, null, () => {
-                    mark.SetActive(false);
-                });
             });
         }
 
@@ -544,11 +525,6 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     public RectTransform GetCoreField()
     {
         return m_coreField;
-    }
-
-    public RectTransform GetMarkField()
-    {
-        return m_markField;
     }
 
     public void SetAllMyCardToRecovery()

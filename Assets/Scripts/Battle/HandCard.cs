@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField]
-    private Text m_openText = null;
+    private TMPro.TextMeshProUGUI m_openText = null;
 
     [SerializeField]
     private bool m_isMoveHand = true;
@@ -26,13 +26,19 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
             if (m_isOpen)
             {
-                m_openText.text = "表";
+                if (m_openText != null)
+                {
+                    m_openText.text = "表";
+                }
                 string[] namelist = this.gameObject.name.Split('^');
                 m_image.sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = namelist[0], cardId = namelist[1] });
             }
             else
             {
-                m_openText.text = "裏";
+                if (m_openText != null)
+                {
+                    m_openText.text = "裏";
+                }
                 m_image.sprite = CardDetailManager.Instance().GetSleeveSprite();
             }
         }

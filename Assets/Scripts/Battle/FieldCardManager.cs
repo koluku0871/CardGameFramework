@@ -36,31 +36,31 @@ public class FieldCardManager : MonoBehaviour
     private Image m_deckCard = null;
 
     [SerializeField]
-    private Text m_deckCardCountText = null;
+    private TMPro.TextMeshProUGUI m_deckCardCountText = null;
 
     [SerializeField]
     private Image m_trashCard = null;
 
     [SerializeField]
-    private Text m_trashCardCountText = null;
+    private TMPro.TextMeshProUGUI m_trashCardCountText = null;
 
     [SerializeField]
     private Image m_exclusionCard = null;
 
     [SerializeField]
-    private Text m_exclusionCardCountText = null;
+    private TMPro.TextMeshProUGUI m_exclusionCardCountText = null;
 
     [SerializeField]
     private Image m_damageCard = null;
 
     [SerializeField]
-    private Text m_damageCardCountText = null;
+    private TMPro.TextMeshProUGUI m_damageCardCountText = null;
 
     [SerializeField]
     private Image m_subCard = null;
 
     [SerializeField]
-    private Text m_subCardCountText = null;
+    private TMPro.TextMeshProUGUI m_subCardCountText = null;
 
     [SerializeField]
     private RectTransform m_atHandContent = null;

@@ -49,7 +49,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     [Header("カード")]
 
     [SerializeField]
-    private Text m_openText = null;
+    private TMPro.TextMeshProUGUI m_openText = null;
 
     [SerializeField]
     private Image m_soulImage = null;
@@ -403,9 +403,6 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 case ConstManager.PhotonObjectType.SOULCORE:
                 case ConstManager.PhotonObjectType.DAMAGE:
                     transform.SetParent(playerFieldManager.GetCoreField());
-                    break;
-                case ConstManager.PhotonObjectType.MARK:
-                    transform.SetParent(playerFieldManager.GetMarkField());
                     break;
             }
         }

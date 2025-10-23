@@ -60,13 +60,13 @@ public class CardOptionWindow : MonoBehaviour
     private Button m_button = null;
 
     [SerializeField]
-    private Text m_text = null;
+    private TMPro.TextMeshProUGUI m_text = null;
 
     [SerializeField]
     private Image m_NumButtonMask = null;
 
     [SerializeField]
-    private Text m_NumButtonText = null;
+    private TMPro.TextMeshProUGUI m_NumButtonText = null;
 
     public int numButtonTextNum = 1;
 

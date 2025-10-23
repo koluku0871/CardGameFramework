@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class CoinManager : MonoBehaviour, IPunObservable
 {
     [SerializeField]
-    private Text m_openText = null;
+    private TMPro.TextMeshProUGUI m_openText = null;
 
     private bool m_isOpen = false;
     public bool IsOpen

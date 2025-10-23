@@ -27,7 +27,6 @@ public class ConstManager
         CARD,
         SOULCORE,
         CORE,
-        MARK,
         DAMAGE,
     }
 

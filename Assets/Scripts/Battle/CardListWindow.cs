@@ -29,7 +29,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
 
     private void Awake()
     {
-        if (m_photonView.IsMine || BattleSceneManager.IsNoPlayerInstance(m_photonView)) instance = this;
+        if (m_photonView.IsMine || BattleSceneManager.Instance().IsNoPlayerInstance(m_photonView)) instance = this;
 
         GameObject canvasPanel = GameObject.FindGameObjectWithTag("BattleScenePanel");
         transform.SetParent(canvasPanel.transform);

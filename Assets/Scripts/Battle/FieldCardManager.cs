@@ -94,7 +94,7 @@ public class FieldCardManager : MonoBehaviour
 
     private void Awake()
     {
-        if (m_photonView.IsMine || BattleSceneManager.IsNoPlayerInstance(m_photonView)) instance = this;
+        if (m_photonView.IsMine || BattleSceneManager.Instance().IsNoPlayerInstance(m_photonView)) instance = this;
 
         if (m_atHandCard != null)
         {
@@ -102,8 +102,6 @@ public class FieldCardManager : MonoBehaviour
         }
         
         m_handCard.gameObject.SetActive(false);
-
-        // m_trashCard.gameObject.SetActive(false);
     }
 
     bool isInit = true;

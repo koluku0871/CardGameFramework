@@ -73,7 +73,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     private Toggle m_detailToggle = null;
 
     [SerializeField]
-    private BattlePlayerManager m_battlePlayerManager = null;
+    private List<TMPro.TextMeshProUGUI> m_playerNameList = new List<TMPro.TextMeshProUGUI> ();
 
     private string m_playerName = "";
 
@@ -165,7 +165,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         var localPlayer = PhotonNetwork.LocalPlayer;
         m_playerName = localPlayer.ActorNumber + "P " + localPlayer.NickName;
 
-        m_battlePlayerManager.SetRoomHash();
+        SetRoomHash();
 
         m_inButton.interactable = true;
         m_outButton.interactable = true;
@@ -195,7 +195,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     {
         base.OnRoomPropertiesUpdate(propertiesThatChanged);
 
-        m_battlePlayerManager.OnPropertiesUpdate(propertiesThatChanged);
+        OnPropertiesUpdate(propertiesThatChanged);
 
         SetCustomRoomProperties();
     }
@@ -408,15 +408,19 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             str += "[key = " + key.ToString() + ", value = " + value.ToString() + "],";
         }
 
-        customRoomProperties.Add("playerName1", m_battlePlayerManager.roomHash["playerName1"]);
-        customRoomProperties.Add("playerName2", m_battlePlayerManager.roomHash["playerName2"]);
-        customRoomProperties.Add("playerDeck1", m_battlePlayerManager.roomHash["playerDeck1"]);
-        customRoomProperties.Add("playerDeck2", m_battlePlayerManager.roomHash["playerDeck2"]);
+        for (int i = 0; i < 4; i++)
+        {
+            if (roomHash.ContainsKey("playerName" + (i + 1)))
+            {
+                customRoomProperties.Add("playerName" + (i + 1), roomHash["playerName" + (i + 1)]);
+                customRoomProperties.Add("playerDeck" + (i + 1), roomHash["playerDeck" + (i + 1)]);
+            }
+        }
 
-        if (m_battlePlayerManager.roomHashCount <= customRoomProperties.Count)
+        if (roomHashCount <= customRoomProperties.Count)
         {
             Debug.Log(str);
-            m_battlePlayerManager.SetRoomHash(customRoomProperties);
+            SetRoomHash(customRoomProperties);
         }
     }
 
@@ -457,12 +461,12 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        m_battlePlayerManager.SetInBattlePlayer(m_playerName, m_deckName);
+        SetInBattlePlayer(m_playerName, m_deckName);
     }
 
     public void OnClickToOutButton()
     {
-        m_battlePlayerManager.SetOutBattlePlayer(m_playerName);
+        SetOutBattlePlayer(m_playerName);
     }
 
     public void OnValueChangedToDeckSelectDropdown()
@@ -485,12 +489,10 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
 
     public void OnClickToStartButton()
     {
-        if (!m_battlePlayerManager.IsStandbyBattlePlayer())
+        if (!IsStandbyBattlePlayer())
         {
             return;
         }
-
-        //m_photonView.RPC(nameof(MoveBattleScene), RpcTarget.AllBuffered);
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.LoadLevel("BattleScene");
@@ -507,15 +509,12 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             Destroy(content.gameObject);
         }
 
-        ArrayList keys = new ArrayList(m_battlePlayerManager.roomHash.Keys);
+        ArrayList keys = new ArrayList(roomHash.Keys);
         keys.Sort();
         foreach (var key in keys)
         {
-            var propertie = m_battlePlayerManager.roomHash[key];
-            if (key.ToString() == "playerName1"
-                || key.ToString() == "playerName2"
-                || key.ToString() == "playerDeck1"
-                || key.ToString() == "playerDeck2")
+            var propertie = roomHash[key];
+            if (key.ToString().Contains("playerName") || key.ToString().Contains("playerDeck"))
             {
                 continue;
             }
@@ -561,18 +560,145 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         }
     }
 
-    /*[PunRPC]
-    public void MoveBattleScene()
-    {
-        PhotonNetwork.IsMessageQueueRunning = false;
-
-        m_battlePlayerManager.SetRoomHash();
-
-        FadeManager.Instance().OnStart("BattleScene", false);
-    }*/
-
     public void OnClickToCloseButton()
     {
         PhotonNetwork.LeaveLobby();
+    }
+
+
+    /***
+     * ExitGames.Client.Photon.Hashtable関連
+     */
+
+    // ハッシュテーブルを宣言
+    public ExitGames.Client.Photon.Hashtable roomHash = new ExitGames.Client.Photon.Hashtable();
+    public int roomHashCount = 0;
+
+    public bool IsStandbyBattlePlayer()
+    {
+        int playerNameCount = 0;
+        foreach (var playerName in m_playerNameList)
+        {
+            if (!string.IsNullOrEmpty(playerName.text))
+            {
+                playerNameCount++;
+            }
+        }
+
+        return playerNameCount >= 2;
+    }
+
+    public void SetRoomHash()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            ExitGames.Client.Photon.Hashtable customRoomProperties = new ExitGames.Client.Photon.Hashtable();
+            customRoomProperties.Add("Type", AssetBundleManager.Instance().CardType);
+            customRoomProperties.Add("Core", 3);
+            customRoomProperties.Add("SoulCore", 1);
+            customRoomProperties.Add("Life", 5);
+            customRoomProperties.Add("Hand", 4);
+            customRoomProperties.Add("IsSecurityAtHand", true);
+
+            for (int i = 0; i < 4; i++)
+            {
+                customRoomProperties.Add("playerName" + (i + 1), "");
+                customRoomProperties.Add("playerDeck" + (i + 1), "");
+            }
+
+            SetRoomHash(customRoomProperties);
+        }
+        else
+        {
+            roomHash = PhotonNetwork.CurrentRoom.CustomProperties;
+        }
+
+        if (roomHashCount < roomHash.Count)
+        {
+            roomHashCount = roomHash.Count;
+        }
+    }
+
+    public void SetRoomHash(ExitGames.Client.Photon.Hashtable customRoomProperties)
+    {
+        roomHash = customRoomProperties;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomHash);
+    }
+
+    public void SetInBattlePlayer(string playerName, string deckName)
+    {
+        int nullHashNum = -1;
+        int hitHashNum = -1;
+        for (int i = 0; i < 4; i++)
+        {
+            if (nullHashNum == -1)
+            {
+                if (!roomHash.ContainsKey("playerName" + (i + 1)) || (string)roomHash["playerName" + (i + 1)] == "")
+                {
+                    nullHashNum = (i + 1);
+                }
+            }
+
+            if ((string)roomHash["playerName" + (i + 1)] == playerName)
+            {
+                hitHashNum = (i + 1);
+            }
+        }
+
+        if (hitHashNum != -1 || nullHashNum == -1)
+        {
+            return;
+        }
+
+        roomHash["playerName" + nullHashNum] = playerName;
+        roomHash["playerDeck" + nullHashNum] = deckName;
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomHash);
+
+        m_playerNameList[nullHashNum - 1].text = playerName;
+    }
+
+    public void SetOutBattlePlayer(string playerName)
+    {
+        int hitHashNum = -1;
+        for (int i = 0; i < 4; i++)
+        {
+
+            if ((string)roomHash["playerName" + (i + 1)] == playerName)
+            {
+                hitHashNum = (i + 1);
+            }
+        }
+
+        if (hitHashNum == -1)
+        {
+            return;
+        }
+
+        roomHash["playerName" + hitHashNum] = "";
+        roomHash["playerDeck" + hitHashNum] = "";
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomHash);
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (roomHash.ContainsKey("playerName" + (i + 1)))
+            {
+                m_playerNameList[i].text = roomHash["playerName" + (i + 1)].ToString();
+            }
+        }
+    }
+
+    public void OnPropertiesUpdate(ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        roomHash = PhotonNetwork.CurrentRoom.CustomProperties;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (roomHash.ContainsKey("playerName" + (i + 1)))
+            {
+                m_playerNameList[i].text = roomHash["playerName" + (i + 1)].ToString();
+            }
+        }
     }
 }

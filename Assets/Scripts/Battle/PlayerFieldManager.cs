@@ -100,7 +100,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
-        if (m_photonView.IsMine || BattleSceneManager.IsNoPlayerInstance(m_photonView)) instance = this;
+        if (m_photonView.IsMine || BattleSceneManager.Instance().IsNoPlayerInstance(m_photonView)) instance = this;
     }
 
     private void Start()
@@ -114,12 +114,18 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         base.OnEnable();
 
-        GameObject canvasPanel = GameObject.FindGameObjectWithTag("FieldPanel");
-        transform.SetParent(canvasPanel.transform);
+        var targetPanel = BattleSceneManager.Instance().GetFieldPanelSub(BattleSceneManager.GetPlayerName(m_photonView));
+        foreach (GameObject canvasPanel in GameObject.FindGameObjectsWithTag("FieldPanelSub"))
+        {
+            if (canvasPanel.transform == targetPanel)
+            {
+                transform.SetParent(canvasPanel.transform);
+            }
+        }
 
         if (m_fieldCardManager != null)
         {
-            m_fieldCardManager.SetActiveToButton(m_photonView.IsMine || BattleSceneManager.IsNoPlayerInstance(m_photonView));
+            m_fieldCardManager.SetActiveToButton(m_photonView.IsMine || BattleSceneManager.Instance().IsNoPlayerInstance(m_photonView));
         }
 
         SetButton(m_photonView.IsMine);
@@ -150,6 +156,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 BattleSceneManager.Instance().m_coinManager.SetIsOpen(Convert.ToBoolean(new System.Random().Next(0, 2)));
             });
         }
+
+        SetActive(m_moveSecurityToggle, IsMine);
 
         if (SetActive(m_damageButton, IsMine))
         {

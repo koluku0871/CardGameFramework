@@ -10,15 +10,6 @@ using UnityEngine.UI;
 public class BattleSceneManager : MonoBehaviourPunCallbacks
 {
     [SerializeField]
-    private RectTransform m_fieldPanel = null;
-
-    [SerializeField]
-    private Text m_playerName1Text = null;
-
-    [SerializeField]
-    private Text m_playerName2Text = null;
-
-    [SerializeField]
     private ScrollRect m_scrollRect = null;
 
     [SerializeField]
@@ -55,10 +46,45 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
     public static string m_type = "";
     public static string m_playerName = "";
-    public static string m_playerName1 = "";
-    public static string m_playerName2 = "";
-    public static string m_playerDeck1 = "";
-    public static string m_playerDeck2 = "";
+
+    [Serializable]
+    public class PlayerStatus
+    {
+        public string m_playerName = "";
+        public string m_playerDeck = "";
+        public TMPro.TextMeshProUGUI m_playerNameText = null;
+        public Transform m_fieldPanelSub = null;
+        public PlayerFieldManager m_playerFieldManager = null;
+
+        public void SetPlayerName(string playerName)
+        {
+            m_playerName = playerName;
+            m_playerNameText.text = playerName;
+        }
+
+        public Transform GetFieldPanelSub(string playerName)
+        {
+            if (m_playerName != playerName)
+            {
+                return null;
+            }
+
+            return m_fieldPanelSub;
+        }
+
+        public bool IsNoPlayer()
+        {
+            return string.IsNullOrEmpty(m_playerName);
+        }
+
+        public bool IsNoPlayerFieldManager()
+        {
+            return m_playerFieldManager == null;
+        }
+    }
+
+    public List<PlayerStatus> m_playerStatusList = new List<PlayerStatus>();
+    public bool m_isPlayerStatusComplete = false;
 
     public void Awake()
     {
@@ -74,6 +100,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     public void Start()
     {
         m_playerName = GetPlayerName(PhotonNetwork.LocalPlayer);
+        int playerCount = 0;
 
         foreach (var prop in PhotonNetwork.CurrentRoom.CustomProperties)
         {
@@ -85,48 +112,121 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                     m_type = value;
                     break;
                 case "playerName1":
-                    m_playerName1 = value;
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        playerCount++;
+                    }
+                    m_playerStatusList[0].SetPlayerName(value);
                     break;
                 case "playerName2":
-                    m_playerName2 = value;
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        playerCount++;
+                    }
+                    m_playerStatusList[1].SetPlayerName(value);
+                    break;
+                case "playerName3":
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        playerCount++;
+                    }
+                    m_playerStatusList[2].SetPlayerName(value);
+                    break;
+                case "playerName4":
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        playerCount++;
+                    }
+                    m_playerStatusList[3].SetPlayerName(value);
                     break;
                 case "playerDeck1":
-                    m_playerDeck1 = value;
+                    m_playerStatusList[0].m_playerDeck = value;
                     break;
                 case "playerDeck2":
-                    m_playerDeck2 = value;
+                    m_playerStatusList[1].m_playerDeck = value;
                     break;
+                case "playerDeck3":
+                    m_playerStatusList[2].m_playerDeck = value;
+                    break;
+                case "playerDeck4":
+                    m_playerStatusList[3].m_playerDeck = value;
+                    break;
+            }
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (m_playerStatusList[i].m_playerName == m_playerName)
+            {
+                m_playerStatusList[i].m_playerNameText.text += "- mine";
+                Debug.LogError("m_playerName = " + m_playerName);
             }
         }
 
         SetUi();
     }
 
-    public List<PlayerFieldManager> m_fieldManagerList = new List<PlayerFieldManager>();
     SortedDictionary<long, string> m_sortLogList = new SortedDictionary<long, string>();
 
     public void Update()
     {
-        if (m_fieldManagerList.Count < 2)
+        if (!m_isPlayerStatusComplete)
         {
             GameObject[] playFieldList = GameObject.FindGameObjectsWithTag("PlayField");
             foreach (var playFieldObj in playFieldList)
             {
                 PlayerFieldManager fieldManager = playFieldObj.GetComponent<PlayerFieldManager>();
-                if (fieldManager == null || m_fieldManagerList.Contains(fieldManager))
+                if (fieldManager == null)
                 {
                     continue;
                 }
-                m_fieldManagerList.Add(fieldManager);
+
+                foreach (var playerStatu in m_playerStatusList)
+                {
+                    if (playerStatu.IsNoPlayer())
+                    {
+                        continue;
+                    }
+                    if (!playerStatu.IsNoPlayerFieldManager())
+                    {
+                        continue;
+                    }
+                    if (fieldManager.transform.parent != playerStatu.m_fieldPanelSub)
+                    {
+                        continue;
+                    }
+                    playerStatu.m_playerFieldManager = fieldManager;
+                    break;
+                }
+            }
+
+            bool isPlayerStatusComplete = true;
+            foreach (var playerStatu in m_playerStatusList)
+            {
+                if (playerStatu.IsNoPlayer())
+                {
+                    continue;
+                }
+                if (!playerStatu.IsNoPlayerFieldManager())
+                {
+                    continue;
+                }
+                isPlayerStatusComplete = false;
                 break;
             }
+            m_isPlayerStatusComplete = isPlayerStatusComplete;
         }
         else
         {
             bool isAdd = false;
-            foreach (var fieldManager in m_fieldManagerList)
+            foreach (var playerStatu in m_playerStatusList)
             {
-                foreach (var log in fieldManager.GetLogList())
+                if (playerStatu.m_playerFieldManager == null)
+                {
+                    continue;
+                }
+
+                foreach (var log in playerStatu.m_playerFieldManager.GetLogList())
                 {
                     if (string.IsNullOrEmpty(log))
                     {
@@ -175,103 +275,68 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
     public void SetUi()
     {
-        IsPlayer = m_playerName == m_playerName1 || m_playerName == m_playerName2;
-
-        m_playerName1Text.text = m_playerName1;
-        m_playerName2Text.text = m_playerName2;
-
-        if (m_playerName == m_playerName1)
+        IsPlayer = false;
+        for (int i = 0; i < m_playerStatusList.Count; i++)
         {
-            m_playerName1Text.text += "- mine";
-            Debug.LogError("m_playerName1 = " + m_playerName1);
-            m_fieldPanel.localRotation = Quaternion.Euler(0, 0, 0);
-
-            GameObject obj = null;
-            try
+            if (m_playerStatusList[i].m_playerName != m_playerName)
             {
-                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField_" + m_type, Vector3.zero, Quaternion.identity);
+                continue;
             }
-            catch
-            {
-                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField", Vector3.zero, Quaternion.identity);
-            }
-            
-            PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
-            obj.SetActive(true);
-            obj.transform.localPosition = Vector3.zero;
-            obj.transform.localRotation = Quaternion.identity;
-            obj.transform.localScale = Vector3.one;
-
-            var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
-            string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
-            for (int index = 0; index < deckFiles.Length; index++)
-            {
-                int start = deckFiles[index].LastIndexOf("/") + 1;
-                int end = deckFiles[index].LastIndexOf(".json");
-                int count = end - start;
-                string deckFileName = deckFiles[index].Substring(start, count);
-
-                if (m_playerDeck1 != deckFileName)
-                {
-                    continue;
-                }
-
-                StreamReader sr = new StreamReader(deckFiles[index], Encoding.UTF8);
-                playerFieldManager.SetDeckDetail(sr.ReadToEnd());
-                sr.Close();
-                break;
-            }
-
-            PhotonNetwork.Instantiate("Prefab/Battle/CardListWindow", Vector3.zero, Quaternion.identity);
-
-            m_cardOptionWindow.transform.SetAsLastSibling();
+            IsPlayer = true;
         }
 
-        if (m_playerName == m_playerName2)
+        foreach (var playerStatu in m_playerStatusList)
         {
-            m_playerName2Text.text += "- mine";
-            Debug.LogError("m_playerName2 = " + m_playerName2);
-            m_fieldPanel.localRotation = Quaternion.Euler(0, 0, 180);
-
-            GameObject obj = null;
-            try
+            if (m_playerName == playerStatu.m_playerName || (!IsPlayer && GetPlayerName(PhotonNetwork.MasterClient) == playerStatu.m_playerName))
             {
-                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField_" + m_type, Vector3.zero, Quaternion.Euler(0, 0, 180));
-            }
-            catch
-            {
-                obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField", Vector3.zero, Quaternion.Euler(0, 0, 180));
-            }
+                playerStatu.m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 0);
 
-            PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
-            obj.SetActive(true);
-            obj.transform.localPosition = Vector3.zero;
-            obj.transform.localRotation = Quaternion.Euler(0, 0, 180);
-            obj.transform.localScale = Vector3.one;
-
-            var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
-            string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
-            for (int index = 0; index < deckFiles.Length; index++)
-            {
-                int start = deckFiles[index].LastIndexOf("/") + 1;
-                int end = deckFiles[index].LastIndexOf(".json");
-                int count = end - start;
-                string deckFileName = deckFiles[index].Substring(start, count);
-
-                if (m_playerDeck2 != deckFileName)
+                if (m_playerName == playerStatu.m_playerName)
                 {
-                    continue;
+                    GameObject obj = null;
+                    try
+                    {
+                        obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField_" + m_type, Vector3.zero, Quaternion.identity);
+                    }
+                    catch
+                    {
+                        obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField", Vector3.zero, Quaternion.identity);
+                    }
+                    PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
+                    obj.SetActive(true);
+                    obj.transform.localPosition = Vector3.zero;
+                    obj.transform.localRotation = Quaternion.identity;
+                    obj.transform.localScale = Vector3.one;
+
+                    var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
+                    string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
+                    for (int index = 0; index < deckFiles.Length; index++)
+                    {
+                        int start = deckFiles[index].LastIndexOf("/") + 1;
+                        int end = deckFiles[index].LastIndexOf(".json");
+                        int count = end - start;
+                        string deckFileName = deckFiles[index].Substring(start, count);
+
+                        if (playerStatu.m_playerDeck != deckFileName)
+                        {
+                            continue;
+                        }
+
+                        StreamReader sr = new StreamReader(deckFiles[index], Encoding.UTF8);
+                        playerFieldManager.SetDeckDetail(sr.ReadToEnd());
+                        sr.Close();
+                        break;
+                    }
+
+                    PhotonNetwork.Instantiate("Prefab/Battle/CardListWindow", Vector3.zero, Quaternion.identity);
+
+                    m_cardOptionWindow.transform.SetAsLastSibling();
                 }
-
-                StreamReader sr = new StreamReader(deckFiles[index], Encoding.UTF8);
-                playerFieldManager.SetDeckDetail(sr.ReadToEnd());
-                sr.Close();
-                break;
             }
-
-            PhotonNetwork.Instantiate("Prefab/Battle/CardListWindow", Vector3.zero, Quaternion.identity);
-
-            m_cardOptionWindow.transform.SetAsLastSibling();
+            else
+            {
+                playerStatu.m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
+            }
         }
 
         if (PhotonNetwork.IsMasterClient)
@@ -284,6 +349,11 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             {
                 GameObject costManagerObj = PhotonNetwork.InstantiateRoomObject("Prefab/Battle/CostManager", Vector3.zero, Quaternion.identity);
             }
+        }
+
+        if (!IsPlayer)
+        {
+            m_cardOptionWindow.Close();
         }
 
         m_optionDropdown.options.Clear();
@@ -326,14 +396,34 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         return player.ActorNumber + "P " + player.NickName;
     }
 
-    public static bool IsNoPlayerInstance(PhotonView photonView)
+    public bool IsNoPlayerInstance(PhotonView photonView)
     {
-        string s =  GetPlayerName(photonView);
-        return !IsPlayer && IsPlayerName1(s);
+        string playerName =  GetPlayerName(photonView);
+        return !IsPlayer && GetPlayerName(PhotonNetwork.MasterClient) == playerName;
     }
 
-    public static bool IsPlayerName1(string playerName)
+    public Transform GetFieldPanelSub(string playerName)
     {
-        return playerName == m_playerName1;
+        foreach (var playerStatu in m_playerStatusList)
+        {
+            var fieldPanelSub = playerStatu.GetFieldPanelSub(playerName);
+            if (fieldPanelSub != null)
+            {
+                return fieldPanelSub;
+            }
+        }
+        return null;
+    }
+
+    public void SetFieldPanelSubRot(Transform fieldPanelSub)
+    {
+        if (fieldPanelSub.localRotation != Quaternion.Euler(0, 0, 0))
+        {
+            fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 0);
+        }
+        else
+        {
+            fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
+        }
     }
 }

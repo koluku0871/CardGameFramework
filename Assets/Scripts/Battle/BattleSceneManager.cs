@@ -3,12 +3,16 @@ using Photon.Realtime;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class BattleSceneManager : MonoBehaviourPunCallbacks
 {
+    [SerializeField]
+    private ToggleGroup m_viewToggleGroup = null;
+
     [SerializeField]
     private ScrollRect m_scrollRect = null;
 
@@ -53,6 +57,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         public string m_playerName = "";
         public string m_playerDeck = "";
         public TMPro.TextMeshProUGUI m_playerNameText = null;
+        public Canvas m_canvas = null;
         public Transform m_fieldPanelSub = null;
         public PlayerFieldManager m_playerFieldManager = null;
 
@@ -215,6 +220,10 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                 break;
             }
             m_isPlayerStatusComplete = isPlayerStatusComplete;
+            if (m_isPlayerStatusComplete)
+            {
+                SetFieldPanelSubSize(true);
+            }
         }
         else
         {
@@ -424,6 +433,120 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         else
         {
             fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
+        }
+    }
+
+    public void SetFieldPanelSubSize(bool state)
+    {
+        if (!state)
+        {
+            return;
+        }
+
+        if (!m_isPlayerStatusComplete)
+        {
+            return;
+        }
+
+        float scale = 1;
+        float posScale = 1;
+        Toggle activeToggle = m_viewToggleGroup.ActiveToggles().First();
+        switch (activeToggle.name)
+        {
+            case "ToggleViewS":
+                scale = 1;
+                posScale = 1;
+                break;
+            case "ToggleViewM":
+                scale = 0.5f;
+                posScale = 2;
+                break;
+        }
+
+        float sW = Screen.width;
+        float w = 744;
+        float h = 600;
+
+        if (scale == 1)
+        {
+            foreach (var playerStatu in m_playerStatusList)
+            {
+                if (playerStatu.IsNoPlayer())
+                {
+                    continue;
+                }
+                playerStatu.m_canvas.scaleFactor = scale;
+                playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+            }
+            return;
+        }
+
+        List<string> upNameList = new List<string>();
+        List<string> downNameList = new List<string>();
+        foreach (var playerStatu in m_playerStatusList)
+        {
+            if (playerStatu.IsNoPlayer())
+            {
+                continue;
+            }
+
+            if (playerStatu.m_fieldPanelSub.localRotation != Quaternion.Euler(0, 0, 0))
+            {
+                upNameList.Add(playerStatu.m_playerName);
+            }
+            else
+            {
+                downNameList.Add(playerStatu.m_playerName);
+            }
+        }
+
+        List<float> xList = new List<float>();
+        List<float> yList = new List<float>();
+        xList.Add((sW * posScale / 2) - (w / 2));
+        yList.Add(0);
+
+        xList.Add(((sW * posScale / 2) - (w / 2)) - w - 10);
+        yList.Add(0);
+
+        xList.Add((sW * posScale / 2) - (w / 2));
+        yList.Add(0 + (h / 2) + 5);
+
+        xList.Add(((sW * posScale / 2) - (w / 2)) - w - 10);
+        yList.Add(0 + (h / 2) + 5);
+
+        foreach (var playerStatu in m_playerStatusList)
+        {
+            if (playerStatu.IsNoPlayer())
+            {
+                continue;
+            }
+
+            if (downNameList.IndexOf(playerStatu.m_playerName) != -1)
+            {
+                if (downNameList.Count < 2)
+                {
+                    playerStatu.m_canvas.scaleFactor = 1;
+                    playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+                    continue;
+                }
+                int index = downNameList.IndexOf(playerStatu.m_playerName);
+
+                playerStatu.m_canvas.scaleFactor = scale;
+                playerStatu.m_fieldPanelSub.localPosition = new Vector3(xList[index], -yList[index], 0);
+            }
+            else if (upNameList.IndexOf(playerStatu.m_playerName) != -1)
+            {
+                if (upNameList.Count < 2)
+                {
+                    playerStatu.m_canvas.scaleFactor = 1;
+                    playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+                    continue;
+                }
+                int index = upNameList.IndexOf(playerStatu.m_playerName);
+
+                playerStatu.m_canvas.scaleFactor = scale;
+                playerStatu.m_fieldPanelSub.localPosition = new Vector3(xList[index], yList[index], 0);
+            }
         }
     }
 }

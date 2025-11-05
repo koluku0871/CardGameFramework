@@ -60,11 +60,17 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         public Canvas m_canvas = null;
         public Transform m_fieldPanelSub = null;
         public PlayerFieldManager m_playerFieldManager = null;
+        public Button m_discodeButton = null;
 
         public void SetPlayerName(string playerName)
         {
             m_playerName = playerName;
             m_playerNameText.text = playerName;
+            var child = m_discodeButton.transform.GetChild(0);
+            if (child != null)
+            {
+                child.GetComponent<TMPro.TextMeshProUGUI>().text = playerName;
+            }
         }
 
         public Transform GetFieldPanelSub(string playerName)
@@ -424,6 +430,52 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         return null;
     }
 
+    public void SetFieldPanelSubRot(int index)
+    {
+        float sW = Screen.width;
+        float w = 744;
+        float h = 600;
+
+        List<float> xList = new List<float>();
+        List<float> yList = new List<float>();
+        xList.Add(sW - (w / 2));
+        yList.Add(0);
+
+        xList.Add((sW - (w / 2)) - w - 10);
+        yList.Add(0);
+
+        xList.Add(sW - (w / 2));
+        yList.Add(0 + (h / 2) + 5);
+
+        xList.Add((sW - (w / 2)) - w - 10);
+        yList.Add(0 + (h / 2) + 5);
+
+        for (int i = 0; i < m_playerStatusList.Count; i++)
+        {
+            if (m_playerStatusList[i].IsNoPlayer())
+            {
+                m_playerStatusList[i].m_discodeButton.gameObject.SetActive(false);
+                continue;
+            }
+
+            if (index == i)
+            {
+                m_playerStatusList[i].m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 0);
+                m_playerStatusList[i].m_canvas.scaleFactor = 1;
+                m_playerStatusList[i].m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+                m_playerStatusList[i].m_discodeButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                m_playerStatusList[i].m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
+                m_playerStatusList[i].m_canvas.scaleFactor = 0.5f;
+                m_playerStatusList[i].m_fieldPanelSub.localPosition = new Vector3(xList[i], yList[i], 0);
+                m_playerStatusList[i].m_discodeButton.gameObject.SetActive(true);
+                m_playerStatusList[i].m_discodeButton.transform.localPosition = new Vector3(xList[i] + (w / 2), yList[i] + (h / 4), 0);
+            }
+        }
+    }
+
     public void SetFieldPanelSubRot(Transform fieldPanelSub)
     {
         if (fieldPanelSub.localRotation != Quaternion.Euler(0, 0, 0))
@@ -450,7 +502,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
         float scale = 1;
         float posScale = 1;
-        Toggle activeToggle = m_viewToggleGroup.ActiveToggles().First();
+        UnityEngine.UI.Toggle activeToggle = m_viewToggleGroup.ActiveToggles().First();
         switch (activeToggle.name)
         {
             case "ToggleViewS":
@@ -460,6 +512,19 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             case "ToggleViewM":
                 scale = 0.5f;
                 posScale = 2;
+                break;
+            case "ToggleViewDiscode":
+                scale = 0.5f;
+                posScale = 2;
+                foreach (var playerStatu in m_playerStatusList)
+                {
+                    playerStatu.m_discodeButton.gameObject.SetActive(false);
+                    if (playerStatu.IsNoPlayer())
+                    {
+                        continue;
+                    }
+                    playerStatu.m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
+                }
                 break;
         }
 
@@ -514,8 +579,10 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         xList.Add(((sW * posScale / 2) - (w / 2)) - w - 10);
         yList.Add(0 + (h / 2) + 5);
 
-        foreach (var playerStatu in m_playerStatusList)
+        for (int i = 0; i < m_playerStatusList.Count; i++)
         {
+            var playerStatu = m_playerStatusList[i];
+
             if (playerStatu.IsNoPlayer())
             {
                 continue;
@@ -543,9 +610,19 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                     continue;
                 }
                 int index = upNameList.IndexOf(playerStatu.m_playerName);
+                if (activeToggle.name == "ToggleViewDiscode")
+                {
+                    index = i;
+                }
 
                 playerStatu.m_canvas.scaleFactor = scale;
                 playerStatu.m_fieldPanelSub.localPosition = new Vector3(xList[index], yList[index], 0);
+
+                if (activeToggle.name == "ToggleViewDiscode")
+                {
+                    playerStatu.m_discodeButton.gameObject.SetActive(true);
+                    playerStatu.m_discodeButton.transform.localPosition = new Vector3(xList[index] + (w / 2), yList[index] + (h / 4), 0);
+                }
             }
         }
     }

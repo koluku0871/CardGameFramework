@@ -120,6 +120,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             if (canvasPanel.transform == targetPanel)
             {
                 transform.SetParent(canvasPanel.transform);
+                transform.SetAsFirstSibling();
             }
         }
 

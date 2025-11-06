@@ -516,16 +516,22 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             case "ToggleViewDiscode":
                 scale = 0.5f;
                 posScale = 2;
-                foreach (var playerStatu in m_playerStatusList)
-                {
-                    playerStatu.m_discodeButton.gameObject.SetActive(false);
-                    if (playerStatu.IsNoPlayer())
-                    {
-                        continue;
-                    }
-                    playerStatu.m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
-                }
                 break;
+        }
+
+
+        foreach (var playerStatu in m_playerStatusList)
+        {
+            playerStatu.m_discodeButton.gameObject.SetActive(false);
+            if (playerStatu.IsNoPlayer())
+            {
+                continue;
+            }
+
+            if (activeToggle.name == "ToggleViewDiscode")
+            {
+                playerStatu.m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
+            }
         }
 
         float sW = Screen.width;

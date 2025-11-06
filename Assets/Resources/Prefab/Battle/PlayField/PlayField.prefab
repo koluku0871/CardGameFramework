@@ -1671,7 +1671,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2779668437685438059}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -3742,7 +3742,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3457351609025713958
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3845,7 +3845,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5943148414733110803}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.19814087
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5267,7 +5267,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &5494857453347028823
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5369,8 +5369,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7498991858624987458}
   m_HandleRect: {fileID: 4101750271240245612}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

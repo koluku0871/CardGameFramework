@@ -119,39 +119,43 @@ public class FieldCardManager : MonoBehaviour
 
     public void InitSetting()
     {
-        if (BattleSceneManager.m_type == "bs")
+        int hand = (int)PhotonNetwork.CurrentRoom.CustomProperties["Hand"];
+        switch (BattleSceneManager.m_type)
         {
-            if (DeckManager.IsInContract(m_deckDetailList))
-            {
-                CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.CONTRACT);
-            }
-            else
-            {
-                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, 4);
-            }
-        }
+            case "bs":
+                if (DeckManager.IsInContract(m_deckDetailList))
+                {
+                    CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.CONTRACT);
+                }
+                else
+                {
+                    AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
+                }
+                break;
+            case "digimon":
+                bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
+                FieldCardManager.Instance().SetSecurityAtHand(isSecurityAtHand);
 
-        if (BattleSceneManager.m_type == "digimon")
-        {
-            bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
-            FieldCardManager.Instance().SetSecurityAtHand(isSecurityAtHand);
-
-            AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, 5);
-            if (!FieldCardManager.Instance().IsActiveAtHand())
-            {
-                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.DAMAGE, true, 5);
-            }
-            else
-            {
-                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.AT_HAND, true, 5);
-            }
-        }
-
-        if (BattleSceneManager.m_type == "hololive")
-        {
-            AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, 7);
-            // TODO 後々
-            AddDstFromSrc(CardOptionWindow.OPTION_TYPE.SUB, CardOptionWindow.OPTION_TYPE.DAMAGE, true, 5);
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
+                if (!FieldCardManager.Instance().IsActiveAtHand())
+                {
+                    AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.DAMAGE, true, 5);
+                }
+                else
+                {
+                    AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.AT_HAND, true, 5);
+                }
+                break;
+            case "dm":
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
+                break;
+            case "hololive":
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.SUB, CardOptionWindow.OPTION_TYPE.DAMAGE, true, 5);
+                break;
+            default:
+                AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
+                break;
         }
     }
 
@@ -1095,8 +1099,15 @@ public class FieldCardManager : MonoBehaviour
 
     public void SetSecurityAtHand(bool isActive)
     {
-        m_damageCard.transform.parent.gameObject.SetActive(!isActive);
-        m_atHandContent.transform.parent.parent.gameObject.SetActive(isActive);
+        if (m_damageCard != null)
+        {
+            m_damageCard.transform.parent.gameObject.SetActive(!isActive);
+        }
+
+        if (m_atHandContent != null)
+        {
+            m_atHandContent.transform.parent.parent.gameObject.SetActive(isActive);
+        }
     }
 
     public bool IsActiveAtHand()

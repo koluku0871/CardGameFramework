@@ -572,7 +572,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         string[] list = name.Split('^');
         var cardId = list[1];
         GameObject card = PhotonNetwork.Instantiate("Prefab/Battle/Card", Vector3.zero, Quaternion.identity);
-        card.transform.localScale = Vector3.one;
+        card.transform.localScale = new Vector3(1, 1, 1);
         Image cardImage = FieldCardManager.Instance().CreateCard(
             new DeckManager.CardDetail() { tag = list[0], cardId = cardId }, false, card.GetComponent<Image>(), m_cardField,
             null,
@@ -599,6 +599,13 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     }
                 }
             });
+
+        float size = float.Parse(PhotonNetwork.CurrentRoom.CustomProperties["CardSize"].ToString());
+        cardImage.rectTransform.sizeDelta = new Vector2(
+            cardImage.rectTransform.sizeDelta.x * size,
+            cardImage.rectTransform.sizeDelta.y * size
+        );
+
         cardImage.name = name;
         cardImage.gameObject.SetActive(true);
         TouchManager touchManager = card.GetComponent<TouchManager>();

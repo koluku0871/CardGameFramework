@@ -597,8 +597,35 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             customRoomProperties.Add("Core", 3);
             customRoomProperties.Add("SoulCore", 1);
             customRoomProperties.Add("Life", 5);
-            customRoomProperties.Add("Hand", 4);
-            customRoomProperties.Add("IsSecurityAtHand", true);
+
+            switch (AssetBundleManager.Instance().CardType)
+            {
+                case "bs":
+                    customRoomProperties.Add("Hand", 4);
+                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("IsSecurityAtHand", false);
+                    break;
+                case "dm":
+                    customRoomProperties.Add("Hand", 5);
+                    customRoomProperties.Add("CardSize", "0.7");
+                    customRoomProperties.Add("IsSecurityAtHand", false);
+                    break;
+                case "digimon":
+                    customRoomProperties.Add("Hand", 5);
+                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("IsSecurityAtHand", true);
+                    break;
+                case "hololive":
+                    customRoomProperties.Add("Hand", 7);
+                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("IsSecurityAtHand", false);
+                    break;
+                default:
+                    customRoomProperties.Add("Hand", 5);
+                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("IsSecurityAtHand", false);
+                    break;
+            }
 
             for (int i = 0; i < 4; i++)
             {

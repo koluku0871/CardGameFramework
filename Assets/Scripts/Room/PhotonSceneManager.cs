@@ -602,7 +602,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             {
                 case "bs":
                     customRoomProperties.Add("Hand", 4);
-                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("CardSize", "1");
                     customRoomProperties.Add("IsSecurityAtHand", false);
                     break;
                 case "dm":
@@ -612,17 +612,17 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
                     break;
                 case "digimon":
                     customRoomProperties.Add("Hand", 5);
-                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("CardSize", "1");
                     customRoomProperties.Add("IsSecurityAtHand", true);
                     break;
                 case "hololive":
                     customRoomProperties.Add("Hand", 7);
-                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("CardSize", "1");
                     customRoomProperties.Add("IsSecurityAtHand", false);
                     break;
                 default:
                     customRoomProperties.Add("Hand", 5);
-                    customRoomProperties.Add("CardSize", "1.0");
+                    customRoomProperties.Add("CardSize", "1");
                     customRoomProperties.Add("IsSecurityAtHand", false);
                     break;
             }

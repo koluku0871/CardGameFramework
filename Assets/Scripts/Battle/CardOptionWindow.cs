@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -454,11 +455,13 @@ public class CardOptionWindow : MonoBehaviour
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから契約カードを手札に送る", () => {
             FieldCardManager.Instance().AddHandFromDeckToContract();
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 3);
+            int hand = (int)PhotonNetwork.CurrentRoom.CustomProperties["Hand"];
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, (hand - 1));
             CloseOnSound();
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから契約カードを手札に送らない", () => {
-            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 4);
+            int hand = (int)PhotonNetwork.CurrentRoom.CustomProperties["Hand"];
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, hand);
             CloseOnSound();
         }));
 

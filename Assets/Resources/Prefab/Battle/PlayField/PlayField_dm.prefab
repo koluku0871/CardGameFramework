@@ -581,7 +581,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000005275011, y: 0}
+  m_AnchoredPosition: {x: 0.0000021457672, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3639621066822940234
@@ -5366,7 +5366,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7498991858624987458}
   m_HandleRect: {fileID: 4101750271240245612}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -5499,8 +5499,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 74, y: 90}
-  m_SizeDelta: {x: 100, y: 60}
+  m_AnchoredPosition: {x: 74, y: 110}
+  m_SizeDelta: {x: 80, y: 60}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &7915589494018968468
 CanvasRenderer:
@@ -5631,7 +5631,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 50, y: 31}
+  m_Offset: {x: 40, y: 31}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -5641,7 +5641,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 1
-  m_Size: {x: 100, y: 60}
+  m_Size: {x: 80, y: 60}
   m_EdgeRadius: 0
 --- !u!1 &7798527949386249833
 GameObject:

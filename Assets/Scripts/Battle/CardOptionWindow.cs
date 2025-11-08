@@ -342,6 +342,16 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキからX枚を裏向きでフィールドに送る", () => {
+            var cardList = FieldCardManager.Instance().GetCardDetailList(OPTION_TYPE.DECK, true, numButtonTextNum);
+            foreach (var cardDetail in cardList)
+            {
+                var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.DECK, cardDetail.tag, cardDetail.cardId)[0];
+                Image cardImage = PlayerFieldManager.Instance().CreateCard(cardDetail.ToString(), false);
+                cardImage.sprite = CardDetailManager.Instance().GetSleeveSprite();
+            }
+            CloseOnSound();
+        }));
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + atHandStr + "の上に送る", () => {
             FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
@@ -600,6 +610,12 @@ public class CardOptionWindow : MonoBehaviour
         detailOptionType = OPTION_TYPE.FIELD_ROT;
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを開く", () => {
+            if (target.sprite == CardDetailManager.Instance().GetSleeveSprite())
+            {
+                string[] list = target.name.Split('^');
+                target.sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
+            }
+
             TouchManager touchManager = target.GetComponent<TouchManager>();
             if (touchManager != null)
             {
@@ -608,6 +624,19 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを閉じる", () => {
+            TouchManager touchManager = target.GetComponent<TouchManager>();
+            if (touchManager != null)
+            {
+                touchManager.SetIsOpen(false);
+            }
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分にも見えないようにカードを閉じる", () => {
+            if (target.sprite != CardDetailManager.Instance().GetSleeveSprite())
+            {
+                target.sprite = CardDetailManager.Instance().GetSleeveSprite();
+            }
+
             TouchManager touchManager = target.GetComponent<TouchManager>();
             if (touchManager != null)
             {

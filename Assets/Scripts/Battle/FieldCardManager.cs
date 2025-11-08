@@ -148,6 +148,19 @@ public class FieldCardManager : MonoBehaviour
                 break;
             case "dm":
                 AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
+
+                var cardList = FieldCardManager.Instance().GetCardDetailList(CardOptionWindow.OPTION_TYPE.DECK, true, 5);
+                int cardIndex = -1;
+                foreach (var cardDetail in cardList)
+                {
+                    var card = FieldCardManager.Instance().RemoveCardDetail(CardOptionWindow.OPTION_TYPE.DECK, cardDetail.tag, cardDetail.cardId)[0];
+                    Image cardImage = PlayerFieldManager.Instance().CreateCard(cardDetail.ToString(), false);
+                    cardImage.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                    cardImage.rectTransform.localPosition = new Vector3(
+                        -(cardImage.rectTransform.sizeDelta.x / 2) + ((cardImage.rectTransform.sizeDelta.x + 2) * cardIndex), -2, 0
+                    );
+                    cardIndex++;
+                }
                 break;
             case "hololive":
                 AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);

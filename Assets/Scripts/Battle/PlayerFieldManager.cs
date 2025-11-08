@@ -598,6 +598,13 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                         touchManager.IsInner = !touchManager.IsInner;
                     }
                 }
+            },
+            (Image target, string tag, string cardId) => {
+                if (target.sprite != CardDetailManager.Instance().GetSleeveSprite())
+                {
+                    CardDetailManager.Instance().SetSprite(target.sprite);
+                    CardDetailManager.Instance().SetCardDetail(tag, cardId);
+                }
             });
 
         float size = float.Parse(PhotonNetwork.CurrentRoom.CustomProperties["CardSize"].ToString());

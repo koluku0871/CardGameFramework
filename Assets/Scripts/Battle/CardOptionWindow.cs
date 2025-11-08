@@ -389,11 +389,6 @@ public class CardOptionWindow : MonoBehaviour
 
         detailOptionType = OPTION_TYPE.CARD_LIST;
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を除外一覧に送る", () => {
-            var cardList = FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
-            CardListWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
-            CloseOnSound();
-        }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキからフィールドに送る", () => {
             string[] list = target.name.Split('^');
             var card = FieldCardManager.Instance().RemoveCardDetail(OPTION_TYPE.DECK, list[0], list[1])[0];

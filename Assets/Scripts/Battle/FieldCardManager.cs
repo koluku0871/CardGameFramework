@@ -113,8 +113,11 @@ public class FieldCardManager : MonoBehaviour
         }
         isInit = false;
 
-        bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
-        SetSecurityAtHand(isSecurityAtHand);
+        if (BattleSceneManager.m_type == "digimon")
+        {
+            bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
+            SetSecurityAtHand(isSecurityAtHand);
+        }
     }
 
     public void InitSetting()

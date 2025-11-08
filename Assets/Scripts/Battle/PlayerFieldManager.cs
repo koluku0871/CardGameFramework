@@ -618,6 +618,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         TouchManager touchManager = card.GetComponent<TouchManager>();
         if (touchManager != null)
         {
+            var sizeDelta = touchManager.m_scrollRectTransform.sizeDelta;
+            touchManager.m_scrollRectTransform.sizeDelta = new Vector2 (sizeDelta.x, sizeDelta.y * size);
             touchManager.SetIsOpen(isOpen);
         }
 

@@ -62,7 +62,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1213,7 +1213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
-  m_SynchronizeScale: 1
+  m_SynchronizeScale: 0
   m_UseLocal: 1
 --- !u!114 &6621160422120912080
 MonoBehaviour:
@@ -1227,6 +1227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3188e570baa5f5845ae39a08da08c9e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_rectTransform: {fileID: 6621160422120912081}
   m_sprites: []
   m_photonObjectType: 1
   m_openText: {fileID: 8040548761961355081}
@@ -1234,6 +1235,7 @@ MonoBehaviour:
   m_isOverlapImage: {fileID: 2581067269280606081}
   m_isInnerImage: {fileID: 3789385581401787828}
   m_scrollRect: {fileID: 3321226174697145235}
+  m_scrollRectTransform: {fileID: 5547387657018575773}
   m_content: {fileID: 7842697582629724519}
   m_contentInnerImage: {fileID: 1755516127633935308}
   m_inputFields: {fileID: 0}

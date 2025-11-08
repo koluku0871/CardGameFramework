@@ -1,14 +1,19 @@
 ﻿using Photon.Pun;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Image = UnityEngine.UI.Image;
 
 public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragHandler, IEndDragHandler, IPunObservable
 {
     [Header("共通")]
-    
+
+    [SerializeField]
+    private RectTransform m_rectTransform = null;
+
     [SerializeField]
     private List<Sprite> m_sprites = new List<Sprite>();
 
@@ -62,6 +67,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
     [SerializeField]
     private ScrollRect m_scrollRect = null;
+    [SerializeField]
+    public RectTransform m_scrollRectTransform = null;
 
     [SerializeField]
     private Transform m_content = null;
@@ -753,7 +760,13 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
             if (PhotonObjectType == ConstManager.PhotonObjectType.CARD)
             {
-                stream.SendNext(transform.name);
+                stream.SendNext(
+                    transform.name
+                    + "," + m_rectTransform.sizeDelta.x
+                    + "," + m_rectTransform.sizeDelta.y
+                    + "," + m_scrollRectTransform.sizeDelta.x
+                    + "," + m_scrollRectTransform.sizeDelta.y
+                );
                 stream.SendNext(IsOpen);
                 stream.SendNext(IsSoul);
                 stream.SendNext(IsAwake);
@@ -773,7 +786,11 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
             if (PhotonObjectType == ConstManager.PhotonObjectType.CARD)
             {
-                transform.name = (string)stream.ReceiveNext();
+                string[] arr = ((string)stream.ReceiveNext()).Split(',');
+                transform.name = arr[0];
+                m_rectTransform.sizeDelta = new Vector2(float.Parse(arr[1]), float.Parse(arr[2]));
+                m_scrollRectTransform.sizeDelta = new Vector2(float.Parse(arr[3]), float.Parse(arr[4]));
+
                 IsOpen = (bool)stream.ReceiveNext();
                 IsSoul = (bool)stream.ReceiveNext();
                 IsAwake = (bool)stream.ReceiveNext();

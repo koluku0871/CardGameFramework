@@ -12,6 +12,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     private PhotonView m_photonView = null;
 
+    public RectTransform m_rectTransform = null;
+
     [SerializeField]
     private Button m_optionButton = null;
     [SerializeField]
@@ -154,7 +156,11 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         if (SetActive(m_coinButton, IsMine))
         {
             m_coinButton.onClick.AddListener(() => {
-                BattleSceneManager.Instance().m_coinManager.SetIsOpen(Convert.ToBoolean(new System.Random().Next(0, 2)));
+                GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
+                int index = new System.Random().Next(0, BattleSceneManager.Instance().m_playerIndexList.Count);
+                coinObj.GetComponent<CoinManager>().SetIsOpen(
+                    BattleSceneManager.Instance().m_playerStatusList[BattleSceneManager.Instance().m_playerIndexList[index]].m_playerName.Substring(0, 2)
+                );
             });
         }
 

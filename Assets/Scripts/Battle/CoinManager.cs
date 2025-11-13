@@ -7,28 +7,6 @@ public class CoinManager : MonoBehaviour, IPunObservable
     [SerializeField]
     private TMPro.TextMeshProUGUI m_openText = null;
 
-    private bool m_isOpen = false;
-    public bool IsOpen
-    {
-        private set
-        {
-            m_isOpen = value;
-            if (m_isOpen)
-            {
-                m_openText.text = "1P";
-            }
-            else
-            {
-                m_openText.text = "2P";
-            }
-            PlayerFieldManager.Instance().AddLogList("先行は" + m_openText.text);
-        }
-        get
-        {
-            return m_isOpen;
-        }
-    }
-
     private void Awake()
     {
         GameObject coinPanel = GameObject.FindGameObjectWithTag("CoinPanel");
@@ -41,10 +19,11 @@ public class CoinManager : MonoBehaviour, IPunObservable
         this.gameObject.SetActive(false);
     }
 
-    public void SetIsOpen(bool isOpen)
+    public void SetIsOpen(string text)
     {
         this.gameObject.GetComponent<PhotonView>().RequestOwnership();
-        IsOpen = isOpen;
+        m_openText.text = text;
+        PlayerFieldManager.Instance().AddLogList("コインの結果は" + m_openText.text);
         this.gameObject.SetActive(true);
     }
 
@@ -53,12 +32,12 @@ public class CoinManager : MonoBehaviour, IPunObservable
         if (stream.IsWriting)
         {
             //データの送信
-            stream.SendNext(IsOpen);
+            stream.SendNext(m_openText.text);
         }
         else
         {
             //データの受信
-            IsOpen = (bool)stream.ReceiveNext();
+            m_openText.text = (string)stream.ReceiveNext();
         }
     }
 }

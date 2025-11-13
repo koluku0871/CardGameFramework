@@ -22,8 +22,6 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private CardOptionWindow m_cardOptionWindow = null;
 
-    public CoinManager m_coinManager = null;
-
     [SerializeField]
     private TMPro.TMP_Dropdown m_optionDropdown = null;
 
@@ -95,6 +93,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     }
 
     public List<PlayerStatus> m_playerStatusList = new List<PlayerStatus>();
+    public List<int> m_playerIndexList = new List<int>();
     public bool m_isPlayerStatusComplete = false;
 
     public void Awake()
@@ -111,7 +110,6 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     public void Start()
     {
         m_playerName = GetPlayerName(PhotonNetwork.LocalPlayer);
-        int playerCount = 0;
 
         foreach (var prop in PhotonNetwork.CurrentRoom.CustomProperties)
         {
@@ -123,30 +121,30 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                     m_type = value;
                     break;
                 case "playerName1":
-                    if (string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        playerCount++;
+                        m_playerIndexList.Add(0);
                     }
                     m_playerStatusList[0].SetPlayerName(value);
                     break;
                 case "playerName2":
-                    if (string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        playerCount++;
+                        m_playerIndexList.Add(1);
                     }
                     m_playerStatusList[1].SetPlayerName(value);
                     break;
                 case "playerName3":
-                    if (string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        playerCount++;
+                        m_playerIndexList.Add(2);
                     }
                     m_playerStatusList[2].SetPlayerName(value);
                     break;
                 case "playerName4":
-                    if (string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        playerCount++;
+                        m_playerIndexList.Add(3);
                     }
                     m_playerStatusList[3].SetPlayerName(value);
                     break;
@@ -357,8 +355,8 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
-            m_coinManager = coinObj.GetComponent<CoinManager>();
-            m_coinManager.SetIsOpen(Convert.ToBoolean(new System.Random().Next(0, 2)));
+            int index = new System.Random().Next(0, m_playerIndexList.Count);
+            coinObj.GetComponent<CoinManager>().SetIsOpen(m_playerStatusList[m_playerIndexList[index]].m_playerName.Substring(0, 2));
 
             if (m_type == "digimon")
             {
@@ -438,17 +436,22 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
         List<float> xList = new List<float>();
         List<float> yList = new List<float>();
-        xList.Add(sW - (w / 2));
+        List<float> discodeYList = new List<float>();
+        xList.Add(-(w / 4));
         yList.Add(0);
+        discodeYList.Add(-75);
 
-        xList.Add((sW - (w / 2)) - w - 10);
+        xList.Add((w / 4));
         yList.Add(0);
+        discodeYList.Add(-75);
 
-        xList.Add(sW - (w / 2));
-        yList.Add(0 + (h / 2) + 5);
+        xList.Add(-(w / 4));
+        yList.Add(-(h / 4) - 2);
+        discodeYList.Add(-(h / 4) - 2 - 75);
 
-        xList.Add((sW - (w / 2)) - w - 10);
-        yList.Add(0 + (h / 2) + 5);
+        xList.Add((w / 4));
+        yList.Add(-(h / 4) - 2);
+        discodeYList.Add(-(h / 4) - 2 - 75);
 
         for (int i = 0; i < m_playerStatusList.Count; i++)
         {
@@ -461,17 +464,19 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             if (index == i)
             {
                 m_playerStatusList[i].m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 0);
-                m_playerStatusList[i].m_canvas.scaleFactor = 1;
-                m_playerStatusList[i].m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+                m_playerStatusList[i].m_playerFieldManager.m_rectTransform.localScale = Vector3.one;
+                m_playerStatusList[i].m_playerFieldManager.m_rectTransform.localPosition = Vector3.zero;
                 m_playerStatusList[i].m_discodeButton.gameObject.SetActive(false);
             }
             else
             {
                 m_playerStatusList[i].m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 180);
-                m_playerStatusList[i].m_canvas.scaleFactor = 0.5f;
-                m_playerStatusList[i].m_fieldPanelSub.localPosition = new Vector3(xList[i], yList[i], 0);
+                m_playerStatusList[i].m_playerFieldManager.m_rectTransform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                m_playerStatusList[i].m_playerFieldManager.m_rectTransform.localPosition = new Vector3(xList[i], yList[i], 0);
+                //m_playerStatusList[i].m_fieldPanelSub.localPosition = new Vector3(xList[i], yList[i], 0);
                 m_playerStatusList[i].m_discodeButton.gameObject.SetActive(true);
-                m_playerStatusList[i].m_discodeButton.transform.localPosition = new Vector3(xList[i] + (w / 2), yList[i] + (h / 4), 0);
+                m_playerStatusList[i].m_discodeButton.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                m_playerStatusList[i].m_discodeButton.transform.localPosition = new Vector3(xList[i], discodeYList[i], 0);
             }
         }
     }
@@ -501,21 +506,17 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         }
 
         float scale = 1;
-        float posScale = 1;
         UnityEngine.UI.Toggle activeToggle = m_viewToggleGroup.ActiveToggles().First();
         switch (activeToggle.name)
         {
             case "ToggleViewS":
                 scale = 1;
-                posScale = 1;
                 break;
             case "ToggleViewM":
                 scale = 0.5f;
-                posScale = 2;
                 break;
             case "ToggleViewDiscode":
                 scale = 0.5f;
-                posScale = 2;
                 break;
         }
 
@@ -546,8 +547,11 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                 {
                     continue;
                 }
-                playerStatu.m_canvas.scaleFactor = scale;
-                playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+                playerStatu.m_playerFieldManager.m_rectTransform.localScale = Vector3.one;
+
+                var localPos = playerStatu.m_playerFieldManager.m_rectTransform.localPosition;
+                playerStatu.m_playerFieldManager.m_rectTransform.localPosition = Vector3.zero;
+                //playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
             }
             return;
         }
@@ -573,17 +577,22 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
         List<float> xList = new List<float>();
         List<float> yList = new List<float>();
-        xList.Add((sW * posScale / 2) - (w / 2));
+        List<float> discodeYList = new List<float>();
+        xList.Add(-(w / 4));
         yList.Add(0);
+        discodeYList.Add(-75);
 
-        xList.Add(((sW * posScale / 2) - (w / 2)) - w - 10);
+        xList.Add((w / 4));
         yList.Add(0);
+        discodeYList.Add(-75);
 
-        xList.Add((sW * posScale / 2) - (w / 2));
-        yList.Add(0 + (h / 2) + 5);
+        xList.Add(-(w / 4));
+        yList.Add(-(h / 4) - 2);
+        discodeYList.Add(-(h / 4) - 2 - 75);
 
-        xList.Add(((sW * posScale / 2) - (w / 2)) - w - 10);
-        yList.Add(0 + (h / 2) + 5);
+        xList.Add((w / 4));
+        yList.Add(-(h / 4) - 2);
+        discodeYList.Add(-(h / 4) - 2 - 75);
 
         for (int i = 0; i < m_playerStatusList.Count; i++)
         {
@@ -598,21 +607,24 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             {
                 if (downNameList.Count < 2)
                 {
-                    playerStatu.m_canvas.scaleFactor = 1;
-                    playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+                    playerStatu.m_playerFieldManager.m_rectTransform.localScale = Vector3.one;
+                    playerStatu.m_playerFieldManager.m_rectTransform.localPosition = Vector3.zero;
+                    //playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
                     continue;
                 }
                 int index = downNameList.IndexOf(playerStatu.m_playerName);
 
-                playerStatu.m_canvas.scaleFactor = scale;
-                playerStatu.m_fieldPanelSub.localPosition = new Vector3(xList[index], -yList[index], 0);
+                playerStatu.m_playerFieldManager.m_rectTransform.localScale = new Vector3(scale, scale, scale);
+                playerStatu.m_playerFieldManager.m_rectTransform.localPosition = new Vector3(xList[index], yList[index], 0);
+                //playerStatu.m_fieldPanelSub.localPosition = new Vector3(xList[index], -yList[index], 0);
             }
             else if (upNameList.IndexOf(playerStatu.m_playerName) != -1)
             {
                 if (upNameList.Count < 2)
                 {
-                    playerStatu.m_canvas.scaleFactor = 1;
-                    playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
+                    playerStatu.m_playerFieldManager.m_rectTransform.localScale = Vector3.one;
+                    playerStatu.m_playerFieldManager.m_rectTransform.localPosition = Vector3.zero;
+                    //playerStatu.m_fieldPanelSub.localPosition = new Vector3((sW / 2) - (w / 2), 0, 0);
                     continue;
                 }
                 int index = upNameList.IndexOf(playerStatu.m_playerName);
@@ -621,13 +633,16 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                     index = i;
                 }
 
-                playerStatu.m_canvas.scaleFactor = scale;
-                playerStatu.m_fieldPanelSub.localPosition = new Vector3(xList[index], yList[index], 0);
+                playerStatu.m_playerFieldManager.m_rectTransform.localScale = new Vector3(scale, scale, scale);
+                playerStatu.m_playerFieldManager.m_rectTransform.localPosition = new Vector3(xList[index], yList[index], 0);
+                //playerStatu.m_fieldPanelSub.localPosition = new Vector3(xList[index], yList[index], 0);
 
                 if (activeToggle.name == "ToggleViewDiscode")
                 {
                     playerStatu.m_discodeButton.gameObject.SetActive(true);
-                    playerStatu.m_discodeButton.transform.localPosition = new Vector3(xList[index] + (w / 2), yList[index] + (h / 4), 0);
+                    playerStatu.m_discodeButton.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                    playerStatu.m_discodeButton.transform.localPosition = new Vector3(xList[index], discodeYList[index], 0);
+                    //playerStatu.m_discodeButton.transform.localPosition = new Vector3(xList[index] + (w / 2), yList[index] + (h / 4), 0);
                 }
             }
         }

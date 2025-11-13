@@ -557,9 +557,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1192334438888283285}
   - component: {fileID: 8831276774581006152}
-  - component: {fileID: 2599472354393541295}
   - component: {fileID: 8877928168764329292}
   - component: {fileID: 6186015901845612012}
+  - component: {fileID: -8179974456845702327}
   m_Layer: 5
   m_Name: PlayField_digimon
   m_TagString: PlayField
@@ -577,7 +577,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1271105300102485300}
   m_Father: {fileID: 0}
@@ -606,27 +606,11 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 2599472354393541295}
   - {fileID: 8877928168764329292}
+  - {fileID: -8179974456845702327}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &2599472354393541295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1192334438888283284}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!114 &8877928168764329292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -640,6 +624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_photonView: {fileID: 8831276774581006152}
+  m_rectTransform: {fileID: 1192334438888283285}
   m_optionButton: {fileID: 5946152575898701815}
   m_coinButton: {fileID: 1047534865067176360}
   m_damageButton: {fileID: 1017909380614693425}
@@ -689,6 +674,22 @@ MonoBehaviour:
   m_atHandCard: {fileID: 4276087124814098220}
   m_handContent: {fileID: 8809806411725641811}
   m_handCard: {fileID: 6926645090106284209}
+--- !u!114 &-8179974456845702327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192334438888283284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.PhotonTransformView
+  m_SynchronizePosition: 0
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &1589419684355010579
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,11 +1,15 @@
 using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class CostManager : MonoBehaviour, IPunObservable
 {
-    public List<Toggle> m_toggleList = new List<Toggle>();
+    public List<Transform> m_listAreas = new List<Transform>();
+
+    public UnityEngine.UI.Toggle m_toggle = null;
 
     public string m_toggleName = "toggle_0";
 
@@ -14,22 +18,37 @@ public class CostManager : MonoBehaviour, IPunObservable
         GameObject panel = GameObject.FindGameObjectWithTag("CostPanel");
         transform.SetParent(panel.transform);
         transform.localPosition = Vector3.zero;
-
-        this.transform.localRotation = Quaternion.identity;
-
-        if (!PhotonNetwork.IsMasterClient && BattleSceneManager.IsPlayer)
-        {
-            this.transform.localRotation = Quaternion.Euler(0, 0, 180);
-        }
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
     }
 
     private void Start()
     {
-        for(int index = 0; index < m_toggleList.Count; index++)
+        m_toggle.name = "toggle_0";
+        m_toggle.onValueChanged.AddListener(OnValueChanged);
+
+        for (int index = 0; index < m_listAreas.Count; index++)
         {
-            var toggle = m_toggleList[index];
-            toggle.name = "toggle_" + index;
-            toggle.onValueChanged.AddListener(OnValueChanged);
+            if (BattleSceneManager.Instance().m_playerStatusList[index].IsNoPlayer())
+            {
+                m_listAreas[index].gameObject.SetActive(false);
+                continue;
+            }
+
+            m_listAreas[index].gameObject.SetActive(true);
+
+            int num = 0;
+            foreach (Transform c in m_listAreas[index])
+            {
+                num++;
+                UnityEngine.UI.Toggle toggle = c.GetComponent<UnityEngine.UI.Toggle>();
+                if (toggle == null)
+                {
+                    continue;
+                }
+                toggle.name = "toggle_" + BattleSceneManager.Instance().m_playerStatusList[index].m_playerName + "_" + num;
+                toggle.onValueChanged.AddListener(OnValueChanged);
+            }
         }
     }
 
@@ -38,7 +57,7 @@ public class CostManager : MonoBehaviour, IPunObservable
         if (state)
         {
             this.gameObject.GetComponent<PhotonView>().RequestOwnership();
-            Toggle activeToggle = this.gameObject.GetComponent<ToggleGroup>().GetFirstActiveToggle();
+            UnityEngine.UI.Toggle activeToggle = this.gameObject.GetComponent<ToggleGroup>().GetFirstActiveToggle();
             m_toggleName = (activeToggle.name);
 
             var textObj = activeToggle.transform.Find("Text (TMP)");
@@ -69,15 +88,34 @@ public class CostManager : MonoBehaviour, IPunObservable
             var toggleName = (string)stream.ReceiveNext();
             if (toggleName != m_toggleName)
             {
-                for (int index = 0; index < m_toggleList.Count; index++)
+                if (m_toggle.name == toggleName)
                 {
-                    var toggle = m_toggleList[index];
-                    if (toggle.name != toggleName)
-                    {
-                        continue;
-                    }
-                    toggle.isOn = true;
+                    m_toggle.isOn = true;
                     m_toggleName = toggleName;
+                }
+                else
+                {
+                    for (int index = 0; index < m_listAreas.Count; index++)
+                    {
+                        if (BattleSceneManager.Instance().m_playerStatusList[index].IsNoPlayer())
+                        {
+                            continue;
+                        }
+                        foreach (Transform c in m_listAreas[index])
+                        {
+                            UnityEngine.UI.Toggle toggle = c.GetComponent<UnityEngine.UI.Toggle>();
+                            if (toggle == null)
+                            {
+                                continue;
+                            }
+                            if (toggle.name != toggleName)
+                            {
+                                continue;
+                            }
+                            toggle.isOn = true;
+                            m_toggleName = toggleName;
+                        }
+                    }
                 }
             }
         }

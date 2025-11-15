@@ -829,6 +829,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3188e570baa5f5845ae39a08da08c9e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_rectTransform: {fileID: 0}
   m_sprites:
   - {fileID: 0}
   - {fileID: 0}
@@ -839,11 +840,15 @@ MonoBehaviour:
   m_photonObjectType: 3
   m_openText: {fileID: 0}
   m_soulImage: {fileID: 0}
-  m_endTagStr: 
   m_isOverlapImage: {fileID: 0}
-  m_isOverlap: 0
+  m_isInnerImage: {fileID: 0}
+  m_scrollRect: {fileID: 0}
+  m_scrollRectTransform: {fileID: 0}
+  m_content: {fileID: 0}
+  m_contentInnerImage: {fileID: 0}
   m_inputFields: {fileID: 5386129022315198790}
   m_TextMeshPro: {fileID: 7873993950292015072}
+  m_innerCardDetailList: []
 --- !u!114 &6891552379495495374
 MonoBehaviour:
   m_ObjectHideFlags: 0

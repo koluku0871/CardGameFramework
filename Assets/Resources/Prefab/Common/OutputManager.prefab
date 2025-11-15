@@ -139,8 +139,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7399154272020816632}
   - component: {fileID: 1647606485514509898}
+  - component: {fileID: 3470514140512118761}
   m_Layer: 0
-  m_Name: AudioSourceManager
+  m_Name: OutputManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -179,6 +180,18 @@ MonoBehaviour:
   m_audioSourceSe: {fileID: 4833280993319888849}
   m_soundBgmList: []
   m_soundSeList: []
+--- !u!114 &3470514140512118761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5876123954842803211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b7d1174053a3e944a6fba5b146a74b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FadeManager
 --- !u!1 &8412888000591653939
 GameObject:
   m_ObjectHideFlags: 0

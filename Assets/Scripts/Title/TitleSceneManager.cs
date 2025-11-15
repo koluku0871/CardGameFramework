@@ -11,9 +11,6 @@ using UnityEngine.UI;
 public class TitleSceneManager : MonoBehaviour
 {
     [SerializeField]
-    private FadeManager m_fadeManager = null;
-
-    [SerializeField]
     private AudioSourceManager m_audioManager = null;
 
     [SerializeField]
@@ -52,11 +49,6 @@ public class TitleSceneManager : MonoBehaviour
 
     void Start()
     {
-        if (FadeManager.Instance() == null)
-        {
-            Instantiate(m_fadeManager);
-        }
-
         if (AudioSourceManager.Instance() == null)
         {
             Instantiate(m_audioManager);

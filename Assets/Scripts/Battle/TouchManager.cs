@@ -485,6 +485,9 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     public override void OnDisable()
     {
         base.OnDisable();
+
+        if (!m_photonView.IsMine) return;
+
         PhotonNetwork.Destroy(m_photonView);
     }
 

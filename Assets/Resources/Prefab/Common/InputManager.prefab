@@ -1016,7 +1016,7 @@ GameObject:
   - component: {fileID: 3713919395509795414}
   - component: {fileID: 7100046100289741912}
   m_Layer: 0
-  m_Name: MouseManager
+  m_Name: InputManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1811,7 +1811,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!114 &4985841527029387727
 MonoBehaviour:

@@ -1,9 +1,7 @@
 using Photon.Pun;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class CostManager : MonoBehaviour, IPunObservable
 {
@@ -12,6 +10,12 @@ public class CostManager : MonoBehaviour, IPunObservable
     public UnityEngine.UI.Toggle m_toggle = null;
 
     public string m_toggleName = "toggle_0";
+
+    private static CostManager instance = null;
+    public static CostManager Instance()
+    {
+        return instance;
+    }
 
     private void Awake()
     {
@@ -50,6 +54,11 @@ public class CostManager : MonoBehaviour, IPunObservable
                 toggle.onValueChanged.AddListener(OnValueChanged);
             }
         }
+    }
+
+    public void OnEnable()
+    {
+        instance = this;
     }
 
     public void OnValueChanged(bool state)
@@ -118,6 +127,24 @@ public class CostManager : MonoBehaviour, IPunObservable
                     }
                 }
             }
+        }
+    }
+
+    public void SetAsLastSiblingToPlayerName(string playerName)
+    {
+        for (int index = 0; index < m_listAreas.Count; index++)
+        {
+            if (BattleSceneManager.Instance().m_playerStatusList[index].IsNoPlayer())
+            {
+                continue;
+            }
+
+            if (BattleSceneManager.Instance().m_playerStatusList[index].m_playerName != playerName)
+            {
+                continue;
+            }
+
+            m_listAreas[index].SetAsLastSibling();
         }
     }
 }

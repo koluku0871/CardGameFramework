@@ -682,7 +682,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -695,7 +695,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -708,7 +708,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -723,7 +723,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -736,7 +736,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, false, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, false, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -750,7 +750,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -763,7 +763,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -776,7 +776,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -789,7 +789,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -803,7 +803,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');
@@ -816,7 +816,7 @@ public class CardOptionWindow : MonoBehaviour
             {
                 foreach (var cardDetail in touchManager.m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, cardDetail.tag, cardDetail.cardId);
+                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, innerListFromType, true, null, cardDetail.tag, cardDetail.cardId);
                 }
             }
             string[] list = target.name.Split('^');

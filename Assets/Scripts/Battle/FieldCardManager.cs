@@ -987,6 +987,11 @@ public class FieldCardManager : MonoBehaviour
 
     public void RemoveCardImage(CardOptionWindow.OPTION_TYPE option, Image card)
     {
+        if (card == null)
+        {
+            return;
+        }
+
         switch(option)
         {
             case CardOptionWindow.OPTION_TYPE.HAND:

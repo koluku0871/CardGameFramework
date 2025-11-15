@@ -227,42 +227,12 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             if (m_isPlayerStatusComplete)
             {
                 SetFieldPanelSubSize(true);
+                CostManager.Instance().SetAsLastSiblingToPlayerName(m_playerName);
             }
         }
         else
         {
-            bool isAdd = false;
-            foreach (var playerStatu in m_playerStatusList)
-            {
-                if (playerStatu.m_playerFieldManager == null)
-                {
-                    continue;
-                }
-
-                foreach (var log in playerStatu.m_playerFieldManager.GetLogList())
-                {
-                    if (string.IsNullOrEmpty(log))
-                    {
-                        continue;
-                    }
-
-                    var item = log.Split(',');
-                    var key = long.Parse(item[0]);
-                    if (m_sortLogList.ContainsKey(key))
-                    {
-                        continue;
-                    }
-                    isAdd = true;
-                    m_sortLogList.Add(key, item[1]);
-                }
-            }
-
-            if (isAdd)
-            {
-                Debug.Log(string.Join("\n", m_sortLogList.Values));
-                m_logText.text = string.Join("\n", m_sortLogList.Values);
-                m_scrollRect.verticalNormalizedPosition = 0f;
-            }
+            
         }
     }
 
@@ -390,6 +360,46 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                 CardOptionWindow.Instance().innerListFromType = type;
             }
         });
+    }
+
+    public bool UpdateLog()
+    {
+        if (!m_isPlayerStatusComplete) return false;
+
+        bool isAdd = false;
+        foreach (var playerStatu in m_playerStatusList)
+        {
+            if (playerStatu.m_playerFieldManager == null)
+            {
+                continue;
+            }
+
+            foreach (var log in playerStatu.m_playerFieldManager.GetLogList())
+            {
+                if (string.IsNullOrEmpty(log))
+                {
+                    continue;
+                }
+
+                var item = log.Split(',');
+                var key = long.Parse(item[0]);
+                if (m_sortLogList.ContainsKey(key))
+                {
+                    continue;
+                }
+                isAdd = true;
+                m_sortLogList.Add(key, item[1]);
+            }
+        }
+
+        if (isAdd)
+        {
+            Debug.Log(string.Join("\n", m_sortLogList.Values));
+            m_logText.text = string.Join("\n", m_sortLogList.Values);
+            m_scrollRect.verticalNormalizedPosition = 0f;
+        }
+
+        return isAdd;
     }
 
     public void OnClickToCloseButton()

@@ -639,6 +639,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         var logText = TimeUtil.GetUnixTime(DateTime.Now).ToString() + "," + BattleSceneManager.m_playerName + " --> " + log;
         Debug.Log(logText);
         m_logList.Add(logText);
+
+        BattleSceneManager.Instance().UpdateLog();
     }
 
     public List<string> GetLogList()
@@ -665,6 +667,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 m_fieldCardManager.SetFieldCardManagerDataJson((string)stream.ReceiveNext());
                 m_logList.Clear();
                 m_logList.AddRange(((string)stream.ReceiveNext()).Split("#").ToList());
+
+                BattleSceneManager.Instance().UpdateLog();
             }
         }
     }

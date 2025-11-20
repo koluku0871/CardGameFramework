@@ -8,6 +8,7 @@ public class ConstManager
     public const string DIRECTORY_PATH_TO_EXE = "/exe/";
     public const string DIRECTORY_PATH_TO_LOG = "/log/";
     public const string DIRECTORY_PATH_TO_HELP = "/help/";
+    public const string DIRECTORY_PATH_TO_SAMPLEDECK = "/sample/";
 
 #if UNITY_EDITOR
     public static readonly string DIRECTORY_PATH = "E:/UnityProject/CardGameFramework/data";
@@ -20,6 +21,7 @@ public class ConstManager
     public static readonly string DIRECTORY_FULL_PATH_TO_EXE = DIRECTORY_PATH + DIRECTORY_PATH_TO_EXE;
     public static readonly string DIRECTORY_FULL_PATH_TO_LOG = DIRECTORY_PATH + DIRECTORY_PATH_TO_LOG;
     public static readonly string DIRECTORY_FULL_PATH_TO_HELP = DIRECTORY_PATH + DIRECTORY_PATH_TO_HELP;
+    public static readonly string DIRECTORY_FULL_PATH_TO_SAMPLEDECK = DIRECTORY_PATH + DIRECTORY_PATH_TO_SAMPLEDECK;
 
     public enum PhotonObjectType
     {

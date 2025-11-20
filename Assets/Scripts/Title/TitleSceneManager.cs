@@ -257,7 +257,7 @@ public class TitleSceneManager : MonoBehaviour
                     directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK;
                 }
 
-                    string key = Path.GetFileNameWithoutExtension(directoryPath + data);
+                string key = Path.GetFileNameWithoutExtension(directoryPath + data);
                 pathList.Add(key);
 
                 if (File.Exists(directoryPath + data))
@@ -268,13 +268,31 @@ public class TitleSceneManager : MonoBehaviour
                 m_textMeshPro.text += "DownloadFilePath : " + data + "\n";
                 UnityEngine.Debug.Log(fileData.url + data);
 
-                using var fileStream = File.OpenWrite(directoryPath + data);
-                UnityWebRequest req = UnityWebRequest.Get(fileData.url + data);
-                yield return req.WriteToStreamAsync(fileStream);
-
-                while (!req.isDone)
+                bool isRequest = true;
+                while (isRequest)
                 {
-                    yield return new WaitForSeconds(1f);
+                    UnityWebRequest req = UnityWebRequest.Get(fileData.url + data);
+
+                    var handler = new DownloadHandlerFile(directoryPath + data);
+                    handler.removeFileOnAbort = true;
+
+                    req.downloadHandler = handler;
+                    yield return req.SendWebRequest();
+
+                    while (!req.isDone)
+                    {
+                        yield return new WaitForSeconds(0.5f);
+                    }
+
+                    if (string.IsNullOrEmpty(req.error))
+                    {
+                        req.Dispose();
+                        isRequest = false;
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogError(req.error);
+                    }
                 }
             }
         }

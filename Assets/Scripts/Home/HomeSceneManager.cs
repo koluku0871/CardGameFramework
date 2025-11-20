@@ -225,7 +225,6 @@ public class HomeSceneManager : MonoBehaviour
     }
 
     public void OnClickToDeckButton() {
-        //SceneManager.LoadScene("DeckScene");
         FadeManager.Instance().OnStart("DeckScene");
     }
 

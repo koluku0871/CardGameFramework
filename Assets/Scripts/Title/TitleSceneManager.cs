@@ -49,6 +49,8 @@ public class TitleSceneManager : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 120;
+
         if (AudioSourceManager.Instance() == null)
         {
             Instantiate(m_audioManager);

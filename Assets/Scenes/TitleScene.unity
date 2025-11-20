@@ -720,7 +720,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7d03dd3f645aa6f408a5ede41524af84, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0774bcb7613f85e4b8fcdbd60eff9319, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -795,7 +795,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7d03dd3f645aa6f408a5ede41524af84, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0774bcb7613f85e4b8fcdbd60eff9319, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1030,7 +1030,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7d03dd3f645aa6f408a5ede41524af84, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0774bcb7613f85e4b8fcdbd60eff9319, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1105,7 +1105,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7d03dd3f645aa6f408a5ede41524af84, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0774bcb7613f85e4b8fcdbd60eff9319, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1180,7 +1180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7d03dd3f645aa6f408a5ede41524af84, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0774bcb7613f85e4b8fcdbd60eff9319, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1469,8 +1469,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e1433b7d324d424fb2db1468e103813, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_fadeManager: {fileID: 6028503505361378300, guid: b5ef3d677d3045e40aca4f85a3ec6633,
-    type: 3}
   m_audioManager: {fileID: 1647606485514509898, guid: 872bfcbf9c5655a48a9a904ad8e2b7b0,
     type: 3}
   m_assetBundleManager: {fileID: 5507470352115371558, guid: afdd4456c4b646342b250861ed1e7837,

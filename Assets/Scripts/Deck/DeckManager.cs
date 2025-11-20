@@ -65,7 +65,7 @@ public class DeckManager : MonoBehaviour
                 }
                 count++;
             }
-            Debug.Log(cardDetail.ToString() + " : " + num + " : " + count);
+            UnityEngine.Debug.Log(cardDetail.ToString() + " : " + num + " : " + count);
             return num <= count;
         }
     }
@@ -99,6 +99,8 @@ public class DeckManager : MonoBehaviour
 
     [SerializeField]
     private TMPro.TextMeshProUGUI m_maxRandomCountText = null;
+
+    private System.Diagnostics.Process _process;
 
     private static DeckManager instance = null;
     public static DeckManager Instance() {
@@ -208,82 +210,19 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    public void OnClickToDeckSaveButton() {
-        DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
-        var selectId = deckSceneManager.GetDeckSelectDropdown().value;
-        if (1 > selectId) {
-            return;
-        }
-        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
-        string deckFileName = deckSceneManager.GetDeckSelectDropdown().options[selectId].text;
-
-        DeckDetail deckCardList = new DeckDetail();
-        deckCardList.type = AssetBundleManager.Instance().CardType;
-        foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
-            string[] cardData = c.name.Split('^');
-            if (cardData.Length < 2) {
-                continue;
-            }
-            var cardId = cardData[1];
-            CardDetail cardDetail = new CardDetail()
-            {
-                tag = cardData[0],
-                cardId = cardId
-            };
-            deckCardList.Add(cardDetail);
-
-            ShinyEffectForUGUI shiny = c.GetComponent<ShinyEffectForUGUI>();
-            if (shiny != null)
-            {
-                deckCardList.AddToAce(cardDetail);
-            }
-        }
-
-        foreach (Transform c in deckSceneManager.GetSubDeckContent().transform)
-        {
-            string[] cardData = c.name.Split('^');
-            if (cardData.Length < 2)
-            {
-                continue;
-            }
-            var cardId = cardData[1];
-            deckCardList.AddToSub(new CardDetail()
-            {
-                tag = cardData[0],
-                cardId = cardId
-            });
-        }
-
-        foreach (Transform c in deckSceneManager.GetTokenDeckContent().transform)
-        {
-            string[] cardData = c.name.Split('^');
-            if (cardData.Length < 2)
-            {
-                continue;
-            }
-            var cardId = cardData[1];
-            deckCardList.AddToToken(new CardDetail()
-            {
-                tag = cardData[0],
-                cardId = cardId
-            });
-        }
-
-        string deckData = JsonUtility.ToJson(deckCardList);
-        Debug.Log(deckData);
-        StreamWriter streamWriter = new StreamWriter(directoryPath + deckFileName + ".json");
-        streamWriter.WriteLine(deckData);
-        streamWriter.Close();
-
-        CheckDeckDirectory();
-    }
-
-    public void OnClickToDeckCreateButton() {
+    public string OnClickToDeckSaveButton()
+    {
         var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
         string deckFileName = deckSceneManager.GetDeckCreateInputField().text;
-        if (deckFileName == "") {
-            return;
+        if (deckFileName == "")
+        {
+            var selectId = deckSceneManager.GetDeckSelectDropdown().value;
+            if (1 > selectId)
+            {
+                return "";
+            }
+            deckFileName = deckSceneManager.GetDeckSelectDropdown().options[selectId].text;
         }
 
         DeckDetail deckCardList = new DeckDetail();
@@ -345,6 +284,54 @@ public class DeckManager : MonoBehaviour
         streamWriter.Close();
 
         CheckDeckDirectory();
+
+        return deckFileName;
+    }
+
+    public void OnClickToUploadButton()
+    {
+        string deckFileName = OnClickToDeckSaveButton();
+
+        OptionData optionData = new OptionData();
+        optionData.IsFileExists();
+        optionData.LoadTxt();
+
+        File.Copy(
+            ConstManager.DIRECTORY_FULL_PATH_TO_DECK + deckFileName + ".json",
+            ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + optionData.name + "_" + deckFileName + ".sample",
+            true
+        );
+
+        Debug.Log(ConstManager.DIRECTORY_PATH + "/ResUpload.exe" + " SampleDeck " + ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + optionData.name + "_" + deckFileName + ".sample");
+
+        _process = new System.Diagnostics.Process();
+
+        // プロセスを起動するときに使用する値のセットを指定
+        _process.StartInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = ConstManager.DIRECTORY_PATH + "/ResUpload.exe",
+            Arguments = "SampleDeck " + ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + optionData.name + "_" + deckFileName + ".sample",
+            UseShellExecute = false,
+            WorkingDirectory = ConstManager.DIRECTORY_PATH,
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            CreateNoWindow = true,
+        };
+
+        _process.EnableRaisingEvents = true;
+        _process.Exited += DisposeProcess;
+
+        _process.Start();
+        _process.BeginOutputReadLine();
+    }
+    private void DisposeProcess(object sender, EventArgs e)
+    {
+        if (_process == null || _process.HasExited) return;
+
+        _process.StandardInput.Close();
+        _process.CloseMainWindow();
+        _process.Dispose();
+        _process = null;
     }
 
     public void OnClickToDeckRCreateButton()

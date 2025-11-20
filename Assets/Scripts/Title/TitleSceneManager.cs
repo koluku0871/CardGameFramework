@@ -90,6 +90,12 @@ public class TitleSceneManager : MonoBehaviour
             Directory.CreateDirectory(path);
         }
 
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
         OptionData optionData = new OptionData();
         optionData.IsFileExists();
         if (!optionData.IsFileExists())
@@ -232,6 +238,11 @@ public class TitleSceneManager : MonoBehaviour
 
             foreach (var data in fileData.list.Split(","))
             {
+                if (string.IsNullOrEmpty(data))
+                {
+                    continue;
+                }
+
                 directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_BUNDLES;
                 if (Path.GetExtension(data) == ".exe")
                 {
@@ -240,6 +251,10 @@ public class TitleSceneManager : MonoBehaviour
                 else if(Path.GetExtension(data) == ".help")
                 {
                     directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_HELP;
+                }
+                else if (Path.GetExtension(data) == ".sample")
+                {
+                    directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK;
                 }
 
                     string key = Path.GetFileNameWithoutExtension(directoryPath + data);

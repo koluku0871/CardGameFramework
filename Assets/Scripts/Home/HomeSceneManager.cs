@@ -237,6 +237,11 @@ public class HomeSceneManager : MonoBehaviour
 #endif
     }
 
+    public void OnClickToOpenExplorer()
+    {
+        System.Diagnostics.Process.Start(Application.dataPath);
+    }
+
     public void OnClickToCloseButton() {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

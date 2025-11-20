@@ -7,6 +7,7 @@ public class OptionData : JsonFileData
 {
     public string name = "";
     public string cardType = "";
+    public int isNotLoad = 0;
     public float homeBgmVolume = 0.1f;
     public float battleBgmVolume = 0.1f;
     public float deckBgmVolume = 0.1f;
@@ -30,6 +31,7 @@ public class OptionData : JsonFileData
 
             this.name = optionData.name;
             this.cardType = optionData.cardType;
+            this.isNotLoad = optionData.isNotLoad;
             this.homeBgmVolume = optionData.homeBgmVolume;
             this.battleBgmVolume = optionData.battleBgmVolume;
             this.deckBgmVolume = optionData.deckBgmVolume;

@@ -28,12 +28,7 @@ public class HomeSceneManager : MonoBehaviour
     private TMPro.TMP_Dropdown m_typeDropdown = null;
 
     [SerializeField]
-    private Toggle m_contentToggle = null;
-
-    [SerializeField]
-    private TMPro.TextMeshProUGUI m_contentToggleText = null;
-
-    private List<Toggle> m_contentToggleList = new List<Toggle>();
+    private Toggle m_notLoadToggle = null;
 
     [SerializeField]
     private UnityEngine.UI.Slider m_homeBgmSlider = null;
@@ -153,6 +148,8 @@ public class HomeSceneManager : MonoBehaviour
 
         m_nameText.text = m_nameInputField.text;
 
+        m_notLoadToggle.isOn = (optionData.isNotLoad == 1);
+
         m_versionText.text = "v " + UnityEngine.Application.version;
         m_reDlTextContent.text = "";
 
@@ -267,6 +264,13 @@ public class HomeSceneManager : MonoBehaviour
         bool isUpdateCardType = optionData.cardType != m_typeDropdown.options[m_typeDropdown.value].text;
         optionData.cardType = m_typeDropdown.options[m_typeDropdown.value].text;
         AssetBundleManager.Instance().CardType = optionData.cardType;
+
+        int isNotLoad = 0;
+        if (m_notLoadToggle.isOn)
+        {
+            isNotLoad = 1;
+        }
+        optionData.isNotLoad = isNotLoad;
 
         optionData.homeBgmVolume = m_homeBgmSlider.value;
         optionData.battleBgmVolume = m_battleBgmSlider.value;

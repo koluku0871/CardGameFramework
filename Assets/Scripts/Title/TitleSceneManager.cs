@@ -144,8 +144,7 @@ public class TitleSceneManager : MonoBehaviour
             _process.BeginOutputReadLine();
         }
 
-        path = ConstManager.DIRECTORY_FULL_PATH_TO_OPTION + "DLlock.json";
-        if (File.Exists(path))
+        if (optionData.isNotLoad == 1)
         {
             StartCoroutine(AssetBundleManager.Instance().ReadFileList(() => {
                 AssetBundleManager.Instance().SetCardTextList();

@@ -6,6 +6,8 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static CoreManager;
+using static DeckManager;
 
 public class DeckSceneManager : MonoBehaviour
 {
@@ -75,19 +77,19 @@ public class DeckSceneManager : MonoBehaviour
     [Header("デッキ情報")]
 
     [SerializeField]
-    private Text m_deckCardCountText = null;
+    private TMPro.TextMeshProUGUI m_deckCardCountText = null;
 
     [SerializeField]
     private RectTransform m_deckContent = null;
 
     [SerializeField]
-    private Text m_subDeckCardCountText = null;
+    private TMPro.TextMeshProUGUI m_subDeckCardCountText = null;
 
     [SerializeField]
     private RectTransform m_subDeckContent = null;
 
     [SerializeField]
-    private Text m_tokenDeckCardCountText = null;
+    private TMPro.TextMeshProUGUI m_tokenDeckCardCountText = null;
 
     [SerializeField]
     private RectTransform m_tokenDeckContent = null;
@@ -95,7 +97,7 @@ public class DeckSceneManager : MonoBehaviour
     [Header("検索結果")]
 
     [SerializeField]
-    private Text m_searchCardCountText = null;
+    private TMPro.TextMeshProUGUI m_searchCardCountText = null;
 
     [SerializeField]
     private InfiniteScroll m_searchInfiniteScroll = null;
@@ -106,7 +108,7 @@ public class DeckSceneManager : MonoBehaviour
     [Header("お気に入り")]
 
     [SerializeField]
-    private Text m_favoriteCardCountText = null;
+    private TMPro.TextMeshProUGUI m_favoriteCardCountText = null;
 
     [SerializeField]
     private InfiniteScroll m_favoriteInfiniteScroll = null;
@@ -117,6 +119,8 @@ public class DeckSceneManager : MonoBehaviour
     private DeckManager m_deckManager = null;
 
     private List<CardData> cardDatas = new List<CardData>();
+    private List<DeckManager.CardDetail> notViewFavoriteCardDetails = new List<DeckManager.CardDetail>();
+
     public CardData GetCardDatas(int index)
     {
         if (index < 0 || cardDatas.Count-1 < index)
@@ -167,10 +171,17 @@ public class DeckSceneManager : MonoBehaviour
         FavoriteData favoriteData = JsonUtility.FromJson<FavoriteData>(sr.ReadToEnd());
         sr.Close();
 
+        notViewFavoriteCardDetails.Clear();
         favoriteCardDatas.Clear();
         foreach (var cardData in favoriteData.cardDetails)
         {
-            favoriteCardDatas.Add(AssetBundleManager.Instance().GetBaseData(cardData.tag, cardData.cardId));
+            var baseData =  AssetBundleManager.Instance().GetBaseData(cardData.tag, cardData.cardId);
+            if (baseData == null)
+            {
+                notViewFavoriteCardDetails.Add(cardData);
+                continue;
+            }
+            favoriteCardDatas.Add(baseData);
         }
     }
 
@@ -222,22 +233,22 @@ public class DeckSceneManager : MonoBehaviour
         return m_tokenDeckContent;
     }
 
-    public Text GetDeckCardCountText()
+    public TMPro.TextMeshProUGUI GetDeckCardCountText()
     {
         return m_deckCardCountText;
     }
 
-    public Text GetSubDeckCardCountText()
+    public TMPro.TextMeshProUGUI GetSubDeckCardCountText()
     {
         return m_subDeckCardCountText;
     }
 
-    public Text GetTokenDeckCardCountText()
+    public TMPro.TextMeshProUGUI GetTokenDeckCardCountText()
     {
         return m_tokenDeckCardCountText;
     }
 
-    public Text GetSearchCardCountText()
+    public TMPro.TextMeshProUGUI GetSearchCardCountText()
     {
         return m_searchCardCountText;
     }
@@ -267,6 +278,14 @@ public class DeckSceneManager : MonoBehaviour
                     continue;
                 }
                 favoriteData.cardDetails.Add(new DeckManager.CardDetail() { tag = cardData.PackNo, cardId = cardData.CardNo });
+            }
+        }
+
+        if (notViewFavoriteCardDetails != null && notViewFavoriteCardDetails.Count > 0)
+        {
+            foreach (var cardData in notViewFavoriteCardDetails)
+            {
+                favoriteData.cardDetails.Add(cardData);
             }
         }
         

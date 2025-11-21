@@ -101,6 +101,7 @@ public class KeyCodeManager : MonoBehaviour
     {
         m_inputActionList.Clear();
         AddInputActionList(InputType.GET_DOWN, KeyCode.H, "ヘルプウィンドウの表示/非表示", ActiveToWindow);
+        AddInputActionList(InputType.GET_DOWN, KeyCode.V, "音声認識開始/停止", SpeechManager.Instance().ChangeDictationRecognizer);
     }
 
     public void ActiveToWindow()

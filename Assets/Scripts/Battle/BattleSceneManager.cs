@@ -172,6 +172,14 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             }
         }
 
+        SpeechManager.Instance().AddAction((text) => {
+            if (text.Contains("専攻はもらった"))
+            {
+                GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
+                coinObj.GetComponent<CoinManager>().SetIsOpen(m_playerName.Substring(0, 2));
+            }
+        });
+
         SetUi();
     }
 

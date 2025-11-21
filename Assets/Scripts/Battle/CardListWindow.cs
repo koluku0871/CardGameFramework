@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static CardOptionWindow;
+using static UnityEngine.GraphicsBuffer;
 
 public class CardListWindow : MonoBehaviour, IPunObservable
 {
@@ -60,8 +62,6 @@ public class CardListWindow : MonoBehaviour, IPunObservable
 
     public void DeleteCardList()
     {
-        FieldCardManager fieldCardManager = FieldCardManager.Instance();
-
         foreach (Transform c in m_card.transform.parent)
         {
             if (c == m_card.transform)
@@ -124,6 +124,56 @@ public class CardListWindow : MonoBehaviour, IPunObservable
         m_optionType = CardOptionWindow.OPTION_TYPE.NONE;
 
         transform.localScale = Vector3.zero;
+    }
+
+    public void OnClickToUpButton()
+    {
+        if (!m_photonView.IsMine)
+        {
+            return;
+        }
+
+
+        foreach (Transform c in m_card.transform.parent)
+        {
+            if (c == m_card.transform)
+            {
+                continue;
+            }
+
+            Image image = c.GetComponent<Image>();
+            if (image != null)
+            {
+                string[] list = image.name.Split('^');
+                FieldCardManager.Instance().AddDstFromSrc(m_optionType, m_optionType, true, list[0], list[1]);
+            }
+        }
+        Close();
+    }
+
+    public void OnClickToDownButton()
+    {
+        if (!m_photonView.IsMine)
+        {
+            return;
+        }
+
+
+        foreach (Transform c in m_card.transform.parent)
+        {
+            if (c == m_card.transform)
+            {
+                continue;
+            }
+
+            Image image = c.GetComponent<Image>();
+            if (image != null)
+            {
+                string[] list = image.name.Split('^');
+                FieldCardManager.Instance().AddDstFromSrc(m_optionType, m_optionType, false, list[0], list[1]);
+            }
+        }
+        Close();
     }
 
     public void OnClickToCloseButton()

@@ -26,6 +26,8 @@ public class CardOptionWindow : MonoBehaviour
 
         DAMAGE,
         SUB,
+
+        CARD_LIST_OPTION,   // カード一覧表示のオプションボタン
     }
 
     [Serializable]

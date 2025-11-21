@@ -210,7 +210,12 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    public string OnClickToDeckSaveButton()
+    public void OnClickToDeckSaveButton()
+    {
+        SaveDeck();
+    }
+
+    public string SaveDeck()
     {
         var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
         DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
@@ -290,7 +295,7 @@ public class DeckManager : MonoBehaviour
 
     public void OnClickToUploadButton()
     {
-        string deckFileName = OnClickToDeckSaveButton();
+        string deckFileName = SaveDeck();
 
         OptionData optionData = new OptionData();
         optionData.IsFileExists();

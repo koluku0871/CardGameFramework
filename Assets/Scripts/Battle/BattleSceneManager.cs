@@ -172,6 +172,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             }
         }
 
+        SpeechManager.Instance().RemoveAction();
         SpeechManager.Instance().AddAction((text) => {
             if (text.Contains("専攻はもらった"))
             {
@@ -256,6 +257,8 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.Disconnect();
 
+        SpeechManager.Instance().RemoveAction();
+
         FadeManager.Instance().OnStart("HomeScene");
     }
 
@@ -333,8 +336,18 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
-            int index = new System.Random().Next(0, m_playerIndexList.Count);
-            coinObj.GetComponent<CoinManager>().SetIsOpen(m_playerStatusList[m_playerIndexList[index]].m_playerName.Substring(0, 2));
+
+            string coin = (string)PhotonNetwork.CurrentRoom.CustomProperties["Coin"];
+
+            if (string.IsNullOrEmpty(coin))
+            {
+                int index = new System.Random().Next(0, m_playerIndexList.Count);
+                coinObj.GetComponent<CoinManager>().SetIsOpen(m_playerStatusList[m_playerIndexList[index]].m_playerName.Substring(0, 2));
+            }
+            else
+            {
+                coinObj.GetComponent<CoinManager>().SetIsOpen(coin);
+            }
 
             if (m_type == "digimon")
             {

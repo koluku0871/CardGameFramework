@@ -175,6 +175,15 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         UpdatePlayerList();
 
         SetCustomRoomProperties();
+
+        SpeechManager.Instance().RemoveAction();
+        SpeechManager.Instance().AddAction((text) => {
+            if (text.Contains("êÍçUÇÕÇ‡ÇÁÇ¡ÇΩ"))
+            {
+                roomHash["Coin"] = m_playerName.Substring(0, 2);
+                SetRoomHash(roomHash);
+            }
+        });
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -220,6 +229,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     {
         base.OnDisconnected(cause);
 
+        SpeechManager.Instance().RemoveAction();
         FadeManager.Instance().OnStart("HomeScene");
     }
 
@@ -495,6 +505,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         }
 
         PhotonNetwork.CurrentRoom.IsOpen = false;
+
         PhotonNetwork.LoadLevel("BattleScene");
     }
 
@@ -597,6 +608,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             customRoomProperties.Add("Core", 3);
             customRoomProperties.Add("SoulCore", 1);
             customRoomProperties.Add("Life", 5);
+            customRoomProperties.Add("Coin", "");
 
             switch (AssetBundleManager.Instance().CardType)
             {

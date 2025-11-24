@@ -15,9 +15,62 @@ public class DeckManager : MonoBehaviour
         public string tag = "";
         public string cardId = "";
 
+        public CardDetail()
+        {
+        }
+
+        public CardDetail(string name)
+        {
+            string[] list = name.Split('^');
+
+            this.tag = list[0];
+            this.cardId = list[1];
+        }
+
+        public CardDetail(string tag, string cardId)
+        {
+            this.tag = tag;
+            this.cardId = cardId;
+        }
+
         public new string ToString()
         {
             return tag + "^" + cardId;
+        }
+    }
+
+    [Serializable]
+    public class CardDetailPlusOption : CardDetail
+    {
+        public string option = "";
+
+        public CardDetailPlusOption(string tag, string cardId, string option)
+        {
+            this.tag = tag;
+            this.cardId = cardId;
+            this.option = option;
+        }
+
+        public CardDetailPlusOption(string name)
+        {
+            string[] list = name.Split('^');
+
+            this.tag = list[0];
+            this.cardId = list[1];
+            if (list.Length > 2)
+            {
+                this.option = list[2];
+            }
+        }
+
+        public CardDetail GetCardDetail()
+        {
+            return new CardDetail() { tag = tag, cardId = cardId };
+        }
+
+        public new string ToString()
+        {
+            return tag + "^" + cardId + "^" + option;
         }
     }
 

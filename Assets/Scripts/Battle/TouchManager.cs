@@ -1,6 +1,5 @@
 ﻿using Photon.Pun;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -276,7 +275,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         }
     }
 
-    public List<DeckManager.CardDetail> m_innerCardDetailList = new List<DeckManager.CardDetail>();
+    public List<DeckManager.CardDetailPlusOption> m_innerCardDetailList = new List<DeckManager.CardDetailPlusOption>();
     private string m_innerCardDetailListStr = "";
     private List<Image> m_cardImageList = new List<Image>();
 
@@ -311,11 +310,11 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             foreach (string str in m_innerCardDetailListStr.Split("#"))
             {
                 var split = str.Split("^");
-                if (split.Count() != 2)
+                if (split.Count() < 2)
                 {
                     continue;
                 }
-                m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = split[0], cardId = split[1] });
+                m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(str));
             }
         }
 
@@ -358,12 +357,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                         }
                         else
                         {
-                            string[] list = this.gameObject.name.Split('^');
                             m_innerCardDetailList.RemoveAt(index);
-                            m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
+                            m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(this.gameObject.name));
                             this.gameObject.name = target.gameObject.name;
-                            list = this.gameObject.name.Split('^');
-                            this.gameObject.GetComponent<Image>().sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
+                            this.gameObject.GetComponent<Image>().sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail(this.gameObject.name));
                         }
                         
                         SetInnerCardDetailList(string.Join("#", m_innerCardDetailList.Select(x => x.ToString())));
@@ -374,14 +371,37 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                     int index = m_cardImageList.IndexOf(target);
                     if (index != -1)
                     {
-                        PlayerFieldManager.Instance().CreateCard(target.name, true);
                         AudioSourceManager.Instance().PlayOneShot(0);
-                        m_innerCardDetailList.RemoveAt(index);
+                        if (isDoubleClick)
+                        {
+                            if (string.IsNullOrEmpty(m_innerCardDetailList[index].option))
+                            {
+                                m_innerCardDetailList[index].option = "IsClose";
+                            }
+                            else
+                            {
+                                m_innerCardDetailList[index].option = "";
+                            }
+                        }
+                        else
+                        {
+                            PlayerFieldManager.Instance().CreateCard(target.name, true);
+                            m_innerCardDetailList.RemoveAt(index);
+                        }
                         SetInnerCardDetailList(string.Join("#", m_innerCardDetailList.Select(x => x.ToString())));
                     }
                 }
             );
             card.gameObject.name = cardDetail.ToString();
+
+            if (!string.IsNullOrEmpty(cardDetail.option))
+            {
+                if (cardDetail.option == "IsClose")
+                {
+                    card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                }
+            }
+
             m_cardImageList.Add(card);
         }
     }
@@ -642,7 +662,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 {
                     RemoveOoverlapObjectList(m_endObj);
                     m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.AddRange(m_innerCardDetailList);
-                    m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
+                    m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
                     FieldCardManager.Instance().RemoveCardImage(CardOptionWindow.OPTION_TYPE.FIELD, m_image);
                     AudioSourceManager.Instance().PlayOneShot(0);
 

@@ -112,6 +112,9 @@ public class CardOptionWindow : MonoBehaviour
                 damageStr = "ライフ";
                 subStr = "エールデッキ";
                 break;
+            default:
+                SetButtonToEtc();
+                break;
         }
 
         SetButtonToOption();
@@ -234,6 +237,18 @@ public class CardOptionWindow : MonoBehaviour
                 CloseOnSound();
             }));
         }
+    }
+
+    private void SetButtonToEtc()
+    {
+        OPTION_TYPE optionType = OPTION_TYPE.STEP;
+        OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F1, false, "アクティブ＆ドローフェイズ", () => {
+            FieldCardManager.Instance().AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
+            PlayerFieldManager.Instance().SetAllMyCardToRecovery();
+            Close();
+        }));
     }
 
     private void SetButtonToOption()

@@ -15,7 +15,13 @@ public class DeckSceneManager : MonoBehaviour
     private Button m_closeButton = null;
 
     [SerializeField]
+    private ToggleGroup m_selectToggleGroup = null;
+
+    [SerializeField]
     private Dropdown m_deckSelectDropdown = null;
+
+    [SerializeField]
+    private Dropdown m_sampleSelectDropdown = null;
 
     [SerializeField]
     private InputField m_deckCreateInputField = null;
@@ -185,6 +191,11 @@ public class DeckSceneManager : MonoBehaviour
         }
     }
 
+    public ToggleGroup GetDeckSelectToggleGroup()
+    {
+        return m_selectToggleGroup;
+    }
+
     public Dropdown GetDeckSelectDropdown()
     {
         return m_deckSelectDropdown;
@@ -193,6 +204,11 @@ public class DeckSceneManager : MonoBehaviour
     public InputField GetDeckCreateInputField()
     {
         return m_deckCreateInputField;
+    }
+
+    public Dropdown GetSampleSelectDropdown()
+    {
+        return m_sampleSelectDropdown;
     }
 
     public Image GetTargetCardDetail()

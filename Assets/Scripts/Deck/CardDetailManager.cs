@@ -158,6 +158,7 @@ public class CardDetailManager : MonoBehaviour
         Debug.Log("tag : " + tag);
 
         var isAwake = AssetBundleManager.Instance().ExistsBaseData(tag, cardId + "_b");
+        //Debug.LogWarning(cardId + "_b : " + isAwake.ToString());
         m_awake.gameObject.SetActive(isAwake);
         if (isAwake)
         {

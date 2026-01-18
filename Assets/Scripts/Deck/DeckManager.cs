@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -208,6 +209,46 @@ public class DeckManager : MonoBehaviour
                 sr.Close();
             }
         }
+
+        deckSceneManager.GetSampleSelectDropdown().ClearOptions();
+        deckSceneManager.GetSampleSelectDropdown().options.Add(new Dropdown.OptionData()
+        {
+            text = "no select"
+        });
+
+        directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK;
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+            Debug.Log("directoryPath:" + directoryPath);
+        }
+        else
+        {
+            string[] deckFiles = Directory.GetFiles(directoryPath, "*.sample", SearchOption.AllDirectories);
+            for (int index = 0; index < deckFiles.Length; index++)
+            {
+                var sr = new StreamReader(deckFiles[index], Encoding.UTF8);
+                var deckStr = sr.ReadToEnd();
+                try
+                {
+                    DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(deckStr);
+                    if (deckCardList.GetDeckType() == AssetBundleManager.Instance().CardType)
+                    {
+                        int start = deckFiles[index].LastIndexOf("/") + 1;
+                        int end = deckFiles[index].LastIndexOf(".sample");
+                        int count = end - start;
+                        string deckFileName = deckFiles[index].Substring(start, count);
+                        deckSceneManager.GetSampleSelectDropdown().options.Add(new Dropdown.OptionData()
+                        {
+                            text = deckFileName
+                        });
+                    }
+                }
+                catch { }
+
+                sr.Close();
+            }
+        }
     }
 
     public void OnValueChangedToDeckSelectDropdown() {
@@ -229,11 +270,40 @@ public class DeckManager : MonoBehaviour
 
         yield return null;
 
-        var selectId = deckSceneManager.GetDeckSelectDropdown().value;
-        try
+        Toggle activeToggle = deckSceneManager.GetDeckSelectToggleGroup().ActiveToggles().First();
+        var selectId = 0;
+        Dictionary<string, int> strings = new Dictionary<string, int>();
+        DeckDetail deckCardList = null;
+        if (activeToggle.name == "DeckToggle")
         {
-            DeckDetail deckCardList = JsonUtility.FromJson<DeckDetail>(m_deckList[selectId-1]);
-            Dictionary<string, int> strings = new Dictionary<string, int>();
+            selectId = deckSceneManager.GetDeckSelectDropdown().value;
+            try
+            {
+                deckCardList = JsonUtility.FromJson<DeckDetail>(m_deckList[selectId - 1]);
+            }
+            catch
+            {
+                Debug.Log("OnValueChangedToDeckSelectDropdownCoroutine DeckToggle selectId = " + selectId);
+            }
+        }
+        else if (activeToggle.name == "UploadDeckToggle")
+        {
+            try
+            {
+                selectId = deckSceneManager.GetSampleSelectDropdown().value;
+                var deckFileName = deckSceneManager.GetSampleSelectDropdown().options[selectId].text;
+                var sr = new StreamReader(ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + deckFileName + ".sample", Encoding.UTF8);
+                var deckStr = sr.ReadToEnd();
+                deckCardList = JsonUtility.FromJson<DeckDetail>(deckStr);
+            }
+            catch
+            {
+                Debug.Log("OnValueChangedToDeckSelectDropdownCoroutine UploadDeckToggle selectId = " + selectId);
+            }
+        }
+
+        if (deckCardList != null)
+        {
             foreach (CardDetail card in deckCardList.cardDetailList)
             {
                 if (!strings.ContainsKey(card.ToString()))
@@ -257,15 +327,30 @@ public class DeckManager : MonoBehaviour
                 AddCard(card.tag, card.cardId, deckSceneManager.GetTokenDeckContent());
             }
         }
-        catch
-        {
-            Debug.Log("OnValueChangedToDeckSelectDropdownCoroutine selectId = " + selectId);
-        }
     }
 
     public void OnClickToDeckSaveButton()
     {
         SaveDeck();
+    }
+    public void OnClickToSampleSaveButton()
+    {
+        var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK;
+        DeckSceneManager deckSceneManager = DeckSceneManager.Instance();
+        var selectId = deckSceneManager.GetSampleSelectDropdown().value;
+        if (1 > selectId)
+        {
+            return;
+        }
+        var deckFileName = deckSceneManager.GetSampleSelectDropdown().options[selectId].text;
+
+        File.Copy(
+            ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + deckFileName + ".sample",
+            ConstManager.DIRECTORY_FULL_PATH_TO_DECK + deckFileName + ".json",
+            true
+        );
+
+        CheckDeckDirectory();
     }
 
     public string SaveDeck()

@@ -71,6 +71,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     [Header("digimon")]
     [SerializeField]
     private Toggle m_moveSecurityToggle = null;
+    [SerializeField]
+    private Toggle m_stayMousePosToggle = null;
 
     public bool IsMoveSecurity
     {
@@ -82,6 +84,19 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             }
 
             return m_moveSecurityToggle.isOn;
+        }
+    }
+
+    public bool IsStayMousePos
+    {
+        get
+        {
+            if (m_stayMousePosToggle == null)
+            {
+                return false;
+            }
+
+            return m_stayMousePosToggle.isOn;
         }
     }
 
@@ -165,6 +180,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         SetActive(m_moveSecurityToggle, IsMine);
+        SetActive(m_stayMousePosToggle, IsMine);
 
         if (SetActive(m_damageButton, IsMine))
         {

@@ -661,8 +661,24 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 if (m_endObj != null)
                 {
                     RemoveOoverlapObjectList(m_endObj);
-                    m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.AddRange(m_innerCardDetailList);
-                    m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
+                    if (!PlayerFieldManager.Instance().IsStayMousePos)
+                    {
+                        m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.AddRange(m_innerCardDetailList);
+                        m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
+                    }
+                    else
+                    {
+                        if (m_endObj.transform.position.x > Input.mousePosition.x)
+                        {
+                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Insert(0, new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
+                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.InsertRange(0, m_innerCardDetailList);
+                        }
+                        else
+                        {
+                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.AddRange(m_innerCardDetailList);
+                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
+                        }
+                    }
                     FieldCardManager.Instance().RemoveCardImage(CardOptionWindow.OPTION_TYPE.FIELD, m_image);
                     AudioSourceManager.Instance().PlayOneShot(0);
 

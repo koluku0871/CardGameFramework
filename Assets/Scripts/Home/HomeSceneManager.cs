@@ -292,7 +292,7 @@ public class HomeSceneManager : MonoBehaviour
     {
 #if UNITY_EDITOR
 #elif UNITY_STANDALONE_WIN
-        System.Diagnostics.Process.Start(Application.dataPath.Replace("_Data", ".exe"));
+        System.Diagnostics.Process.Start(UnityEngine.Application.dataPath.Replace("_Data", ".exe"));
         UnityEngine.Application.Quit();
 #endif
     }

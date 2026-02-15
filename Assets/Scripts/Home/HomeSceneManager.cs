@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Octokit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -69,6 +71,12 @@ public class HomeSceneManager : MonoBehaviour
 
     [SerializeField]
     private TMPro.TextMeshProUGUI m_logContentText = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_gitLogContent = null;
+
+
+    private Dictionary<DateTime, string> m_gitLogTable = new Dictionary<DateTime, string>();
 
 
     private void Start()
@@ -153,7 +161,15 @@ public class HomeSceneManager : MonoBehaviour
         m_versionText.text = "v " + UnityEngine.Application.version;
         m_reDlTextContent.text = "";
 
-        StartCoroutine(DrawAssetBundleText(() => { }));
+        StartCoroutine(DrawAssetBundleText(() => {
+            StartCoroutine(GetCommitToGithub(() => {
+                foreach (var n in m_gitLogTable.OrderByDescending(c => c.Key))
+                {
+                    //UnityEngine.Debug.LogError(n.Key + ": " + n.Value);
+                    m_gitLogContent.text += n.ToString() + "\n";
+                }
+            }));
+        }));
     }
 
     public void Update()
@@ -217,6 +233,53 @@ public class HomeSceneManager : MonoBehaviour
         action();
     }
 
+    public IEnumerator GetCommitToGithub(Action action)
+    {
+        var github = new GitHubClient(new ProductHeaderValue("CardGameFrameworkAPP"));
+        var tokenAuth = new Credentials("");
+        github.Credentials = tokenAuth;
+
+        var owner = "koluku0871";
+        var repo = "CardGameFramework";
+
+        var commits = github.Repository.Commit.GetAll(owner, repo);
+
+        while (!commits.IsCompleted)
+        {
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        foreach (var commit in commits.Result.Take(50))
+        {
+            //UnityEngine.Debug.Log($"SHA: {commit.Sha}");
+            //UnityEngine.Debug.Log($"Author: {commit.Commit.Author.Name}");
+            //UnityEngine.Debug.Log($"Date: {commit.Commit.Author.Date}");
+            //UnityEngine.Debug.Log($"Message: {commit.Commit.Message}");
+            //UnityEngine.Debug.Log("---------------------------------");
+
+            //UnityEngine.Debug.Log(commit.Commit.Author.Date.LocalDateTime + " : " + commit.Commit.Message);
+            m_gitLogTable.Add(commit.Commit.Author.Date.LocalDateTime, commit.Commit.Message);
+            //yield return null;
+        }
+
+        repo = "CardGameImg";
+        commits = github.Repository.Commit.GetAll(owner, repo);
+
+        while (!commits.IsCompleted)
+        {
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        foreach (var commit in commits.Result.Take(50))
+        {
+            //UnityEngine.Debug.Log(commit.Commit.Author.Date.LocalDateTime + " : " + commit.Commit.Message);
+            m_gitLogTable.Add(commit.Commit.Author.Date.LocalDateTime, commit.Commit.Message);
+            //yield return null;
+        }
+
+        action();
+    }
+
     public void OnClickToRoomButton() {
         FadeManager.Instance().OnStart("RoomScene");
     }
@@ -236,7 +299,7 @@ public class HomeSceneManager : MonoBehaviour
 
     public void OnClickToOpenExplorer()
     {
-        System.Diagnostics.Process.Start(Application.dataPath);
+        System.Diagnostics.Process.Start(UnityEngine.Application.dataPath);
     }
 
     public void OnClickToCloseButton() {

@@ -47,6 +47,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     }
 
     public static string m_type = "";
+    public bool isSolo = false;
     public static string m_playerName = "";
 
     [Serializable]
@@ -119,6 +120,9 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             {
                 case "Type":
                     m_type = value;
+                    break;
+                case "Solo":
+                    isSolo = (value == "1");
                     break;
                 case "playerName1":
                     if (!string.IsNullOrEmpty(value))
@@ -281,11 +285,14 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
         foreach (var playerStatu in m_playerStatusList)
         {
-            if (m_playerName == playerStatu.m_playerName || (!IsPlayer && GetPlayerName(PhotonNetwork.MasterClient) == playerStatu.m_playerName))
+            if (m_playerName == playerStatu.m_playerName
+                || (!IsPlayer && GetPlayerName(PhotonNetwork.MasterClient) == playerStatu.m_playerName)
+                || (isSolo && !string.IsNullOrEmpty(playerStatu.m_playerName)))
             {
                 playerStatu.m_fieldPanelSub.localRotation = Quaternion.Euler(0, 0, 0);
 
-                if (m_playerName == playerStatu.m_playerName)
+                if (m_playerName == playerStatu.m_playerName
+                    || isSolo)
                 {
                     GameObject obj = null;
                     try
@@ -296,6 +303,12 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                     {
                         obj = PhotonNetwork.Instantiate("Prefab/Battle/PlayField/PlayField", Vector3.zero, Quaternion.identity);
                     }
+
+                    if (isSolo)
+                    {
+                        obj.transform.SetParent(playerStatu.m_fieldPanelSub);
+                    }
+
                     PlayerFieldManager playerFieldManager = obj.GetComponent<PlayerFieldManager>();
                     obj.SetActive(true);
                     obj.transform.localPosition = Vector3.zero;

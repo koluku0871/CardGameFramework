@@ -131,13 +131,16 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         base.OnEnable();
 
-        var targetPanel = BattleSceneManager.Instance().GetFieldPanelSub(BattleSceneManager.GetPlayerName(m_photonView));
-        foreach (GameObject canvasPanel in GameObject.FindGameObjectsWithTag("FieldPanelSub"))
+        if (!BattleSceneManager.Instance().isSolo)
         {
-            if (canvasPanel.transform == targetPanel)
+            var targetPanel = BattleSceneManager.Instance().GetFieldPanelSub(BattleSceneManager.GetPlayerName(m_photonView));
+            foreach (GameObject canvasPanel in GameObject.FindGameObjectsWithTag("FieldPanelSub"))
             {
-                transform.SetParent(canvasPanel.transform);
-                transform.SetAsFirstSibling();
+                if (canvasPanel.transform == targetPanel)
+                {
+                    transform.SetParent(canvasPanel.transform);
+                    transform.SetAsFirstSibling();
+                }
             }
         }
 

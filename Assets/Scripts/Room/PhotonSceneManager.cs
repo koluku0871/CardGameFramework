@@ -4,8 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
 
 public class PhotonSceneManager : MonoBehaviourPunCallbacks
 {
@@ -32,6 +34,9 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
 
     [SerializeField]
     private TMPro.TextMeshProUGUI m_roomButtonText = null;
+
+    [SerializeField]
+    private List<TMPro.TMP_Dropdown> m_EnemyDeckSelectDropdownList = new List<TMPro.TMP_Dropdown>();
 
     [SerializeField]
     private GameObject m_playerNameContent = null;
@@ -84,6 +89,12 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     private int m_count = 0;
 
     private Dictionary<string, RoomInfo> m_cachedRoomList = new Dictionary<string, RoomInfo>();
+
+    public bool isSolo = false;
+    public void SetIsSolo(bool isSolo)
+    {
+        this.isSolo = isSolo;
+    }
 
     public void Awake()
     {
@@ -331,7 +342,27 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
 
                 sr.Close();
             }
+
+            foreach (var deck in m_EnemyDeckSelectDropdownList)
+            {
+                deck.options.Clear();
+                deck.options.AddRange(m_deckSelectDropdown.options);
+            }
         }
+    }
+
+    public void OnClickToSoloButton()
+    {
+        m_roomTitleText.gameObject.SetActive(false);
+        m_roomTitleText.text = "SoloMode";
+        m_roomTitleText.gameObject.SetActive(true);
+
+        RoomOptions roomOptions = new RoomOptions()
+        {
+            IsOpen = false,
+            MaxPlayers = 1
+        };
+        PhotonNetwork.JoinOrCreateRoom(m_roomNameText.text, roomOptions, TypedLobby.Default);
     }
 
     public void OnClickToRoomCreateButton()
@@ -469,6 +500,11 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
         if (m_count < ConstManager.DECK_CARD_MIN_COUNT)
         {
             return;
+        }
+
+        if (isSolo)
+        {
+            SetInEnemyBattlePlayer();
         }
 
         SetInBattlePlayer(m_playerName, m_deckName);
@@ -609,6 +645,7 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
             customRoomProperties.Add("SoulCore", 1);
             customRoomProperties.Add("Life", 5);
             customRoomProperties.Add("Coin", "");
+            customRoomProperties.Add("Solo", 0);
 
             switch (AssetBundleManager.Instance().CardType)
             {
@@ -661,6 +698,26 @@ public class PhotonSceneManager : MonoBehaviourPunCallbacks
     public void SetRoomHash(ExitGames.Client.Photon.Hashtable customRoomProperties)
     {
         roomHash = customRoomProperties;
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomHash);
+    }
+
+    public void SetInEnemyBattlePlayer()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            var selectId = m_EnemyDeckSelectDropdownList[i].value - 1;
+            if (-1 < selectId && selectId < m_deckList.Count)
+            {
+                roomHash["playerName" + (i + 1)] = "P" + (i + 1) +  "enemy";
+                roomHash["playerDeck" + (i + 1)] = m_EnemyDeckSelectDropdownList[i].options[selectId + 1].text;
+            }
+            else
+            {
+                roomHash["playerName" + (i + 1)] = "";
+                roomHash["playerDeck" + (i + 1)] = "";
+            }
+        }
+        roomHash["Solo"] = 1;
         PhotonNetwork.CurrentRoom.SetCustomProperties(roomHash);
     }
 

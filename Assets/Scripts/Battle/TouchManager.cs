@@ -16,6 +16,9 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
     [SerializeField]
     private List<Sprite> m_sprites = new List<Sprite>();
 
+    public PlayerFieldManager m_playerFieldManager = null;
+    public FieldCardManager m_fieldCardManager = null;
+
     public ConstManager.PhotonObjectType m_photonObjectType = ConstManager.PhotonObjectType.NONE;
 
     public ConstManager.PhotonObjectType PhotonObjectType
@@ -330,7 +333,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         m_cardImageList.Clear();
         foreach (var cardDetail in m_innerCardDetailList)
         {
-            var card = FieldCardManager.Instance().CreateCard(cardDetail, true, m_contentInnerImage, m_content,
+            var card = m_fieldCardManager.CreateCard(cardDetail, true, m_contentInnerImage, m_content,
                 (Image target, string tag, string cardId, bool isDoubleClick) => {
                     if (!m_photonView.IsMine) return;
                     int index = m_cardImageList.IndexOf(target);
@@ -385,7 +388,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                         }
                         else
                         {
-                            PlayerFieldManager.Instance().CreateCard(target.name, true);
+                            m_playerFieldManager.CreateCard(target.name, true);
                             m_innerCardDetailList.RemoveAt(index);
                         }
                         SetInnerCardDetailList(string.Join("#", m_innerCardDetailList.Select(x => x.ToString())));
@@ -411,29 +414,6 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         m_photonView = gameObject.GetComponent<PhotonView>();
         if (m_photonView == null) m_photonView = gameObject.AddComponent<PhotonView>();
 
-        List<GameObject> playFieldList = new List<GameObject>();
-        playFieldList.AddRange(GameObject.FindGameObjectsWithTag("PlayField"));
-        foreach (var playField in playFieldList)
-        {
-            PlayerFieldManager playerFieldManager = playField.GetComponent<PlayerFieldManager>();
-            if (playerFieldManager == null || playerFieldManager.photonView.Owner != m_photonView.Owner)
-            {
-                continue;
-            }
-
-            switch (m_photonObjectType)
-            {
-                case ConstManager.PhotonObjectType.CARD:
-                    transform.SetParent(playerFieldManager.GetCardField());
-                    break;
-                case ConstManager.PhotonObjectType.CORE:
-                case ConstManager.PhotonObjectType.SOULCORE:
-                case ConstManager.PhotonObjectType.DAMAGE:
-                    transform.SetParent(playerFieldManager.GetCoreField());
-                    break;
-            }
-        }
-
         BoxCollider2D[] boxColliderList = gameObject.GetComponents<BoxCollider2D>();
         if (boxColliderList.Length < 1)
         {
@@ -447,7 +427,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
 
         m_image = gameObject.GetComponent<Image>();
         if (m_image == null) m_image = gameObject.AddComponent<Image>();
-
+        
         m_eventTrigger = gameObject.GetComponent<EventTrigger>();
         if (m_eventTrigger == null) m_eventTrigger = gameObject.AddComponent<EventTrigger>();
 
@@ -497,9 +477,22 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         m_eventTrigger.triggers.Add(entry);
     }
 
-    private void Start()
+    public void Start()
     {
-        transform.localScale = Vector3.one;
+        if (m_playerFieldManager == null)
+        {
+            List<GameObject> playFieldList = new List<GameObject>();
+            playFieldList.AddRange(GameObject.FindGameObjectsWithTag("PlayField"));
+            foreach (var playField in playFieldList)
+            {
+                PlayerFieldManager playerFieldManager = playField.GetComponent<PlayerFieldManager>();
+                if (playerFieldManager == null || playerFieldManager.photonView.Owner != m_photonView.Owner)
+                {
+                    continue;
+                }
+                SetParent(playerFieldManager);
+            }
+        }
     }
 
     public override void OnDisable()
@@ -583,85 +576,85 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 foreach (var cardDetail in m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
+                    m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.DECK, true, m_image, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.DECK, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
 
-                PlayerFieldManager.Instance().AddLogList(m_image.name + "をデッキに戻す");
+                m_playerFieldManager.AddLogList(m_image.name + "をデッキに戻す");
                 break;
             case "Trash":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 foreach (var cardDetail in m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
+                    m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.TRASH, m_image, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.TRASH, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
 
-                PlayerFieldManager.Instance().AddLogList(m_image.name + "をトラッシュに戻す");
+                m_playerFieldManager.AddLogList(m_image.name + "をトラッシュに戻す");
                 break;
             case "Exclusion":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 foreach (var cardDetail in m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
+                    m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.EXCLUSION, m_image, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.EXCLUSION, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
 
-                PlayerFieldManager.Instance().AddLogList(m_image.name + "を除外一覧に戻す");
+                m_playerFieldManager.AddLogList(m_image.name + "を除外一覧に戻す");
                 break;
             case "Hand":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 foreach (var cardDetail in m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
+                    m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.HAND, m_image, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.HAND, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
 
-                PlayerFieldManager.Instance().AddLogList(m_image.name + "を手札に戻す");
+                m_playerFieldManager.AddLogList(m_image.name + "を手札に戻す");
                 break;
             case "AtHand":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 foreach (var cardDetail in m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
+                    m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.AT_HAND, m_image, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.AT_HAND, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
 
-                PlayerFieldManager.Instance().AddLogList(m_image.name + "を手元に戻す");
+                m_playerFieldManager.AddLogList(m_image.name + "を手元に戻す");
                 break;
             case "Damage":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 foreach (var cardDetail in m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
+                    m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.DAMAGE, true, m_image, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.DAMAGE, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
 
-                PlayerFieldManager.Instance().AddLogList(m_image.name + "をダメージに戻す");
+                m_playerFieldManager.AddLogList(m_image.name + "をダメージに戻す");
                 break;
             case "Sub":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 foreach (var cardDetail in m_innerCardDetailList)
                 {
-                    FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
+                    m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.Instance().innerListFromType, true, m_image, cardDetail.tag, cardDetail.cardId);
                 }
-                FieldCardManager.Instance().AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.SUB, true, m_image, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(CardOptionWindow.OPTION_TYPE.FIELD, CardOptionWindow.OPTION_TYPE.SUB, true, m_image, list[0], list[1]);
                 AudioSourceManager.Instance().PlayOneShot(0);
 
-                PlayerFieldManager.Instance().AddLogList(m_image.name + "をサブデッキに戻す");
+                m_playerFieldManager.AddLogList(m_image.name + "をサブデッキに戻す");
                 break;
             case "Card":
                 if (m_photonObjectType != ConstManager.PhotonObjectType.CARD) return;
                 if (m_endObj != null)
                 {
                     RemoveOoverlapObjectList(m_endObj);
-                    if (!PlayerFieldManager.Instance().IsStayMousePos)
+                    if (!m_playerFieldManager.IsStayMousePos)
                     {
                         m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.AddRange(m_innerCardDetailList);
                         m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
@@ -679,10 +672,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                             m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
                         }
                     }
-                    FieldCardManager.Instance().RemoveCardImage(CardOptionWindow.OPTION_TYPE.FIELD, m_image);
+                    m_fieldCardManager.RemoveCardImage(CardOptionWindow.OPTION_TYPE.FIELD, m_image);
                     AudioSourceManager.Instance().PlayOneShot(0);
 
-                    PlayerFieldManager.Instance().AddLogList(m_image.name + "を" + m_endObj.name + "に内包する");
+                    m_playerFieldManager.AddLogList(m_image.name + "を" + m_endObj.name + "に内包する");
                 }
                 break;
         }
@@ -749,6 +742,25 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         Debug.Log("OnTriggerEnter2D : " + coll.gameObject.name);
 
         AddOoverlapObjectList(coll.gameObject);
+    }
+
+    public void SetParent(PlayerFieldManager playerFieldManager)
+    {
+        m_playerFieldManager = playerFieldManager;
+
+        switch (m_photonObjectType)
+        {
+            case ConstManager.PhotonObjectType.CARD:
+                transform.SetParent(m_playerFieldManager.GetCardField());
+                break;
+            case ConstManager.PhotonObjectType.CORE:
+            case ConstManager.PhotonObjectType.SOULCORE:
+            case ConstManager.PhotonObjectType.DAMAGE:
+                transform.SetParent(m_playerFieldManager.GetCoreField());
+                break;
+        }
+
+        transform.localScale = Vector3.one;
     }
 
     public Image GetImage()

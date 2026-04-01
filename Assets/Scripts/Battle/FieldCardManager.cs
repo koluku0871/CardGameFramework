@@ -74,6 +74,8 @@ public class FieldCardManager : MonoBehaviour
     [SerializeField]
     private Image m_handCard = null;
 
+    public PlayerFieldManager m_playerFieldManager = null;
+
     private List<DeckManager.CardDetail> m_deckDetailList = new List<DeckManager.CardDetail>();
 
     private List<DeckManager.CardDetail> m_aceDetailList = new List<DeckManager.CardDetail>();
@@ -86,22 +88,20 @@ public class FieldCardManager : MonoBehaviour
 
     private List<DeckManager.CardDetail> m_subDetailList = new List<DeckManager.CardDetail>();
 
-    private static FieldCardManager instance = null;
-    public static FieldCardManager Instance()
-    {
-        return instance;
-    }
-
     private void Awake()
     {
-        if (m_photonView.IsMine || BattleSceneManager.Instance().IsNoPlayerInstance(m_photonView)) instance = this;
+        m_playerFieldManager = this.gameObject.GetComponent<PlayerFieldManager>();
 
         if (m_atHandCard != null)
         {
             m_atHandCard.gameObject.SetActive(false);
+            m_atHandCard.GetComponent<HandCard>().m_playerFieldManager = m_playerFieldManager;
+            m_atHandCard.GetComponent<HandCard>().m_fieldCardManager = m_playerFieldManager.m_fieldCardManager;
         }
         
         m_handCard.gameObject.SetActive(false);
+        m_handCard.GetComponent<HandCard>().m_playerFieldManager = m_playerFieldManager;
+        m_handCard.GetComponent<HandCard>().m_fieldCardManager = m_playerFieldManager.m_fieldCardManager;
     }
 
     bool isInit = true;
@@ -128,7 +128,7 @@ public class FieldCardManager : MonoBehaviour
             case "bs":
                 if (DeckManager.IsInContract(m_deckDetailList))
                 {
-                    CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.CONTRACT);
+                    CardOptionWindow.Instance().Open(m_playerFieldManager, this, null, CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.CONTRACT);
                 }
                 else
                 {
@@ -137,10 +137,10 @@ public class FieldCardManager : MonoBehaviour
                 break;
             case "digimon":
                 bool isSecurityAtHand = bool.Parse(PhotonNetwork.CurrentRoom.CustomProperties["IsSecurityAtHand"].ToString());
-                FieldCardManager.Instance().SetSecurityAtHand(isSecurityAtHand);
+                SetSecurityAtHand(isSecurityAtHand);
 
                 AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
-                if (!FieldCardManager.Instance().IsActiveAtHand())
+                if (!IsActiveAtHand())
                 {
                     AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.DAMAGE, true, 5);
                 }
@@ -152,12 +152,12 @@ public class FieldCardManager : MonoBehaviour
             case "dm":
                 AddDstFromSrc(CardOptionWindow.OPTION_TYPE.DECK, CardOptionWindow.OPTION_TYPE.HAND, true, hand);
 
-                var cardList = FieldCardManager.Instance().GetCardDetailList(CardOptionWindow.OPTION_TYPE.DECK, true, 5);
+                var cardList = GetCardDetailList(CardOptionWindow.OPTION_TYPE.DECK, true, 5);
                 int cardIndex = -1;
                 foreach (var cardDetail in cardList)
                 {
-                    var card = FieldCardManager.Instance().RemoveCardDetail(CardOptionWindow.OPTION_TYPE.DECK, cardDetail.tag, cardDetail.cardId)[0];
-                    Image cardImage = PlayerFieldManager.Instance().CreateCard(cardDetail.ToString(), false);
+                    var card = RemoveCardDetail(CardOptionWindow.OPTION_TYPE.DECK, cardDetail.tag, cardDetail.cardId)[0];
+                    Image cardImage = m_playerFieldManager.CreateCard(cardDetail.ToString(), false);
                     cardImage.sprite = CardDetailManager.Instance().GetSleeveSprite();
                     cardImage.rectTransform.localPosition = new Vector3(
                         -(cardImage.rectTransform.sizeDelta.x / 2) + ((cardImage.rectTransform.sizeDelta.x + 2) * cardIndex), -2, 0
@@ -206,7 +206,7 @@ public class FieldCardManager : MonoBehaviour
                 {
                     case -1:
                         Debug.Log("Left Click");
-                        CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DECK);
+                        CardOptionWindow.Instance().Open(m_playerFieldManager, this, null, CardOptionWindow.OPTION_TYPE.DECK);
                         break;
                     case -2:
                         Debug.Log("Right Click");
@@ -234,7 +234,7 @@ public class FieldCardManager : MonoBehaviour
                     {
                         case -1:
                             Debug.Log("Left Click");
-                            CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.DAMAGE);
+                            CardOptionWindow.Instance().Open(m_playerFieldManager, this, null, CardOptionWindow.OPTION_TYPE.DAMAGE);
                             break;
                         case -2:
                             Debug.Log("Right Click");
@@ -263,7 +263,7 @@ public class FieldCardManager : MonoBehaviour
                     {
                         case -1:
                             Debug.Log("Left Click");
-                            CardOptionWindow.Instance().Open(null, CardOptionWindow.OPTION_TYPE.SUB);
+                            CardOptionWindow.Instance().Open(m_playerFieldManager, this, null, CardOptionWindow.OPTION_TYPE.SUB);
                             break;
                         case -2:
                             Debug.Log("Right Click");
@@ -293,7 +293,7 @@ public class FieldCardManager : MonoBehaviour
                 {
                     case -1:
                         Debug.Log("Left Click");
-                        CardOptionWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.TRASH);
+                        CardOptionWindow.Instance().Open(m_playerFieldManager, this, CardOptionWindow.OPTION_TYPE.TRASH);
                         break;
                     case -2:
                         Debug.Log("Right Click");
@@ -319,7 +319,7 @@ public class FieldCardManager : MonoBehaviour
                 {
                     case -1:
                         Debug.Log("Left Click");
-                        CardOptionWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.EXCLUSION);
+                        CardOptionWindow.Instance().Open(m_playerFieldManager, this, CardOptionWindow.OPTION_TYPE.EXCLUSION);
                         break;
                     case -2:
                         Debug.Log("Right Click");
@@ -688,7 +688,7 @@ public class FieldCardManager : MonoBehaviour
             case CardOptionWindow.OPTION_TYPE.HAND:
                 card = CreateCard(cardDetail, true, m_handCard, m_handContent,
                     (Image target, string tag, string cardId, bool isDoubleClick) => {
-                        CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.HAND);
+                        CardOptionWindow.Instance().Open(m_playerFieldManager, this, target, CardOptionWindow.OPTION_TYPE.HAND);
                     });
                 card.name = m_handCard.name;
                 break;
@@ -700,7 +700,7 @@ public class FieldCardManager : MonoBehaviour
 
                 card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
                     (Image target, string tag, string cardId, bool isDoubleClick) => {
-                        if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                        if (!m_playerFieldManager.IsMoveSecurity)
                         {
                             return;
                         }
@@ -712,7 +712,7 @@ public class FieldCardManager : MonoBehaviour
                         }
                     },
                     (Image target, string tag, string cardId, bool isDoubleClick) => {
-                        if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                        if (!m_playerFieldManager.IsMoveSecurity)
                         {
                             return;
                         }
@@ -724,7 +724,7 @@ public class FieldCardManager : MonoBehaviour
                         }
                     },
                     (Image target, string tag, string cardId, bool isDoubleClick) => {
-                        CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);
+                        CardOptionWindow.Instance().Open(m_playerFieldManager, this, target, CardOptionWindow.OPTION_TYPE.AT_HAND);
                     },
                     (Image target, string tag, string cardId) => {
                         if (target.GetComponent<HandCard>().IsOpen)
@@ -795,7 +795,7 @@ public class FieldCardManager : MonoBehaviour
                 {
                     Image card = CreateCard(cardDetail, true, m_handCard, m_handContent,
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
-                            CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.HAND);
+                            CardOptionWindow.Instance().Open(m_playerFieldManager, this, target, CardOptionWindow.OPTION_TYPE.HAND);
                         });
                     card.name = m_handCard.name;
                 }
@@ -810,7 +810,7 @@ public class FieldCardManager : MonoBehaviour
                 {
                     Image card = CreateCard(cardDetail, true, m_atHandCard, m_atHandContent,
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
-                            if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                            if (!m_playerFieldManager.IsMoveSecurity)
                             {
                                 return;
                             }
@@ -822,7 +822,7 @@ public class FieldCardManager : MonoBehaviour
                             }
                         },
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
-                            if (!PlayerFieldManager.Instance().IsMoveSecurity)
+                            if (!m_playerFieldManager.IsMoveSecurity)
                             {
                                 return;
                             }
@@ -834,7 +834,7 @@ public class FieldCardManager : MonoBehaviour
                             }
                         },
                         (Image target, string tag, string cardId, bool isDoubleClick) => {
-                            CardOptionWindow.Instance().Open(target, CardOptionWindow.OPTION_TYPE.AT_HAND);
+                            CardOptionWindow.Instance().Open(m_playerFieldManager, this, target, CardOptionWindow.OPTION_TYPE.AT_HAND);
                         },
                         (Image target, string tag, string cardId) => {
                             if (target.GetComponent<HandCard>().IsOpen)

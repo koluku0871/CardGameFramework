@@ -677,6 +677,7 @@ MonoBehaviour:
   m_atHandCard: {fileID: 4276087124814098220}
   m_handContent: {fileID: 8809806411725641811}
   m_handCard: {fileID: 6926645090106284209}
+  m_playerFieldManager: {fileID: 0}
 --- !u!114 &-8179974456845702327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2478,6 +2479,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_openText: {fileID: 0}
   m_isMoveHand: 1
+  m_playerFieldManager: {fileID: 0}
+  m_fieldCardManager: {fileID: 0}
   m_isOpenHand: 1
   m_startPos: {x: 0, y: 0}
 --- !u!1 &3800638549989886958
@@ -6226,6 +6229,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_openText: {fileID: 5284338136485693034}
   m_isMoveHand: 0
+  m_playerFieldManager: {fileID: 0}
+  m_fieldCardManager: {fileID: 0}
   m_isOpenHand: 0
   m_startPos: {x: 0, y: 0}
 --- !u!1 &6902316108686916326

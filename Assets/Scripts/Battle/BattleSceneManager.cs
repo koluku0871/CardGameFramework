@@ -82,6 +82,16 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             return m_fieldPanelSub;
         }
 
+        public PlayerFieldManager GetPlayerFieldManager(string playerName)
+        {
+            if (m_playerName != playerName)
+            {
+                return null;
+            }
+
+            return m_playerFieldManager;
+        }
+
         public bool IsNoPlayer()
         {
             return string.IsNullOrEmpty(m_playerName);
@@ -181,6 +191,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             if (text.Contains("専攻はもらった"))
             {
                 GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
+                coinObj.GetComponent<CoinManager>().m_playerFieldManager = GetPlayerFieldManager(GetPlayerName(PhotonNetwork.LocalPlayer));
                 coinObj.GetComponent<CoinManager>().SetIsOpen(m_playerName.Substring(0, 2));
             }
         });
@@ -283,6 +294,8 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             IsPlayer = true;
         }
 
+        PlayerFieldManager myPlayerFieldManager = null;
+
         foreach (var playerStatu in m_playerStatusList)
         {
             if (m_playerName == playerStatu.m_playerName
@@ -315,6 +328,13 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                     obj.transform.localRotation = Quaternion.identity;
                     obj.transform.localScale = Vector3.one;
 
+                    if (m_playerName == playerStatu.m_playerName)
+                    {
+                        myPlayerFieldManager = playerFieldManager;
+                        m_cardOptionWindow.m_myPlayerFieldManager = myPlayerFieldManager;
+                        m_cardOptionWindow.m_myFieldCardManager = myPlayerFieldManager.m_fieldCardManager;
+                    }
+
                     var directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_DECK;
                     string[] deckFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
                     for (int index = 0; index < deckFiles.Length; index++)
@@ -335,7 +355,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                         break;
                     }
 
-                    PhotonNetwork.Instantiate("Prefab/Battle/CardListWindow", Vector3.zero, Quaternion.identity);
+                    GameObject cardListWindowObj = PhotonNetwork.Instantiate("Prefab/Battle/CardListWindow", Vector3.zero, Quaternion.identity);
 
                     m_cardOptionWindow.transform.SetAsLastSibling();
                 }
@@ -349,6 +369,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
+            coinObj.GetComponent<CoinManager>().m_playerFieldManager = myPlayerFieldManager;
 
             string coin = (string)PhotonNetwork.CurrentRoom.CustomProperties["Coin"];
 
@@ -365,6 +386,7 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             if (m_type == "digimon")
             {
                 GameObject costManagerObj = PhotonNetwork.InstantiateRoomObject("Prefab/Battle/CostManager", Vector3.zero, Quaternion.identity);
+                costManagerObj.GetComponent<CostManager>().m_playerFieldManager = myPlayerFieldManager;
             }
         }
 
@@ -467,6 +489,19 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             if (fieldPanelSub != null)
             {
                 return fieldPanelSub;
+            }
+        }
+        return null;
+    }
+
+    public PlayerFieldManager GetPlayerFieldManager(string playerName)
+    {
+        foreach (var playerStatu in m_playerStatusList)
+        {
+            var playerFieldManager = playerStatu.GetPlayerFieldManager(playerName);
+            if (playerFieldManager != null)
+            {
+                return playerFieldManager;
             }
         }
         return null;

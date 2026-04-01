@@ -327,3 +327,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_openText: {fileID: 4118240702596218728}
+  m_playerFieldManager: {fileID: 0}

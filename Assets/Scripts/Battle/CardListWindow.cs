@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static CardOptionWindow;
-using static UnityEngine.GraphicsBuffer;
 
 public class CardListWindow : MonoBehaviour, IPunObservable
 {
@@ -16,6 +14,9 @@ public class CardListWindow : MonoBehaviour, IPunObservable
     private CardOptionWindow.OPTION_TYPE m_optionType = CardOptionWindow.OPTION_TYPE.NONE;
 
     public List<DeckManager.CardDetail> m_cardDetailList = new List<DeckManager.CardDetail>();
+
+    public PlayerFieldManager m_playerFieldManager = null;
+    public FieldCardManager m_fieldCardManager = null;
 
     private bool m_isAction = false;
 
@@ -45,12 +46,27 @@ public class CardListWindow : MonoBehaviour, IPunObservable
 
     public void CreateCardList(List<DeckManager.CardDetail> cardDetailList)
     {
+        if (m_fieldCardManager == null)
+        {
+            List<GameObject> playFieldList = new List<GameObject>();
+            playFieldList.AddRange(GameObject.FindGameObjectsWithTag("PlayField"));
+            foreach (var playField in playFieldList)
+            {
+                PlayerFieldManager playerFieldManager = playField.GetComponent<PlayerFieldManager>();
+                if (playerFieldManager == null || playerFieldManager.photonView.Owner != m_photonView.Owner)
+                {
+                    continue;
+                }
+                m_fieldCardManager = playerFieldManager.m_fieldCardManager;
+            }
+        }
+
         foreach (var cardDetail in cardDetailList)
         {
-            Image card = FieldCardManager.Instance().CreateCard(cardDetail, true, m_card, m_card.transform.parent,
+            Image card = m_fieldCardManager.CreateCard(cardDetail, true, m_card, m_card.transform.parent,
                 (Image target, string tag, string cardId, bool isDoubleClick) => {
                     if (!m_isAction || !m_photonView.IsMine) return;
-                    CardOptionWindow.Instance().Open(target, m_optionType, CardOptionWindow.OPTION_TYPE.CARD_LIST,
+                    CardOptionWindow.Instance().Open(m_playerFieldManager, m_fieldCardManager, target, m_optionType, CardOptionWindow.OPTION_TYPE.CARD_LIST,
                         (isAction) => {
                             if (isAction) DeleteCard(new DeckManager.CardDetail() { tag = tag, cardId = cardId });
                         });
@@ -95,8 +111,10 @@ public class CardListWindow : MonoBehaviour, IPunObservable
         }
     }
 
-    public void Open(CardOptionWindow.OPTION_TYPE optionType, List<DeckManager.CardDetail> cardDetailList, bool isAction = true, bool isEnemyOpen = false)
+    public void Open(PlayerFieldManager playerFieldManager, FieldCardManager fieldCardManager, CardOptionWindow.OPTION_TYPE optionType, List<DeckManager.CardDetail> cardDetailList, bool isAction = true, bool isEnemyOpen = false)
     {
+        m_playerFieldManager = playerFieldManager;
+        m_fieldCardManager = fieldCardManager;
         m_optionType = optionType;
         m_cardDetailList = cardDetailList;
         m_isAction = isAction;
@@ -145,7 +163,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
             if (image != null)
             {
                 string[] list = image.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(m_optionType, m_optionType, true, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(m_optionType, m_optionType, true, list[0], list[1]);
             }
         }
         Close();
@@ -170,7 +188,7 @@ public class CardListWindow : MonoBehaviour, IPunObservable
             if (image != null)
             {
                 string[] list = image.name.Split('^');
-                FieldCardManager.Instance().AddDstFromSrc(m_optionType, m_optionType, false, list[0], list[1]);
+                m_fieldCardManager.AddDstFromSrc(m_optionType, m_optionType, false, list[0], list[1]);
             }
         }
         Close();

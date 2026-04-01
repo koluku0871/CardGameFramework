@@ -1186,6 +1186,8 @@ MonoBehaviour:
   m_photonView: {fileID: 8635593977819776844}
   m_card: {fileID: 3471084987989635888}
   m_cardDetailList: []
+  m_playerFieldManager: {fileID: 0}
+  m_fieldCardManager: {fileID: 0}
 --- !u!1 &3471084987904784311
 GameObject:
   m_ObjectHideFlags: 0

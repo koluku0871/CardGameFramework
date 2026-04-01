@@ -7,6 +7,8 @@ public class CoinManager : MonoBehaviour, IPunObservable
     [SerializeField]
     private TMPro.TextMeshProUGUI m_openText = null;
 
+    public PlayerFieldManager m_playerFieldManager = null;
+
     private void Awake()
     {
         GameObject coinPanel = GameObject.FindGameObjectWithTag("CoinPanel");
@@ -23,7 +25,7 @@ public class CoinManager : MonoBehaviour, IPunObservable
     {
         this.gameObject.GetComponent<PhotonView>().RequestOwnership();
         m_openText.text = text;
-        PlayerFieldManager.Instance().AddLogList("コインの結果は" + m_openText.text);
+        m_playerFieldManager.AddLogList("コインの結果は" + m_openText.text);
         this.gameObject.SetActive(true);
     }
 

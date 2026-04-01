@@ -49,7 +49,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     private RectTransform m_coinField = null;
 
     [SerializeField]
-    private FieldCardManager m_fieldCardManager = null;
+    public FieldCardManager m_fieldCardManager = null;
 
     [Header("BS")]
 
@@ -109,17 +109,6 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private ExitGames.Client.Photon.Hashtable m_customRoomProperties = new ExitGames.Client.Photon.Hashtable();
 
-    private static PlayerFieldManager instance = null;
-    public static PlayerFieldManager Instance()
-    {
-        return instance;
-    }
-
-    private void Awake()
-    {
-        if (m_photonView.IsMine || BattleSceneManager.Instance().IsNoPlayerInstance(m_photonView)) instance = this;
-    }
-
     private void Start()
     {
         transform.localScale = Vector3.one;
@@ -167,7 +156,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         if (SetActive(m_optionButton, IsMine))
         {
             m_optionButton.onClick.AddListener(() => {
-                CardOptionWindow.Instance().Open(CardOptionWindow.OPTION_TYPE.STEP);
+                CardOptionWindow.Instance().Open(this, m_fieldCardManager, CardOptionWindow.OPTION_TYPE.STEP);
             });
         }
 
@@ -176,6 +165,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             m_coinButton.onClick.AddListener(() => {
                 GameObject coinObj = PhotonNetwork.Instantiate("Prefab/Battle/Coin", Vector3.zero, Quaternion.identity);
                 int index = new System.Random().Next(0, BattleSceneManager.Instance().m_playerIndexList.Count);
+                coinObj.GetComponent<CoinManager>().m_playerFieldManager = this;
                 coinObj.GetComponent<CoinManager>().SetIsOpen(
                     BattleSceneManager.Instance().m_playerStatusList[BattleSceneManager.Instance().m_playerIndexList[index]].m_playerName.Substring(0, 2)
                 );
@@ -197,6 +187,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     core.SetActive(false);
                 });
                 core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.DAMAGE;
+                core.GetComponent<TouchManager>().m_playerFieldManager = this;
             });
         }
 
@@ -220,6 +211,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     }
                 });
                 core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().m_playerFieldManager = this;
                 m_countCoreList.Add(core);
             });
         }
@@ -257,6 +249,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     }
                 });
                 core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().m_playerFieldManager = this;
                 m_coreList.Add(core);
             });
         }
@@ -284,6 +277,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     }
                 });
                 core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.SOULCORE;
+                core.GetComponent<TouchManager>().m_playerFieldManager = this;
                 m_soulCoreList.Add(core);
             });
         }
@@ -321,6 +315,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     }
                 });
                 core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().m_playerFieldManager = this;
                 m_coreList.Add(core);
             });
         }
@@ -374,6 +369,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                     }
                 });
                 core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
+                core.GetComponent<TouchManager>().m_playerFieldManager = this;
                 m_coreList.Add(core);
             }
         }
@@ -398,6 +394,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 }
             });
             core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.SOULCORE;
+            core.GetComponent<TouchManager>().m_playerFieldManager = this;
             m_soulCoreList.Add(core);
         }
 
@@ -421,6 +418,7 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
                 }
             });
             core.GetComponent<TouchManager>().PhotonObjectType = ConstManager.PhotonObjectType.CORE;
+            core.GetComponent<TouchManager>().m_playerFieldManager = this;
             m_coreList.Add(core);
         }
     }
@@ -578,10 +576,10 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
             switch (c.localRotation.eulerAngles.z)
             {
                 case 270:
-                    FieldCardManager.Instance().SetCardToStand(image);
+                    m_fieldCardManager.SetCardToStand(image);
                     break;
                 case 180:
-                    FieldCardManager.Instance().SetCardToRRest(image);
+                    m_fieldCardManager.SetCardToRRest(image);
                     break;
             }
         }
@@ -598,13 +596,15 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         var cardId = list[1];
         GameObject card = PhotonNetwork.Instantiate("Prefab/Battle/Card", Vector3.zero, Quaternion.identity);
         card.transform.localScale = new Vector3(1, 1, 1);
-        Image cardImage = FieldCardManager.Instance().CreateCard(
+        Image cardImage = m_fieldCardManager.CreateCard(
             new DeckManager.CardDetail() { tag = list[0], cardId = cardId }, false, card.GetComponent<Image>(), m_cardField,
             null,
             (Image target, string targetTag, string targetCardId, bool isDoubleClick) => {
                 if (!isDoubleClick)
                 {
                     CardOptionWindow.Instance().Open(
+                        this,
+                        m_fieldCardManager,
                         target,
                         CardOptionWindow.OPTION_TYPE.FIELD,
                         CardOptionWindow.OPTION_TYPE.FIELD_ROT);
@@ -643,12 +643,14 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         TouchManager touchManager = card.GetComponent<TouchManager>();
         if (touchManager != null)
         {
+            touchManager.SetParent(this);
+            touchManager.m_fieldCardManager = m_fieldCardManager;
             var sizeDelta = touchManager.m_scrollRectTransform.sizeDelta;
             touchManager.m_scrollRectTransform.sizeDelta = new Vector2 (sizeDelta.x, sizeDelta.y * size);
             touchManager.SetIsOpen(isOpen);
         }
 
-        PlayerFieldManager.Instance().AddLogList(name + "を生成");
+        this.AddLogList(name + "を生成");
 
         return cardImage;
     }

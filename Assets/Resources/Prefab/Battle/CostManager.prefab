@@ -8375,6 +8375,7 @@ MonoBehaviour:
   - {fileID: 7802357980004847092}
   m_toggle: {fileID: 3946971781976042560}
   m_toggleName: toggle_0
+  m_playerFieldManager: {fileID: 0}
 --- !u!1 &4417441116134104343
 GameObject:
   m_ObjectHideFlags: 0

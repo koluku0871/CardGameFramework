@@ -11,6 +11,9 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField]
     private bool m_isMoveHand = true;
 
+    public PlayerFieldManager m_playerFieldManager = null;
+    public FieldCardManager m_fieldCardManager = null;
+
     public bool m_isOpenHand = true;
 
     private Image m_image = null;
@@ -77,12 +80,15 @@ public class HandCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         Debug.Log(pos.magnitude);
         if (pos.magnitude > 50)
         {
-            Image cardImage = PlayerFieldManager.Instance().CreateCard(gameObject.name, false);
-            Vector2 mousePos = Input.mousePosition;
-            cardImage.rectTransform.position = mousePos;
-            PlayerFieldManager.Instance().AddLogList(gameObject.name + "をフィールドに出す");
-            AudioSourceManager.Instance().PlayOneShot(0);
-            Destroy(gameObject);
+            if (m_playerFieldManager != null)
+            {
+                Image cardImage = m_playerFieldManager.CreateCard(gameObject.name, false);
+                Vector2 mousePos = Input.mousePosition;
+                cardImage.rectTransform.position = mousePos;
+                m_playerFieldManager.AddLogList(gameObject.name + "をフィールドに出す");
+                AudioSourceManager.Instance().PlayOneShot(0);
+                Destroy(gameObject);
+            }
             return;
         }
     }

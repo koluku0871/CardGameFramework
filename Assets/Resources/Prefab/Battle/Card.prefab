@@ -1231,6 +1231,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_rectTransform: {fileID: 6621160422120912081}
   m_sprites: []
+  m_playerFieldManager: {fileID: 0}
+  m_fieldCardManager: {fileID: 0}
   m_photonObjectType: 1
   m_openText: {fileID: 8040548761961355081}
   m_soulImage: {fileID: 4323791731040794349}

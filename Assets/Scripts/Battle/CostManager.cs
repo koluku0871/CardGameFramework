@@ -11,6 +11,8 @@ public class CostManager : MonoBehaviour, IPunObservable
 
     public string m_toggleName = "toggle_0";
 
+    public PlayerFieldManager m_playerFieldManager = null;
+
     private static CostManager instance = null;
     public static CostManager Instance()
     {
@@ -77,7 +79,7 @@ public class CostManager : MonoBehaviour, IPunObservable
                 {
                     if (int.TryParse(text.text.Replace("toggle_", ""), out int index))
                     {
-                        PlayerFieldManager.Instance().AddLogList("コストを" + index + "に変更");
+                        m_playerFieldManager.AddLogList("コストを" + index + "に変更");
                     }
                 }
             }

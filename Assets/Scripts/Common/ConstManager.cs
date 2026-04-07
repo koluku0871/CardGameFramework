@@ -254,6 +254,7 @@ public class ConstManager
         "BT22-079",
         // マキナモン
         "EX11-027",
+        "EX11-027_P1",
 
 
         /**

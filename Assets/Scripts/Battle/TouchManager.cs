@@ -490,7 +490,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 {
                     continue;
                 }
-                SetParent(playerFieldManager);
+                SetParent(playerFieldManager, playerFieldManager.m_fieldCardManager);
             }
         }
     }
@@ -744,9 +744,10 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
         AddOoverlapObjectList(coll.gameObject);
     }
 
-    public void SetParent(PlayerFieldManager playerFieldManager)
+    public void SetParent(PlayerFieldManager playerFieldManager, FieldCardManager fieldCardManager)
     {
         m_playerFieldManager = playerFieldManager;
+        m_fieldCardManager = fieldCardManager;
 
         switch (m_photonObjectType)
         {

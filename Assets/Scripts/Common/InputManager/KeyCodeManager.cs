@@ -21,6 +21,8 @@ public class KeyCodeManager : MonoBehaviour
     [Serializable]
     public class InputAction
     {
+        public PlayerFieldManager playerFieldManager = null;
+        public FieldCardManager fieldCardManager = null;
         public InputType inputType = InputType.GET;
         public KeyCode keyCode = KeyCode.None;
         public string text = "";
@@ -84,11 +86,13 @@ public class KeyCodeManager : MonoBehaviour
         }
     }
 
-    public void AddInputActionList(InputType inputType, KeyCode keyCode, string text, Action action)
+    public void AddInputActionList(PlayerFieldManager playerFieldManager, FieldCardManager fieldCardManager, InputType inputType, KeyCode keyCode, string text, Action action)
     {
         m_inputActionList.Add(
             new InputAction()
             {
+                playerFieldManager = playerFieldManager,
+                fieldCardManager = fieldCardManager,
                 inputType = inputType,
                 keyCode = keyCode,
                 text = text,
@@ -100,8 +104,8 @@ public class KeyCodeManager : MonoBehaviour
     public void RemoveInputActionList()
     {
         m_inputActionList.Clear();
-        AddInputActionList(InputType.GET_DOWN, KeyCode.H, "ヘルプウィンドウの表示/非表示", ActiveToWindow);
-        AddInputActionList(InputType.GET_DOWN, KeyCode.V, "音声認識開始/停止", SpeechManager.Instance().ChangeDictationRecognizer);
+        AddInputActionList(null, null, InputType.GET_DOWN, KeyCode.H, "ヘルプウィンドウの表示/非表示", ActiveToWindow);
+        AddInputActionList(null, null, InputType.GET_DOWN, KeyCode.V, "音声認識開始/停止", SpeechManager.Instance().ChangeDictationRecognizer);
     }
 
     public void ActiveToWindow()

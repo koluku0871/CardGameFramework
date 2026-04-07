@@ -179,7 +179,7 @@ public class CardOptionWindow : MonoBehaviour
             Close();
         }));
 
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Tab, "コアをリザーブからトラッシュに1個移動する", () =>
+        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.Tab, "コアをリザーブからトラッシュに1個移動する", () =>
         {
             m_myPlayerFieldManager.SetCorePos(ConstManager.CorePosType.RESERVE, ConstManager.CorePosType.TRASH, 1);
         });
@@ -191,7 +191,7 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F1, false, "アクティブ＆ドローフェイズ", () => {
-            targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
+            m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
             m_myPlayerFieldManager.SetAllMyCardToRecovery();
             Close();
         }));
@@ -199,26 +199,26 @@ public class CardOptionWindow : MonoBehaviour
         if (m_myFieldCardManager.IsActiveAtHand())
         {
             m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F12, false, atHandStr + "と手札をデッキに戻して引き直す", () => {
-                foreach (GameObject handObject in targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND))
+                foreach (GameObject handObject in m_myFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND))
                 {
                     string[] list = handObject.name.Split('^');
-                    targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
+                    m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
                 }
 
-                foreach (GameObject handObject in targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.AT_HAND))
+                foreach (GameObject handObject in m_myFieldCardManager.GetCardHandObjList(OPTION_TYPE.AT_HAND))
                 {
                     string[] list = handObject.name.Split('^');
-                    targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
+                    m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.AT_HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
                 }
 
-                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
-                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, 5);
+                m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
+                m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, 5);
                 CloseOnSound();
             }));
 
-            AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.O, atHandStr + "の上から1枚を表にする", () =>
+            AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.O, atHandStr + "の上から1枚を表にする", () =>
             {
-                var card = targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.AT_HAND, false, 1)[0];
+                var card = m_myFieldCardManager.GetCardHandObjList(OPTION_TYPE.AT_HAND, false, 1)[0];
                 HandCard handCard = card.GetComponent<HandCard>();
                 if (handCard != null)
                 {
@@ -230,16 +230,16 @@ public class CardOptionWindow : MonoBehaviour
         else
         {
             m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F12, false, damageStr + "と手札をデッキに戻して引き直す", () => {
-                List<GameObject> handObjectList = targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
+                List<GameObject> handObjectList = m_myFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
                 foreach (GameObject handObject in handObjectList)
                 {
                     string[] list = handObject.name.Split('^');
-                    targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
+                    m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
                 }
-                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.DECK, true, 5);
+                m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.DECK, true, 5);
 
-                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
-                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
+                m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 5);
+                m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, 5);
                 CloseOnSound();
             }));
         }
@@ -251,7 +251,7 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F1, false, "アクティブ＆ドローフェイズ", () => {
-            targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
+            m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
             m_myPlayerFieldManager.SetAllMyCardToRecovery();
             Close();
         }));
@@ -286,13 +286,13 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F9, false, "手札をデッキに戻してX枚引き直す", () => {
-            List<GameObject> handObjectList = targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
+            List<GameObject> handObjectList = m_myFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
             foreach (GameObject handObject in handObjectList)
             {
                 string[] list = handObject.name.Split('^');
-                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
+                m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, handObject.GetComponent<Image>(), list[0], list[1]);
             }
-            targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, numButtonTextNum);
+            m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, numButtonTextNum);
             CloseOnSound();
         }));
 
@@ -304,7 +304,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.T, "トークン一覧の一種類目をフィールドに送る", () =>
+        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.T, "トークン一覧の一種類目をフィールドに送る", () =>
         {
             List<DeckManager.CardDetail> cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.TOKEN);
             if (cardList.Count > 0)
@@ -315,7 +315,7 @@ public class CardOptionWindow : MonoBehaviour
 
         for (int i = 1; i < 11; i++)
         {
-            AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha1, "Xの設定値を" + i + "に変更する。", () =>
+            AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.Alpha1, "Xの設定値を" + i + "に変更する。", () =>
             {
                 OnClickToNumSelectButton(1);
             });
@@ -493,9 +493,9 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.Q, "デッキの上から1枚を手札に加える", () =>
+        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.Q, "デッキの上から1枚を手札に加える", () =>
         {
-            targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
+            m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
             CloseOnSound();
         });
     }
@@ -1260,10 +1260,11 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        AddInputActionList(KeyCodeManager.InputType.GET_DOWN, KeyCode.R, subStr + "の上から1枚をフィールドに送る", () =>
+        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.R, subStr + "の上から1枚をフィールドに送る", () =>
         {
-            var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.SUB, true, 1)[0];
-            var card = targetFieldCardManager.RemoveCardDetail(OPTION_TYPE.SUB, cardList.tag, cardList.cardId)[0];
+            var cardList = m_myFieldCardManager.GetCardDetailList(OPTION_TYPE.SUB, true, 1);
+            var targetCard = cardList[0];
+            var card = m_myFieldCardManager.RemoveCardDetail(OPTION_TYPE.SUB, targetCard.tag, targetCard.cardId)[0];
             m_myPlayerFieldManager.CreateCard(card.ToString());
             CloseOnSound();
         });
@@ -1288,6 +1289,7 @@ public class CardOptionWindow : MonoBehaviour
             if (optionButton.keyCode != KeyCode.None)
             {
                 AddInputActionList(
+                    m_myPlayerFieldManager, targetFieldCardManager,
                     KeyCodeManager.InputType.GET_DOWN, optionButton.keyCode, optionButton.title, () => { optionButton.onClickAction(); }, false
                 );
             }
@@ -1306,9 +1308,11 @@ public class CardOptionWindow : MonoBehaviour
         }
     }
 
-    public void AddInputActionList(KeyCodeManager.InputType inputType, KeyCode keyCode, string title, Action action, bool isLog = true)
+    public void AddInputActionList(
+        PlayerFieldManager playerFieldManager, FieldCardManager fieldCardManager, KeyCodeManager.InputType inputType, KeyCode keyCode, string title, Action action, bool isLog = true)
     {
         KeyCodeManager.Instance().AddInputActionList(
+            playerFieldManager, fieldCardManager,
             KeyCodeManager.InputType.GET_DOWN, keyCode, title, () => {
                 if (isLog) AddLogList(title);
                 action();
@@ -1364,10 +1368,12 @@ public class CardOptionWindow : MonoBehaviour
         }
         else
         {
+            touchManager = target.GetComponent<TouchManager>();
             if (touchManager != null)
             {
                 targetFieldCardManager = touchManager.m_playerFieldManager.m_fieldCardManager;
             }
+            handCard = target.GetComponent<HandCard>();
             if (handCard != null)
             {
                 targetFieldCardManager = handCard.m_playerFieldManager.m_fieldCardManager;

@@ -25,6 +25,22 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
     [SerializeField]
     private TMPro.TMP_Dropdown m_optionDropdown = null;
 
+    [SerializeField]
+    private Button m_notebooklmButtonToDigimon = null;
+    [SerializeField]
+    private Button m_notebooklmButtonToBs = null;
+    [SerializeField]
+    private Button m_notebooklmButtonToDm = null;
+    [SerializeField]
+    private Button m_notebooklmButtonToYugiou = null;
+    [SerializeField]
+    private Button m_notebooklmButtonToHolo = null;
+    [SerializeField]
+    private Button m_notebooklmButtonToPoke = null;
+
+    [SerializeField]
+    private TMPro.TextMeshProUGUI m_onKeyText = null;
+
     public List<string> m_logList = new List<string>();
 
     private static BattleSceneManager instance = null;
@@ -284,6 +300,49 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
 
     public void SetUi()
     {
+        if (m_notebooklmButtonToDigimon != null)
+        {
+            m_notebooklmButtonToDigimon.onClick.AddListener (() => {
+                OnClickToNotebooklmButton("digimon");
+            });
+        }
+
+        if (m_notebooklmButtonToBs != null)
+        {
+            m_notebooklmButtonToBs.onClick.AddListener(() => {
+                OnClickToNotebooklmButton("bs");
+            });
+        }
+
+        if (m_notebooklmButtonToHolo != null)
+        {
+            m_notebooklmButtonToHolo.onClick.AddListener(() => {
+                OnClickToNotebooklmButton("hololive");
+            });
+        }
+
+        if (m_notebooklmButtonToYugiou != null)
+        {
+            m_notebooklmButtonToYugiou.onClick.AddListener(() => {
+                OnClickToNotebooklmButton("yugioh");
+            });
+        }
+
+        if (m_notebooklmButtonToDm != null)
+        {
+            m_notebooklmButtonToDm.onClick.AddListener(() => {
+                OnClickToNotebooklmButton("dm");
+            });
+        }
+
+        if (m_notebooklmButtonToPoke != null)
+        {
+            m_notebooklmButtonToPoke.onClick.AddListener(() => {
+                OnClickToNotebooklmButton("pokemon");
+            });
+        }
+        
+
         IsPlayer = false;
         for (int i = 0; i < m_playerStatusList.Count; i++)
         {
@@ -724,6 +783,31 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
                     //playerStatu.m_discodeButton.transform.localPosition = new Vector3(xList[index] + (w / 2), yList[index] + (h / 4), 0);
                 }
             }
+        }
+    }
+
+    public void OnClickToNotebooklmButton(string type)
+    {
+        switch(type)
+        {
+            case "digimon":
+                Application.OpenURL("https://notebooklm.google.com/notebook/03a42ad4-541b-459e-9e64-ebf2ac041674");
+                break;
+            case "yugioh":
+                Application.OpenURL("https://notebooklm.google.com/notebook/1e048254-d7c8-4282-8855-105957b164a6");
+                break;
+            case "hololive":
+                Application.OpenURL("https://notebooklm.google.com/notebook/bd32400f-eaf9-4693-a807-091a78b23ca6");
+                break;
+            case "dm":
+                Application.OpenURL("https://notebooklm.google.com/notebook/a5a43a78-5412-4e01-bc3c-e7aa7d88da68");
+                break;
+            case "bs":
+                Application.OpenURL("https://notebooklm.google.com/notebook/47a9949f-bccb-4712-9a4c-0a1ef3f6c3fe");
+                break;
+            case "pokemon":
+                Application.OpenURL("https://notebooklm.google.com/notebook/6549ba90-d014-4f5b-b9b0-3eb76430ec6b");
+                break;
         }
     }
 }

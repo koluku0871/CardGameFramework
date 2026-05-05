@@ -418,6 +418,14 @@ public class CardOptionWindow : MonoBehaviour
             targetplayerFieldManager.CreateCard(target.name);
             CloseOnSound();
         }));
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから裏向きでフィールドに送る", () => {
+            string[] list = target.name.Split('^');
+            var card = targetFieldCardManager.RemoveCardDetail(OPTION_TYPE.DECK, list[0], list[1])[0];
+            targetplayerFieldManager.CreateCard(target.name, false);
+            CloseOnSound();
+        }));
+
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上に送る", () => {
             string[] list = target.name.Split('^');
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DECK, true, list[0], list[1]);

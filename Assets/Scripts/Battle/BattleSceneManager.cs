@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 public class BattleSceneManager : MonoBehaviourPunCallbacks
 {
@@ -273,6 +275,26 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
         else
         {
             
+        }
+
+        if (Input.anyKey)
+        {
+            string str = "";
+            foreach (KeyCode kcode in System.Enum.GetValues(typeof(KeyCode)))
+            {
+                if (Input.GetKey(kcode))
+                {
+                    str += kcode.ToString();
+                }
+            }
+            if (m_onKeyText.text != str)
+            {
+            m_onKeyText.text = str;
+            }
+        }
+        else if (!string.IsNullOrEmpty(m_onKeyText.text))
+        {
+            m_onKeyText.text = "";
         }
     }
 

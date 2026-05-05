@@ -302,6 +302,11 @@ public class HomeSceneManager : MonoBehaviour
         System.Diagnostics.Process.Start(UnityEngine.Application.dataPath);
     }
 
+    public void OnClickToRuleButton()
+    {
+        UnityEngine.Application.OpenURL("https://notebooklm.google.com/notebook/0d805f52-0286-49b5-9d19-f574bd68e115");
+    }
+
     public void OnClickToCloseButton() {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

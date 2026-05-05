@@ -375,7 +375,7 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                     if (index != -1)
                     {
                         AudioSourceManager.Instance().PlayOneShot(0);
-                        if (isDoubleClick)
+                        if (Input.GetKey(KeyCode.LeftControl))
                         {
                             if (string.IsNullOrEmpty(m_innerCardDetailList[index].option))
                             {
@@ -654,22 +654,28 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
                 if (m_endObj != null)
                 {
                     RemoveOoverlapObjectList(m_endObj);
+                    string opt = "";
+                    if (Input.GetKey(KeyCode.LeftControl))
+                    {
+                        opt = "IsClose";
+                    }
+                    
                     if (!m_playerFieldManager.IsStayMousePos)
                     {
                         m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.AddRange(m_innerCardDetailList);
-                        m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
+                        m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], opt));
                     }
                     else
                     {
                         if (m_endObj.transform.position.x > Input.mousePosition.x)
                         {
-                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Insert(0, new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
+                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Insert(0, new DeckManager.CardDetailPlusOption(list[0], list[1], opt));
                             m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.InsertRange(0, m_innerCardDetailList);
                         }
                         else
                         {
                             m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.AddRange(m_innerCardDetailList);
-                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], ""));
+                            m_endObj.GetComponent<TouchManager>().m_innerCardDetailList.Add(new DeckManager.CardDetailPlusOption(list[0], list[1], opt));
                         }
                     }
                     m_fieldCardManager.RemoveCardImage(CardOptionWindow.OPTION_TYPE.FIELD, m_image);

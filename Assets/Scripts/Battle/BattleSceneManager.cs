@@ -214,6 +214,15 @@ public class BattleSceneManager : MonoBehaviourPunCallbacks
             }
         });
 
+        KeyCodeManager.Instance().AddInputActionList(
+            null, null,
+            KeyCodeManager.InputType.GET, KeyCode.LeftControl, "左Controlを押しながらカードを内包すると裏向きになる", () => {}
+        );
+        KeyCodeManager.Instance().AddInputActionList(
+            null, null,
+            KeyCodeManager.InputType.GET, KeyCode.LeftControl, "左Controlを押しながら内包したカードを押下すると表/裏向きになる", () => { }
+        );
+
         SetUi();
     }
 

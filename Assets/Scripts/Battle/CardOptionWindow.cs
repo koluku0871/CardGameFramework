@@ -151,19 +151,19 @@ public class CardOptionWindow : MonoBehaviour
             m_myPlayerFieldManager.SetAllMyCardToRecovery();
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "コアをリザーブからトラッシュにX個移動する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "コアをリザーブからトラッシュにX個移動", () => {
             m_myPlayerFieldManager.SetCorePos(ConstManager.CorePosType.RESERVE, ConstManager.CorePosType.TRASH, numButtonTextNum);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "コアをフィールドからリザーブにすべて移動する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "コアをフィールドからリザーブにすべて移動", () => {
             m_myPlayerFieldManager.SetCorePos(ConstManager.CorePosType.FIELD, ConstManager.CorePosType.RESERVE);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F12, false, "フィールドのカードを一段階回復する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F12, false, "フィールドのカードを一段階回復", () => {
             m_myPlayerFieldManager.SetAllMyCardToRecovery();
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "コアをトラッシュからリザーブにすべて移動する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "コアをトラッシュからリザーブにすべて移動", () => {
             m_myPlayerFieldManager.SetCorePos(ConstManager.CorePosType.TRASH, ConstManager.CorePosType.RESERVE);
             Close();
         }));
@@ -179,7 +179,7 @@ public class CardOptionWindow : MonoBehaviour
             Close();
         }));
 
-        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.Tab, "コアをリザーブからトラッシュに1個移動する", () =>
+        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.Tab, "コアをリザーブからトラッシュに1個移動", () =>
         {
             m_myPlayerFieldManager.SetCorePos(ConstManager.CorePosType.RESERVE, ConstManager.CorePosType.TRASH, 1);
         });
@@ -216,7 +216,7 @@ public class CardOptionWindow : MonoBehaviour
                 CloseOnSound();
             }));
 
-            AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.O, atHandStr + "の上から1枚を表にする", () =>
+            AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.O, atHandStr + "の上から1枚表にする", () =>
             {
                 var card = m_myFieldCardManager.GetCardHandObjList(OPTION_TYPE.AT_HAND, false, 1)[0];
                 HandCard handCard = card.GetComponent<HandCard>();
@@ -262,7 +262,7 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE optionType = OPTION_TYPE.STEP;
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分のトークン一覧を確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分のトークン一覧を確認", () => {
             CardListWindow.Instance().Close();
             List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
             List<DeckManager.CardDetail> cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.TOKEN);
@@ -274,7 +274,7 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.TOKEN, openCardList);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "ランダムに手札からX枚トラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "ランダムに手札からトラッシュにX枚送る", () => {
             for (int index = 0; index < numButtonTextNum; index++)
             {
                 List<GameObject> handObjectList = targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
@@ -329,12 +329,12 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE optionType = OPTION_TYPE.DECK;
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキをシャッフルする", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキをシャッフル", () => {
             targetFieldCardManager.ShuffleCardDetailList(OPTION_TYPE.DECK);
             Close();
             AudioSourceManager.Instance().PlayOneShot(1);
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分のデッキを確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分のデッキを確認", () => {
             CardListWindow.Instance().Close();
             List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
             List<DeckManager.CardDetail> cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.DECK);
@@ -346,26 +346,26 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.DECK, openCardList);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を手札に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から手札にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの下からX枚を手札に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの下から手札にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, false, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつデッキの上からX枚を公開する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつデッキの上からX枚公開", () => {
             var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.DECK, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.DECK, cardList, true, true);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を公開する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を公開", () => {
             var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.DECK, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.DECK, cardList);
             CloseOnSound();
         }));
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキからX枚を裏向きでフィールドに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから裏向きでフィールドにX枚送る", () => {
             var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.DECK, true, numButtonTextNum);
             foreach (var cardDetail in cardList)
             {
@@ -376,35 +376,35 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + atHandStr + "の上に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + atHandStr + "の上にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.AT_HAND, true, numButtonTextNum);
             CloseOnSound();
         }));
 
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + damageStr + "の上に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + damageStr + "の上にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, true, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + subStr + "の上に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + subStr + "の上にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, true, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + damageStr + "の下に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + damageStr + "の下にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.DAMAGE, false, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を" + subStr + "の下に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から" + subStr + "の下にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.SUB, false, numButtonTextNum);
             CloseOnSound();
         }));
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚をトラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からトラッシュにX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上からX枚を除外一覧に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキの上から除外一覧にX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
@@ -419,7 +419,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキから裏向きでフィールドに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "デッキからフィールドに裏向きで送る", () => {
             string[] list = target.name.Split('^');
             var card = targetFieldCardManager.RemoveCardDetail(OPTION_TYPE.DECK, list[0], list[1])[0];
             targetplayerFieldManager.CreateCard(target.name, false);
@@ -501,7 +501,7 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
-        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.Q, "デッキの上から1枚を手札に加える", () =>
+        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.Q, "デッキの上から手札に1枚加える", () =>
         {
             m_myFieldCardManager.AddDstFromSrc(OPTION_TYPE.DECK, OPTION_TYPE.HAND, true, 1);
             CloseOnSound();
@@ -861,7 +861,7 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE optionType = OPTION_TYPE.EXCLUSION;
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分の除外一覧を確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分の除外一覧を確認", () => {
             CardListWindow.Instance().Close();
             List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
             List<DeckManager.CardDetail> cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.EXCLUSION);
@@ -873,11 +873,11 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.EXCLUSION, openCardList);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで自分の除外一覧の上からX枚をトラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで自分の除外一覧の上からトラッシュにX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.EXCLUSION, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ自分の除外一覧を確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ自分の除外一覧を確認", () => {
             CardListWindow.Instance().Close();
             List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
             List<DeckManager.CardDetail> cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.EXCLUSION);
@@ -889,7 +889,7 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.EXCLUSION, openCardList, true, true);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手の除外一覧を確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手の除外一覧を確認", () => {
             GameObject[] playFieldList = GameObject.FindGameObjectsWithTag("PlayField");
             FieldCardManager playField = null;
             foreach (var playFieldObj in playFieldList)
@@ -985,7 +985,7 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE optionType = OPTION_TYPE.TRASH;
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分のトラッシュを確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分のトラッシュを確認", () => {
             CardListWindow.Instance().Close();
             List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
             List<DeckManager.CardDetail> cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.TRASH);
@@ -997,7 +997,7 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.TRASH, openCardList);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ自分のトラッシュを確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ自分のトラッシュを確認", () => {
             CardListWindow.Instance().Close();
             List<DeckManager.CardDetail> openCardList = new List<DeckManager.CardDetail>();
             List<DeckManager.CardDetail> cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.TRASH);
@@ -1009,7 +1009,7 @@ public class CardOptionWindow : MonoBehaviour
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.TRASH, openCardList, true, true);
             Close();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手のトラッシュを確認する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手のトラッシュを確認", () => {
             GameObject[] playFieldList = GameObject.FindGameObjectsWithTag("PlayField");
             FieldCardManager playField = null;
             foreach (var playFieldObj in playFieldList)
@@ -1053,6 +1053,13 @@ public class CardOptionWindow : MonoBehaviour
             OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
 
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュからフィールドに送る", () => {
+            string[] list = target.name.Split('^');
+            var card = targetFieldCardManager.RemoveCardDetail(OPTION_TYPE.TRASH, list[0], list[1])[0];
+            targetplayerFieldManager.CreateCard(target.name);
+            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
+        }));
+
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュから" + atHandStr + "の上に送る", () => {
             string[] list = target.name.Split('^');
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.AT_HAND, true, list[0], list[1]);
@@ -1090,12 +1097,6 @@ public class CardOptionWindow : MonoBehaviour
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.TRASH, OPTION_TYPE.EXCLUSION, list[0], list[1]);
             OpenCardDetailListToMine(OPTION_TYPE.TRASH);
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "トラッシュからフィールドに送る", () => {
-            string[] list = target.name.Split('^');
-            var card = targetFieldCardManager.RemoveCardDetail(OPTION_TYPE.TRASH, list[0], list[1])[0];
-            targetplayerFieldManager.CreateCard(target.name);
-            OpenCardDetailListToMine(OPTION_TYPE.TRASH);
-        }));
     }
 
     private void SetButtonToDamage()
@@ -1108,44 +1109,44 @@ public class CardOptionWindow : MonoBehaviour
             Close();
             AudioSourceManager.Instance().PlayOneShot(1);
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ" + damageStr + "の上からX枚を公開する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ" + damageStr + "の上からX枚を公開", () => {
             var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.DAMAGE, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.DAMAGE, cardList, true, true);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上からX枚を公開する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上からX枚を公開", () => {
             var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.DAMAGE, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.DAMAGE, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上からX枚を手札に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上から手札にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.HAND, true, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の下からX枚を手札に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の下から手札にX枚送る", () => {
             targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.HAND, false, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上からX枚を" + subStr + "に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上から" + subStr + "にX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.SUB, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上からX枚をトラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上からトラッシュにX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上からX枚を除外一覧に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, damageStr + "の上から除外一覧にX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + damageStr + "の上からX枚をトラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + damageStr + "の上からトラッシュにX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + damageStr + "の上からX枚を除外一覧に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + damageStr + "の上から除外一覧にX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.DAMAGE, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CloseOnSound();
         }));
@@ -1192,41 +1193,41 @@ public class CardOptionWindow : MonoBehaviour
         OPTION_TYPE optionType = OPTION_TYPE.SUB;
         OPTION_TYPE detailOptionType = OPTION_TYPE.NONE;
 
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "をシャッフルする", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "をシャッフル", () => {
             targetFieldCardManager.ShuffleCardDetailList(OPTION_TYPE.SUB);
             Close();
             AudioSourceManager.Instance().PlayOneShot(1);
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ" + subStr + "の上からX枚を公開する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "相手に見せつつ" + subStr + "の上からX枚を公開", () => {
             var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.SUB, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.SUB, cardList, true, true);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上からX枚を公開する", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上からX枚を公開", () => {
             var cardList = targetFieldCardManager.GetCardDetailList(OPTION_TYPE.SUB, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.SUB, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上からX枚を" + damageStr + "に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上から" + damageStr + "にX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上からX枚をトラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上からトラッシュにX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上からX枚を除外一覧に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, subStr + "の上から除外一覧にX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CardListWindow.Instance().Open(targetplayerFieldManager, targetFieldCardManager, CardOptionWindow.OPTION_TYPE.CARD_LIST, cardList);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + subStr + "の上からX枚をトラッシュに送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + subStr + "の上からトラッシュにX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.TRASH, true, numButtonTextNum);
             CloseOnSound();
         }));
-        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + subStr + "の上からX枚を除外一覧に送る", () => {
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "見ないで" + subStr + "の上から除外一覧にX枚送る", () => {
             var cardList = targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.SUB, OPTION_TYPE.EXCLUSION, true, numButtonTextNum);
             CloseOnSound();
         }));
@@ -1268,7 +1269,7 @@ public class CardOptionWindow : MonoBehaviour
         }));
 
 
-        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.R, subStr + "の上から1枚をフィールドに送る", () =>
+        AddInputActionList(targetplayerFieldManager, targetFieldCardManager, KeyCodeManager.InputType.GET_DOWN, KeyCode.R, subStr + "の上からフィールドに1枚送る", () =>
         {
             var cardList = m_myFieldCardManager.GetCardDetailList(OPTION_TYPE.SUB, true, 1);
             var targetCard = cardList[0];

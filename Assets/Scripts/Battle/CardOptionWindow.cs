@@ -285,6 +285,30 @@ public class CardOptionWindow : MonoBehaviour
             }
             CloseOnSound();
         }));
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "ランダムに手札からデッキの上にX枚送る", () => {
+            for (int index = 0; index < numButtonTextNum; index++)
+            {
+                List<GameObject> handObjectList = targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
+                GameObject handObject = handObjectList[UnityEngine.Random.Range(0, handObjectList.Count)];
+                string[] list = handObject.name.Split('^');
+                Debug.Log(handObject.name);
+                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, true, handObject.GetComponent<Image>(), list[0], list[1]);
+            }
+            CloseOnSound();
+        }));
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "ランダムに手札からデッキの下にX枚送る", () => {
+            for (int index = 0; index < numButtonTextNum; index++)
+            {
+                List<GameObject> handObjectList = targetFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
+                GameObject handObject = handObjectList[UnityEngine.Random.Range(0, handObjectList.Count)];
+                string[] list = handObject.name.Split('^');
+                Debug.Log(handObject.name);
+                targetFieldCardManager.AddDstFromSrc(OPTION_TYPE.HAND, OPTION_TYPE.DECK, false, handObject.GetComponent<Image>(), list[0], list[1]);
+            }
+            CloseOnSound();
+        }));
+
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.F9, false, "手札をデッキに戻してX枚引き直す", () => {
             List<GameObject> handObjectList = m_myFieldCardManager.GetCardHandObjList(OPTION_TYPE.HAND);
             foreach (GameObject handObject in handObjectList)

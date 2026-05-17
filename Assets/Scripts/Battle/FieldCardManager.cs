@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static FieldCardManager;
 
 public class FieldCardManager : MonoBehaviour
 {
@@ -356,27 +357,7 @@ public class FieldCardManager : MonoBehaviour
     public void ShuffleCardDetailList(CardOptionWindow.OPTION_TYPE option)
     {
         List<DeckManager.CardDetail> deckDetailList = new List<DeckManager.CardDetail>();
-        switch (option)
-        {
-            case CardOptionWindow.OPTION_TYPE.DECK:
-                deckDetailList = m_deckDetailList;
-                break;
-            case CardOptionWindow.OPTION_TYPE.TRASH:
-                deckDetailList = m_trashDetailList;
-                break;
-            case CardOptionWindow.OPTION_TYPE.EXCLUSION:
-                deckDetailList = m_exclusionDetailList;
-                break;
-            case CardOptionWindow.OPTION_TYPE.DAMAGE:
-                deckDetailList = m_damageDetailList;
-                break;
-            case CardOptionWindow.OPTION_TYPE.SUB:
-                deckDetailList = m_subDetailList;
-                break;
-            case CardOptionWindow.OPTION_TYPE.TOKEN:
-                deckDetailList = m_aceDetailList;
-                break;
-        }
+        deckDetailList = GetCardDetailList(option);
 
         for (int index = 0; index < deckDetailList.Count; index++)
         {
@@ -388,6 +369,35 @@ public class FieldCardManager : MonoBehaviour
 
         switch (option)
         {
+            case CardOptionWindow.OPTION_TYPE.HAND:
+                foreach (Transform hand in m_handContent)
+                {
+                    if (hand.gameObject.activeSelf)
+                    {
+                        Destroy(hand.gameObject);
+                    }
+                }
+                for (var index = 0; index < deckDetailList.Count; index++)
+                {
+                    AddCardDetailList(option, true, deckDetailList[index]);
+                }
+                break;
+            case CardOptionWindow.OPTION_TYPE.AT_HAND:
+                if (m_atHandContent != null)
+                {
+                    foreach (Transform hand in m_atHandContent)
+                    {
+                        if (hand.gameObject.activeSelf)
+                        {
+                            Destroy(hand.gameObject);
+                        }
+                    }
+                }
+                for (var index = 0; index < deckDetailList.Count; index++)
+                {
+                    AddCardDetailList(option, true, deckDetailList[index]);
+                }
+                break;
             case CardOptionWindow.OPTION_TYPE.DECK:
                 m_deckDetailList = deckDetailList;
                 break;
@@ -464,13 +474,7 @@ public class FieldCardManager : MonoBehaviour
         switch (option)
         {
             case CardOptionWindow.OPTION_TYPE.HAND:
-                foreach (Transform hand in m_handContent)
-                {
-                    if (hand.gameObject.activeSelf)
-                    {
-                        objList.Add(hand.gameObject);
-                    }
-                }
+                objList = GetCardHandObjList(option);
                 for (var index = 0; index < objList.Count; index++)
                 {
                     string[] list = objList[index].name.Split('^');
@@ -481,13 +485,7 @@ public class FieldCardManager : MonoBehaviour
             case CardOptionWindow.OPTION_TYPE.AT_HAND:
                 if (m_atHandContent != null)
                 {
-                    foreach (Transform atHand in m_atHandContent)
-                    {
-                        if (atHand.gameObject.activeSelf)
-                        {
-                            objList.Add(atHand.gameObject);
-                        }
-                    }
+                    objList = GetCardHandObjList(option);
                 }
                 for (var index = 0; index < objList.Count; index++)
                 {

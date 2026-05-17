@@ -296,6 +296,18 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
 
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, atHandStr + "をシャッフル", () => {
+            targetFieldCardManager.ShuffleCardDetailList(OPTION_TYPE.AT_HAND);
+            Close();
+            AudioSourceManager.Instance().PlayOneShot(1);
+        }));
+
+        m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "手札をシャッフル", () => {
+            targetFieldCardManager.ShuffleCardDetailList(OPTION_TYPE.HAND);
+            Close();
+            AudioSourceManager.Instance().PlayOneShot(1);
+        }));
+
         optionType = OPTION_TYPE.TOKEN;
         detailOptionType = OPTION_TYPE.CARD_LIST;
 

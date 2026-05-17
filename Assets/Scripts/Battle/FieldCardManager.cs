@@ -691,6 +691,10 @@ public class FieldCardManager : MonoBehaviour
                         CardOptionWindow.Instance().Open(m_playerFieldManager, this, target, CardOptionWindow.OPTION_TYPE.HAND);
                     });
                 card.name = m_handCard.name;
+                if (!isUp)
+                {
+                    card.transform.SetAsFirstSibling();
+                }
                 break;
             case CardOptionWindow.OPTION_TYPE.AT_HAND:
                 if (m_atHandCard == null || m_atHandContent == null)
@@ -736,6 +740,10 @@ public class FieldCardManager : MonoBehaviour
                 );
                 card.name = m_atHandCard.name;
                 card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                if (!isUp)
+                {
+                    card.transform.SetAsFirstSibling();
+                }
                 break;
             case CardOptionWindow.OPTION_TYPE.DECK:
                 if (!isUp)

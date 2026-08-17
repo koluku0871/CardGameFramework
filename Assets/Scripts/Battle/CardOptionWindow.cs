@@ -672,7 +672,8 @@ public class CardOptionWindow : MonoBehaviour
         detailOptionType = OPTION_TYPE.FIELD_ROT;
 
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "カードを開く", () => {
-            if (target.sprite == CardDetailManager.Instance().GetSleeveSprite())
+            var sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+            if (target.sprite == sleeveSprite)
             {
                 string[] list = target.name.Split('^');
                 target.sprite = CardDetailManager.Instance().GetCardSprite(new DeckManager.CardDetail() { tag = list[0], cardId = list[1] });
@@ -694,9 +695,10 @@ public class CardOptionWindow : MonoBehaviour
             CloseOnSound();
         }));
         m_optionButtonList.Add(new OptionButton(optionType, detailOptionType, KeyCode.None, false, "自分にも見えないようにカードを閉じる", () => {
-            if (target.sprite != CardDetailManager.Instance().GetSleeveSprite())
+            var sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+            if (target.sprite != sleeveSprite)
             {
-                target.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                target.sprite = sleeveSprite;
             }
 
             TouchManager touchManager = target.GetComponent<TouchManager>();

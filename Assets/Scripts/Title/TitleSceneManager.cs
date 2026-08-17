@@ -96,6 +96,32 @@ public class TitleSceneManager : MonoBehaviour
             Directory.CreateDirectory(path);
         }
 
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_RES;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_RES_ICON;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_RES_ICON;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_RES_PLAYMAT;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        path = ConstManager.DIRECTORY_FULL_PATH_TO_RES_SLEEVE;
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
         OptionData optionData = new OptionData();
         optionData.IsFileExists();
         if (!optionData.IsFileExists())
@@ -119,15 +145,16 @@ public class TitleSceneManager : MonoBehaviour
             streamWriter.Close();
         }
 
-        path = ConstManager.DIRECTORY_PATH + "/ResLoad.exe";
+        path = ConstManager.DIRECTORY_PATH + "/ResAccess.exe";
         if (File.Exists(path))
         {
             _process = new Process();
 
             // プロセスを起動するときに使用する値のセットを指定
-            _process.StartInfo = new ProcessStartInfo
+            _process.StartInfo = new System.Diagnostics.ProcessStartInfo
             {
                 FileName = path,
+                Arguments = "DownLoad",
                 UseShellExecute = false,
                 WorkingDirectory = ConstManager.DIRECTORY_PATH,
                 RedirectStandardInput = true,
@@ -135,7 +162,7 @@ public class TitleSceneManager : MonoBehaviour
                 CreateNoWindow = true,
             };
 
-            _process.OutputDataReceived += OnStandardOut;
+            _process.OutputDataReceived += new DataReceivedEventHandler(OnStandardOut);
 
             _process.EnableRaisingEvents = true;
             _process.Exited += DisposeProcess;
@@ -254,6 +281,18 @@ public class TitleSceneManager : MonoBehaviour
                 else if (Path.GetExtension(data) == ".sample")
                 {
                     directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK;
+                }
+                else if (fileData.url.Contains("/Icon/"))
+                {
+                    directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_ICON;
+                }
+                else if (fileData.url.Contains("/Playmat/"))
+                {
+                    directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_PLAYMAT;
+                }
+                else if (fileData.url.Contains("/Sleeve/"))
+                {
+                    directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_SLEEVE;
                 }
 
                 string key = Path.GetFileNameWithoutExtension(directoryPath + data);

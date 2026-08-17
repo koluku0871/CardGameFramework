@@ -56,6 +56,19 @@ public class CardDetailManager : MonoBehaviour
     [SerializeField]
     private List<Sprite> m_symbolSpriteList = new List<Sprite>();
 
+
+    private Sprite m_setSleeveSprite = null;
+    public void SetSleeveSprite(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            sprite = m_sleeveSprite;
+        }
+
+        m_setSleeveSprite = sprite;
+        m_targetDetail.sprite = m_setSleeveSprite;
+    }
+
     public bool isLock = false;
 
     private static CardDetailManager instance = null;
@@ -118,6 +131,11 @@ public class CardDetailManager : MonoBehaviour
 
     public Sprite GetSleeveSprite()
     {
+        if (m_setSleeveSprite != null)
+        {
+            return m_setSleeveSprite;
+        }
+
         return m_sleeveSprite;
     }
 

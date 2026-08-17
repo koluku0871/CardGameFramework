@@ -78,6 +78,9 @@ public class DeckManager : MonoBehaviour
     [Serializable]
     public class DeckDetail {
         public string type = "";
+        public string iconName = "";
+        public string playmatName = "";
+        public string sleeveName = "";
         public List<CardDetail> aceCardDetailList = new List<CardDetail>();
         public List<CardDetail> cardDetailList = new List<CardDetail>();
         public List<CardDetail> subCardDetailList = new List<CardDetail>();
@@ -304,6 +307,10 @@ public class DeckManager : MonoBehaviour
 
         if (deckCardList != null)
         {
+            deckSceneManager.UpdateSupplyDropDown(
+               true, deckCardList.iconName, deckCardList.playmatName, deckCardList.sleeveName
+            );
+
             foreach (CardDetail card in deckCardList.cardDetailList)
             {
                 if (!strings.ContainsKey(card.ToString()))
@@ -370,6 +377,9 @@ public class DeckManager : MonoBehaviour
 
         DeckDetail deckCardList = new DeckDetail();
         deckCardList.type = AssetBundleManager.Instance().CardType;
+        deckCardList.iconName = deckSceneManager.GetSupplyIconName();
+        deckCardList.playmatName = deckSceneManager.GetSupplyPlaymatName();
+        deckCardList.sleeveName = deckSceneManager.GetSupplySleeveName();
         foreach ( Transform c in deckSceneManager.GetDeckContent().transform ) {
             string[] cardData = c.name.Split('^');
             if (cardData.Length < 2) {
@@ -434,6 +444,7 @@ public class DeckManager : MonoBehaviour
     public void OnClickToUploadButton()
     {
         string deckFileName = SaveDeck();
+        if (string.IsNullOrEmpty(deckFileName)) { return; }
 
         OptionData optionData = new OptionData();
         optionData.IsFileExists();
@@ -445,15 +456,15 @@ public class DeckManager : MonoBehaviour
             true
         );
 
-        Debug.Log(ConstManager.DIRECTORY_PATH + "/ResUpload.exe" + " SampleDeck " + ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + optionData.name + "_" + deckFileName + ".sample");
+        Debug.Log(ConstManager.DIRECTORY_PATH + "/ResAccess.exe" + " Upload SampleDeck " + ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + optionData.name + "_" + deckFileName + ".sample");
 
         _process = new System.Diagnostics.Process();
 
         // プロセスを起動するときに使用する値のセットを指定
         _process.StartInfo = new System.Diagnostics.ProcessStartInfo
         {
-            FileName = ConstManager.DIRECTORY_PATH + "/ResUpload.exe",
-            Arguments = "SampleDeck " + ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + optionData.name + "_" + deckFileName + ".sample",
+            FileName = ConstManager.DIRECTORY_PATH + "/ResAccess.exe",
+            Arguments = " Upload SampleDeck " + ConstManager.DIRECTORY_FULL_PATH_TO_SAMPLEDECK + optionData.name + "_" + deckFileName + ".sample",
             UseShellExecute = false,
             WorkingDirectory = ConstManager.DIRECTORY_PATH,
             RedirectStandardInput = true,

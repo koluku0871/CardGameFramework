@@ -1,10 +1,10 @@
 ﻿using Photon.Pun;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static FieldCardManager;
 
 public class FieldCardManager : MonoBehaviour
 {
@@ -28,6 +28,10 @@ public class FieldCardManager : MonoBehaviour
         public List<DeckManager.CardDetail> damageDetailList = new List<DeckManager.CardDetail>();
 
         public List<DeckManager.CardDetail> subDetailList = new List<DeckManager.CardDetail>();
+
+        public string sleeveName = "";
+
+        public string playmatName = "";
     }
 
     [SerializeField]
@@ -159,7 +163,8 @@ public class FieldCardManager : MonoBehaviour
                 {
                     var card = RemoveCardDetail(CardOptionWindow.OPTION_TYPE.DECK, cardDetail.tag, cardDetail.cardId)[0];
                     Image cardImage = m_playerFieldManager.CreateCard(cardDetail.ToString(), false);
-                    cardImage.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                    Sprite sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+                    cardImage.sprite = sleeveSprite;
                     cardImage.rectTransform.localPosition = new Vector3(
                         -(cardImage.rectTransform.sizeDelta.x / 2) + ((cardImage.rectTransform.sizeDelta.x + 2) * cardIndex), -2, 0
                     );
@@ -737,7 +742,8 @@ public class FieldCardManager : MonoBehaviour
                     }
                 );
                 card.name = m_atHandCard.name;
-                card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                Sprite sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+                card.sprite = sleeveSprite;
                 if (!isUp)
                 {
                     card.transform.SetAsFirstSibling();
@@ -851,7 +857,8 @@ public class FieldCardManager : MonoBehaviour
                         }
                     );
                     card.name = m_atHandCard.name;
-                    card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                    Sprite sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+                    card.sprite = sleeveSprite;
                 }
                 break;
             case CardOptionWindow.OPTION_TYPE.DECK:
@@ -1007,7 +1014,8 @@ public class FieldCardManager : MonoBehaviour
             case CardOptionWindow.OPTION_TYPE.FIELD:
             case CardOptionWindow.OPTION_TYPE.BURST:
             case CardOptionWindow.OPTION_TYPE.FLASH:
-                card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                Sprite sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+                card.sprite = sleeveSprite;
                 card.name = "";
                 card.gameObject.SetActive(false);
                 break;
@@ -1142,8 +1150,53 @@ public class FieldCardManager : MonoBehaviour
         return m_atHandContent != null && m_atHandContent.gameObject.activeInHierarchy;
     }
 
+    public void SetSleeveSprite(Sprite sprite)
+    {
+        if (sprite == null)
+        {
+            return;
+        }
+
+        if (m_deckCard != null)
+        {
+            m_deckCard.sprite = sprite;
+        }
+
+        if (m_trashCard != null)
+        {
+            m_trashCard.sprite = sprite;
+        }
+
+        if (m_exclusionCard != null)
+        {
+            m_exclusionCard.sprite = sprite;
+        }
+
+        if (m_damageCard != null)
+        {
+            m_damageCard.sprite = sprite;
+        }
+
+        if (m_subCard != null)
+        {
+            m_subCard.sprite = sprite;
+        }
+
+        if (m_atHandCard != null)
+        {
+            m_atHandCard.sprite = sprite;
+        }
+
+        if (m_handCard != null)
+        {
+            m_handCard.sprite = sprite;
+        }
+    }
+
     // 差分確認用Json
     private string m_fieldCardManagerDataJson = "";
+    private string m_sleeveName = "";
+    private string m_playmatName = "";
 
     public void SetFieldCardManagerDataJson(string fieldCardManagerDataJson)
     {
@@ -1209,8 +1262,6 @@ public class FieldCardManager : MonoBehaviour
             atHandObjectList[index].name = fieldCardData.atHandList[index].Split('#')[0];
         }
 
-        Sprite sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
-
         for (var index = 0; index < fieldCardData.atHandList.Count; index++)
         {
             Image copied = null;
@@ -1235,9 +1286,9 @@ public class FieldCardManager : MonoBehaviour
             EventTrigger cardEventTrigger = copied.GetComponent<EventTrigger>();
             string[] list = fieldCardData.atHandList[index].Split('#');
             copied.name = list[0];
-            if (list[1] == "False" && copied.sprite != sleeveSprite)
+            if (list[1] == "False" && copied.sprite != CardDetailManager.Instance().GetSleeveSprite())
             {
-                copied.sprite = sleeveSprite;
+                copied.sprite = CardDetailManager.Instance().GetSleeveSprite();
                 handCard.SetIsOpen(false);
                 cardEventTrigger.triggers = new List<EventTrigger.Entry>();
             }
@@ -1270,6 +1321,35 @@ public class FieldCardManager : MonoBehaviour
 
         SetDeckDetail(CardOptionWindow.OPTION_TYPE.DAMAGE, fieldCardData.damageDetailList);
         SetDeckDetail(CardOptionWindow.OPTION_TYPE.SUB, fieldCardData.subDetailList);
+
+        if (m_sleeveName == fieldCardData.sleeveName && m_playmatName == fieldCardData.playmatName)
+        {
+            return;
+        }
+
+        m_sleeveName = fieldCardData.sleeveName;
+        if (!string.IsNullOrEmpty(fieldCardData.sleeveName) && fieldCardData.sleeveName != "no select")
+        {
+            byte[] data = File.ReadAllBytes(
+                ConstManager.DIRECTORY_FULL_PATH_TO_RES_SLEEVE + fieldCardData.sleeveName
+            );
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+            SetSleeveSprite(sprite);
+        }
+
+        m_playmatName = fieldCardData.playmatName;
+        if (!string.IsNullOrEmpty(fieldCardData.playmatName) && fieldCardData.playmatName != "no select")
+        {
+            byte[] data = File.ReadAllBytes(
+                ConstManager.DIRECTORY_FULL_PATH_TO_RES_PLAYMAT + fieldCardData.playmatName
+            );
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            m_playerFieldManager.m_background.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        }
     }
 
     public string GetFieldCardManagerDataJson()
@@ -1303,6 +1383,9 @@ public class FieldCardManager : MonoBehaviour
 
         fieldCardData.damageDetailList = m_damageDetailList;
         fieldCardData.subDetailList = m_subDetailList;
+
+        fieldCardData.playmatName = m_playerFieldManager.playmatName;
+        fieldCardData.sleeveName = m_playerFieldManager.sleeveName;
 
         return JsonUtility.ToJson(fieldCardData);
     }

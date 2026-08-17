@@ -10,6 +10,11 @@ public class ConstManager
     public const string DIRECTORY_PATH_TO_HELP = "/help/";
     public const string DIRECTORY_PATH_TO_SAMPLEDECK = "/sample/";
 
+    public const string DIRECTORY_PATH_TO_RES = "/res";
+    public const string DIRECTORY_PATH_TO_RES_ICON = DIRECTORY_PATH_TO_RES + "/icon/";
+    public const string DIRECTORY_PATH_TO_RES_PLAYMAT = DIRECTORY_PATH_TO_RES + "/playmat/";
+    public const string DIRECTORY_PATH_TO_RES_SLEEVE = DIRECTORY_PATH_TO_RES + "/sleeve/";
+
 #if UNITY_EDITOR
     public static readonly string DIRECTORY_PATH = "E:/UnityProject/CardGameFramework/data";
 #else
@@ -22,6 +27,11 @@ public class ConstManager
     public static readonly string DIRECTORY_FULL_PATH_TO_LOG = DIRECTORY_PATH + DIRECTORY_PATH_TO_LOG;
     public static readonly string DIRECTORY_FULL_PATH_TO_HELP = DIRECTORY_PATH + DIRECTORY_PATH_TO_HELP;
     public static readonly string DIRECTORY_FULL_PATH_TO_SAMPLEDECK = DIRECTORY_PATH + DIRECTORY_PATH_TO_SAMPLEDECK;
+
+    public static readonly string DIRECTORY_FULL_PATH_TO_RES = DIRECTORY_PATH + DIRECTORY_PATH_TO_RES;
+    public static readonly string DIRECTORY_FULL_PATH_TO_RES_ICON = DIRECTORY_PATH + DIRECTORY_PATH_TO_RES_ICON;
+    public static readonly string DIRECTORY_FULL_PATH_TO_RES_PLAYMAT = DIRECTORY_PATH + DIRECTORY_PATH_TO_RES_PLAYMAT;
+    public static readonly string DIRECTORY_FULL_PATH_TO_RES_SLEEVE = DIRECTORY_PATH + DIRECTORY_PATH_TO_RES_SLEEVE;
 
     public enum PhotonObjectType
     {

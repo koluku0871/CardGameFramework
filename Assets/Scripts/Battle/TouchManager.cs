@@ -154,7 +154,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             }
             else
             {
-                m_image.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                var sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+                m_image.sprite = sleeveSprite;
                 pointerEnterAction = null;
             }
         }
@@ -401,7 +402,8 @@ public class TouchManager : MonoBehaviourPunCallbacks, IBeginDragHandler, IDragH
             {
                 if (cardDetail.option == "IsClose")
                 {
-                    card.sprite = CardDetailManager.Instance().GetSleeveSprite();
+                    var sleeveSprite = CardDetailManager.Instance().GetSleeveSprite();
+                    card.sprite = sleeveSprite;
                 }
             }
 

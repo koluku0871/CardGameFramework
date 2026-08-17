@@ -1,6 +1,7 @@
 ﻿using Photon.Pun;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,8 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     private PhotonView m_photonView = null;
 
     public RectTransform m_rectTransform = null;
+
+    public Image m_background = null;
 
     [SerializeField]
     private Button m_optionButton = null;
@@ -108,6 +111,11 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
     public List<string> m_logList = new List<string>();
 
     private ExitGames.Client.Photon.Hashtable m_customRoomProperties = new ExitGames.Client.Photon.Hashtable();
+
+    public string sleeveName = "";
+    public string playmatName = "";
+
+    public Sprite sleeveSprite = null;
 
     private void Start()
     {
@@ -533,6 +541,33 @@ public class PlayerFieldManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             DeckManager.DeckDetail jsonDeckDetail = JsonUtility.FromJson<DeckManager.DeckDetail>(deckDetailJson);
 
+            // スリーブ設定
+            sleeveName = jsonDeckDetail.sleeveName;
+            if (!string.IsNullOrEmpty(sleeveName) && sleeveName != "no select")
+            {
+                byte[] data = File.ReadAllBytes(
+                    ConstManager.DIRECTORY_FULL_PATH_TO_RES_SLEEVE + sleeveName
+                );
+                Texture2D texture = new Texture2D(2, 2);
+                texture.LoadImage(data);
+                sleeveSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+                m_fieldCardManager.SetSleeveSprite(sleeveSprite);
+            }
+
+            // プレイマット
+            playmatName = jsonDeckDetail.playmatName;
+            if (!string.IsNullOrEmpty(playmatName) && playmatName != "no select")
+            {
+                byte[] data = File.ReadAllBytes(
+                    ConstManager.DIRECTORY_FULL_PATH_TO_RES_PLAYMAT + playmatName
+                );
+                Texture2D texture = new Texture2D(2, 2);
+                texture.LoadImage(data);
+                m_background.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            }
+
+            // フィールド情報初期設定
             m_fieldCardManager.SetDeckDetail(CardOptionWindow.OPTION_TYPE.DECK, jsonDeckDetail.cardDetailList);
             m_fieldCardManager.ShuffleCardDetailList(CardOptionWindow.OPTION_TYPE.DECK);
 

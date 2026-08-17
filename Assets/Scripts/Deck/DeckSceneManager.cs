@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static CoreManager;
-using static DeckManager;
 
 public class DeckSceneManager : MonoBehaviour
 {
+    [SerializeField]
+    private Image m_background = null;
+
+    [SerializeField]
+    private Sprite m_backgroundSprite = null;
+
     [SerializeField]
     private Button m_closeButton = null;
 
@@ -122,6 +127,25 @@ public class DeckSceneManager : MonoBehaviour
     [SerializeField]
     private DeckCardScrollSetup m_favoriteCardScrollSetup = null;
 
+    [Header("サプライ")]
+    [SerializeField]
+    private TMPro.TMP_InputField m_supplyFileNameText = null;
+
+    [SerializeField]
+    private TMPro.TMP_Dropdown m_supplyTypeDropdown = null;
+
+    [SerializeField]
+    private Button m_supplySendButton = null;
+
+    [SerializeField]
+    private TMPro.TMP_Dropdown m_supplyIconDropdown = null;
+
+    [SerializeField]
+    private TMPro.TMP_Dropdown m_supplyPlaymatDropdown = null;
+
+    [SerializeField]
+    private TMPro.TMP_Dropdown m_supplySleeveDropdown = null;
+
     private DeckManager m_deckManager = null;
 
     private List<CardData> cardDatas = new List<CardData>();
@@ -189,6 +213,215 @@ public class DeckSceneManager : MonoBehaviour
             }
             favoriteCardDatas.Add(baseData);
         }
+
+        UpdateSupplyDropDown(true);
+
+        m_supplySleeveDropdown.onValueChanged.AddListener((int value) => {
+            string fileName = Path.GetFileName(m_supplySleeveDropdown.options[m_supplySleeveDropdown.value].text);
+            if (string.IsNullOrEmpty(fileName) || m_supplySleeveDropdown.value < 1)
+            {
+                CardDetailManager.Instance().SetSleeveSprite(null);
+                return;
+            }
+            byte[] data = File.ReadAllBytes(
+                ConstManager.DIRECTORY_FULL_PATH_TO_RES_SLEEVE + fileName
+            );
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            CardDetailManager.Instance().SetSleeveSprite(
+                Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f))
+            );
+        });
+
+        m_supplyPlaymatDropdown.onValueChanged.AddListener((int value) => {
+            string fileName = Path.GetFileName(m_supplyPlaymatDropdown.options[m_supplyPlaymatDropdown.value].text);
+            if (string.IsNullOrEmpty(fileName) || m_supplyPlaymatDropdown.value < 1)
+            {
+                m_background.sprite = m_backgroundSprite;
+                return;
+            }
+            byte[] data = File.ReadAllBytes(
+                ConstManager.DIRECTORY_FULL_PATH_TO_RES_PLAYMAT + fileName
+            );
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            m_background.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        });
+
+        // サプライ設定　新規ファイル送信ボタン　動作設定
+        m_supplySendButton.onClick.AddListener(() => {
+            if (m_supplyTypeDropdown.value > 0 && !string.IsNullOrEmpty(m_supplyFileNameText.text))
+            {
+                string supplyPath = "";
+                switch (m_supplyTypeDropdown.options[m_supplyTypeDropdown.value].text)
+                {
+                    case "Icon":
+                        supplyPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_ICON;
+                        break;
+                    case "Playmat":
+                        supplyPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_PLAYMAT;
+                        break;
+                    case "Sleeve":
+                        supplyPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_SLEEVE;
+                        break;
+                }
+
+                File.Copy(
+                    m_supplyFileNameText.text,
+                    supplyPath + Path.GetFileName(m_supplyFileNameText.text),
+                    true
+                );
+
+                _process = new System.Diagnostics.Process();
+
+                UnityEngine.Debug.Log(ConstManager.DIRECTORY_PATH + "/ResAccess.exe Upload " + m_supplyTypeDropdown.options[m_supplyTypeDropdown.value].text + " " + m_supplyFileNameText.text);
+
+                // プロセスを起動するときに使用する値のセットを指定
+                _process.StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = ConstManager.DIRECTORY_PATH + "/ResAccess.exe",
+                    Arguments = " Upload " + m_supplyTypeDropdown.options[m_supplyTypeDropdown.value].text + " " + m_supplyFileNameText.text,
+                    UseShellExecute = false,
+                    WorkingDirectory = ConstManager.DIRECTORY_PATH,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                };
+
+                _process.EnableRaisingEvents = true;
+                _process.Exited += DisposeSupplyProcess;
+
+                _process.Start();
+                _process.BeginOutputReadLine();
+
+                m_supplySendButton.enabled = false;
+            }
+        });
+    }
+
+    private System.Diagnostics.Process _process;
+
+    private void DisposeSupplyProcess(object sender, EventArgs e)
+    {
+        if (_process == null || _process.HasExited) return;
+
+        _process.StandardInput.Close();
+        _process.CloseMainWindow();
+        _process.Dispose();
+        _process = null;
+
+        m_supplySendButton.enabled = true;
+
+        UpdateSupplyDropDown(true);
+    }
+
+    public void UpdateSupplyDropDown(bool isInit = false, string iconPath = "", string playmatPath = "", string sleevePath = "")
+    {
+        string directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_ICON;
+        string[] files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories);
+        int value = m_supplyIconDropdown.value;
+        if (isInit)
+        {
+            value = -1;
+        }
+        m_supplyIconDropdown.ClearOptions();
+        m_supplyIconDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+        {
+            text = "no select"
+        });
+        for (int index = 0; index < files.Length; index++)
+        {
+            byte[] data = File.ReadAllBytes(files[index]);
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            m_supplyIconDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+            {
+                text = Path.GetFileName(files[index]),
+                image = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f))
+            });
+
+            if (!string.IsNullOrEmpty(iconPath) && iconPath == Path.GetFileName(files[index]))
+            {
+                UnityEngine.Debug.LogError(iconPath);
+                value = m_supplyIconDropdown.options.Count - 1;
+            }
+        }
+        m_supplyIconDropdown.value = value;
+
+        directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_PLAYMAT;
+        files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories);
+        value = m_supplyPlaymatDropdown.value;
+        if (isInit)
+        {
+            value = -1;
+        }
+        m_supplyPlaymatDropdown.ClearOptions();
+        m_supplyPlaymatDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+        {
+            text = "no select"
+        });
+        for (int index = 0; index < files.Length; index++)
+        {
+            byte[] data = File.ReadAllBytes(files[index]);
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            m_supplyPlaymatDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+            {
+                text = Path.GetFileName(files[index]),
+                image = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f))
+            });
+
+            if (!string.IsNullOrEmpty(playmatPath) && playmatPath == Path.GetFileName(files[index]))
+            {
+                UnityEngine.Debug.LogError(playmatPath);
+                value = m_supplyPlaymatDropdown.options.Count - 1;
+            }
+        }
+        m_supplyPlaymatDropdown.value = value;
+
+        directoryPath = ConstManager.DIRECTORY_FULL_PATH_TO_RES_SLEEVE;
+        files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories);
+        value = m_supplySleeveDropdown.value;
+        if (isInit)
+        {
+            value = -1;
+        }
+        m_supplySleeveDropdown.ClearOptions();
+        m_supplySleeveDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+        {
+            text = "no select"
+        });
+        for (int index = 0; index < files.Length; index++)
+        {
+            byte[] data = File.ReadAllBytes(files[index]);
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(data);
+            m_supplySleeveDropdown.options.Add(new TMPro.TMP_Dropdown.OptionData()
+            {
+                text = Path.GetFileName(files[index]),
+                image = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f))
+            });
+
+            if (!string.IsNullOrEmpty(sleevePath) && sleevePath == Path.GetFileName(files[index]))
+            {
+                UnityEngine.Debug.LogError(sleevePath);
+                value = m_supplySleeveDropdown.options.Count - 1;
+            }
+        }
+        m_supplySleeveDropdown.value = value;
+    }
+
+    public string GetSupplyIconName()
+    {
+        return Path.GetFileName(m_supplyIconDropdown.options[m_supplyIconDropdown.value].text);
+    }
+    public string GetSupplyPlaymatName()
+    {
+        return Path.GetFileName(m_supplyPlaymatDropdown.options[m_supplyPlaymatDropdown.value].text);
+    }
+    public string GetSupplySleeveName()
+    {
+        return Path.GetFileName(m_supplySleeveDropdown.options[m_supplySleeveDropdown.value].text);
     }
 
     public ToggleGroup GetDeckSelectToggleGroup()
@@ -479,7 +712,7 @@ public class DeckSceneManager : MonoBehaviour
             string fileName = packNameList[i];
             string name = fileName;
             string targetTag = key;
-            Debug.Log("key :" + key + ", fileName : " + fileName);
+            UnityEngine.Debug.Log("key :" + key + ", fileName : " + fileName);
             if (isAll)
             {
                 targetTag = fileName.Split("*")[0];
@@ -1025,4 +1258,54 @@ public class DeckSceneManager : MonoBehaviour
 
         m_favoriteCardCountText.text = "お気に入り枚数：" + favoriteCardDatas.Count;
     }
+
+    private Process m_openFileProcess = null;
+
+    public void OpenExistFile()
+    {
+        m_openFileProcess = new Process();
+
+        // プロセスを起動するときに使用する値のセットを指定
+        string path = ConstManager.DIRECTORY_PATH + "/ResAccess.exe";
+        m_openFileProcess.StartInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = path,
+            Arguments = " OpenFile" + " ファイル選択ダイアログ " + ConstManager.DIRECTORY_PATH,
+            UseShellExecute = false,
+            WorkingDirectory = ConstManager.DIRECTORY_PATH,
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            CreateNoWindow = true,
+        };
+
+        m_openFileProcess.OutputDataReceived += new DataReceivedEventHandler((object sender, DataReceivedEventArgs e) =>
+        {
+            if (string.IsNullOrEmpty(e.Data) || e.Data == "非選択")
+            {
+                m_supplyFileNameText.text = "";
+                m_supplyFileNameText.ForceLabelUpdate();
+                return;
+            }
+
+            m_supplyFileNameText.text = e.Data;
+            m_supplyFileNameText.ForceLabelUpdate();
+        });
+
+        m_openFileProcess.EnableRaisingEvents = true;
+        m_openFileProcess.Exited += DisposeProcess;
+
+        m_openFileProcess.Start();
+        m_openFileProcess.BeginOutputReadLine();
+    }
+
+    private void DisposeProcess(object sender, EventArgs e)
+    {
+        if (m_openFileProcess == null || m_openFileProcess.HasExited) return;
+
+        m_openFileProcess.StandardInput.Close();
+        m_openFileProcess.CloseMainWindow();
+        m_openFileProcess.Dispose();
+        m_openFileProcess = null;
+    }
 }
+    
